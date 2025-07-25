@@ -150,7 +150,7 @@ export function SearchContainer({
           </SearchFormContainer>
         )}
       </PageContainer>
-      <NftManagerActor><Grid dataSource={dataSource} /></NftManagerActor>
+      <Grid dataSource={dataSource} />
       {showMoreEnabled && transactions.length > 0 && (
         <div className="flex justify-center mt-6 mb-8">
           <Button

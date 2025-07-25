@@ -34,6 +34,8 @@
 
     "generate": "dfx generate alex_backend",
 
+    "typecheck": "tsc --noEmit",
+
     "test": "jest",
 
     "test:watch": "jest --watch",
@@ -126,7 +128,9 @@
 
     "@tanstack/react-query": "^5.62.8",
 
-    "@tanstack/react-router": "^1.120.15",
+    "@tanstack/react-query-devtools": "^5.83.0",
+
+    "@tanstack/react-router": "^1.129.8",
 
     "@tanstack/react-router-devtools": "^1.120.16",
 
@@ -238,9 +242,15 @@
 
     "react-instantsearch-dom": "^6.40.4",
 
+    "react-lazy-load-image-component": "^1.6.3",
+
     "react-markdown": "^9.1.0",
 
     "react-paginate": "^8.2.0",
+
+    "react-pdf": "^10.0.1",
+
+    "react-plock": "^3.5.1",
 
     "react-qr-code": "^2.0.15",
 
@@ -254,6 +264,8 @@
 
     "react-viewer": "^3.2.2",
 
+    "react-zoom-pan-pinch": "^3.7.0",
+
     "remark-gfm": "^4.0.1",
 
     "root": "github:tanstack/react-virtual",
@@ -263,6 +275,8 @@
     "styled-components": "^6.1.13",
 
     "swiper": "^11.1.12",
+
+    "swr": "^2.3.4",
 
     "tailwind-merge": "^2.5.3",
 
@@ -333,6 +347,8 @@
     "@types/react-dom": "^19.1.6",
 
     "@types/react-instantsearch-dom": "^6.12.8",
+
+    "@types/react-lazy-load-image-component": "^1.6.4",
 
     "@types/react-responsive-masonry": "^2.1.3",
 

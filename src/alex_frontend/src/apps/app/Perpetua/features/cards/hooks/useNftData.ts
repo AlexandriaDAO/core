@@ -12,7 +12,6 @@ import { convertE8sToToken } from '@/apps/Modules/shared/utils/tokenUtils';
 import { createTokenAdapter, determineTokenType, TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
 import { NFTData } from '@/apps/Modules/shared/types/nft';
 import { natToArweaveId } from '@/utils/id_convert';
-import { fetchAssetFromUserCanister } from '@/apps/Modules/shared/state/assetManager/assetManagerThunks';
 import { fetchTransactionsByIds } from '@/apps/Modules/LibModules/arweaveSearch/api/directArweaveClient';
 import { Transaction as ArweaveTransaction } from '@/apps/Modules/shared/types/queries';
 import { ContentUrlInfo, CachedContent } from '@/apps/Modules/LibModules/contentDisplay/types';
@@ -22,6 +21,8 @@ const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
 export const useNftData = (tokenId: string | undefined) => {
   const hookStartTime = performance.now();
+  
+  console.log(`[useNftData] HOOK CALLED with tokenId: ${tokenId}`);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -61,23 +62,19 @@ export const useNftData = (tokenId: string | undefined) => {
   });
 
   // --- Derived values ---
-  const tokenType: TokenType | null = useMemo(() => tokenId ? determineTokenType(tokenId) : null, [tokenId]);
+  const tokenType: TokenType | null = useMemo(() => {
+    const type = tokenId ? determineTokenType(tokenId) : null;
+    console.log(`[useNftData ${tokenId}] Token type determined: ${type}`);
+    return type;
+  }, [tokenId]);
   
-  let mounted = true;
-
-  useEffect(() => {
-    mounted = true;
-    return () => {
-      mounted = false;
-      const hookEndTime = performance.now();
-      console.log(`[BENCH] useNftData_TOTAL_DURATION: ${tokenId || 'undefined'} - ${(hookEndTime - hookStartTime).toFixed(2)}ms`);
-    };
-  }, [tokenId, hookStartTime]);
-
-
   // Effect for deriving Arweave ID and then loading everything
   useEffect(() => {
+    let mounted = true;
+    console.log(`[useNftData ${tokenId}] useEffect triggered - tokenId: ${tokenId}, tokenType: ${tokenType}`);
+    
     if (!tokenId || !tokenType) {
+      console.log(`[useNftData ${tokenId}] Early exit - tokenId: ${!!tokenId}, tokenType: ${!!tokenType}`);
       if (mounted) {
         setIsNftDetailsLoading(false);
         setIsAssetLoading(false);
@@ -146,8 +143,19 @@ export const useNftData = (tokenId: string | undefined) => {
       }
 
       // 2. Load Owner
-      let currentOwner: Principal | null = ownerPrincipal;
-      if (!currentOwner || (nftStaticDataFromCache?.principal && nftStaticDataFromCache.principal !== currentOwner.toText())) {
+      let currentOwner: Principal | null = null;
+      
+      // First check if we have cached owner data
+      if (nftStaticDataFromCache?.principal) {
+        currentOwner = Principal.fromText(nftStaticDataFromCache.principal);
+        console.log(`[useNftData ${tokenId}] Using owner from cache: ${currentOwner.toString()}`);
+      } else if (ownerPrincipal) {
+        currentOwner = ownerPrincipal;
+        console.log(`[useNftData ${tokenId}] Using owner from state: ${currentOwner.toString()}`);
+      }
+      
+      // Only fetch owner if we don't have it
+      if (!currentOwner) {
         if (mounted) setIsOwnerLoading(true);
         try {
           console.log(`[useNftData ${tokenId}] Fetching owner...`);
@@ -168,60 +176,160 @@ export const useNftData = (tokenId: string | undefined) => {
         } finally {
           if (mounted) setIsOwnerLoading(false);
         }
-      }  else if (currentOwner) {
-         console.log(`[useNftData ${tokenId}] Using owner from state: ${currentOwner.toString()}`);
       }
 
 
       // 3. Attempt to load from ICP Asset Canister
       let assetLoadedFromICP = false;
-      if (currentOwner && localDerivedArweaveId && !authCanisterMapLoading) {
+      if (currentOwner && localDerivedArweaveId && allUserAssetCanistersMap) {
           const ownerText = currentOwner.toText();
-          const userAssetCanisterIdString = allUserAssetCanistersMap?.[ownerText];
+          const userAssetCanisterIdString = allUserAssetCanistersMap[ownerText];
+          console.log(`[useNftData ${tokenId}] Owner: ${ownerText}, Asset canisters available: ${Object.keys(allUserAssetCanistersMap).length}, Has canister: ${!!userAssetCanisterIdString}`);
           
           if (userAssetCanisterIdString) {
               console.log(`[useNftData ${tokenId}] User ${ownerText} has asset canister ${userAssetCanisterIdString}. Attempting ICP load for /arweave/${localDerivedArweaveId}`);
               const icpLoadAttemptStart = performance.now();
-              try {
-                  const result = await fetchAssetFromUserCanister(localDerivedArweaveId, userAssetCanisterIdString);
-
-                  if (result?.blob && mounted) {
-                      const objectURL = URL.createObjectURL(result.blob);
-                      const icpUrls: ContentUrlInfo = {
-                          thumbnailUrl: null,
-                          coverUrl: null,
-                          fullUrl: objectURL,
-                      };
-                      setAssetContentUrls(icpUrls);
-                      setAssetSource('ic_canister');
-                      const contentDataItem: ContentDataItem = {
-                          url: objectURL,
-                          textContent: null,
-                          imageObjectUrl: objectURL,
-                          thumbnailUrl: null,
-                          error: null,
-                          data: result.blob,
-                          source: 'ic_canister',
-                          contentType: result.blob.type,
-                          urls: icpUrls
-                      };
-                      dispatch(setContentData({ id: localDerivedArweaveId, content: contentDataItem }));
-                      console.log(`[useNftData ${tokenId}] SUCCESS: Asset ${localDerivedArweaveId} loaded from ICP canister ${userAssetCanisterIdString}.`);
-                      assetLoadedFromICP = true;
-                      if (mounted) setIsAssetLoading(false);
-                      if (mounted) setError(null);
-                  } else if (mounted) {
-                      console.log(`[useNftData ${tokenId}] Asset ${localDerivedArweaveId} NOT found in ICP canister ${userAssetCanisterIdString}.`);
+              
+              // Helper function to attempt ICP fetch with timeout and retries
+              const fetchWithRetry = async (url: string, maxRetries = 2, timeoutMs = 10000): Promise<Response> => {
+                  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                      console.log(`[useNftData ${tokenId}] ICP fetch attempt ${attempt}/${maxRetries}: ${url}`);
+                      
+                      let timeoutId: NodeJS.Timeout | undefined;
+                      
+                      try {
+                          const controller = new AbortController();
+                          timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                          
+                          const response = await fetch(url, {
+                              signal: controller.signal,
+                              cache: 'no-cache', // Prevent aggressive caching that might cause inconsistencies
+                              headers: {
+                                  'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                  'Pragma': 'no-cache'
+                              }
+                          });
+                          
+                          clearTimeout(timeoutId);
+                          console.log(`[useNftData ${tokenId}] ICP fetch attempt ${attempt} response: ${response.status} ${response.statusText}`);
+                          
+                          if (response.ok) {
+                              return response;
+                          } else if (response.status === 404) {
+                              // Don't retry 404s - asset doesn't exist
+                              throw new Error(`Asset not found (404): ${url}`);
+                          } else if (attempt === maxRetries) {
+                              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                          }
+                          // For other errors (5xx, network issues), continue to retry
+                          console.warn(`[useNftData ${tokenId}] ICP fetch attempt ${attempt} failed with ${response.status}, retrying...`);
+                          
+                      } catch (error: any) {
+                          if (timeoutId) {
+                              clearTimeout(timeoutId);
+                          }
+                          if (error.name === 'AbortError') {
+                              console.warn(`[useNftData ${tokenId}] ICP fetch attempt ${attempt} timed out after ${timeoutMs}ms`);
+                          } else if (error.message.includes('404')) {
+                              throw error; // Don't retry 404s
+                          }
+                          
+                          if (attempt === maxRetries) {
+                              throw error;
+                          }
+                          
+                          console.warn(`[useNftData ${tokenId}] ICP fetch attempt ${attempt} error:`, error.message, '- retrying...');
+                          // Brief delay before retry
+                          await new Promise(resolve => setTimeout(resolve, 500 * attempt));
+                      }
                   }
-              } catch (icpError) {
-                  console.warn(`[useNftData ${tokenId}] Error fetching asset ${localDerivedArweaveId} from ICP canister ${userAssetCanisterIdString}:`, icpError);
+                  throw new Error('All retry attempts failed');
+              };
+              
+              try {
+                  // Use the same URL construction approach as useInit.ts
+                  const isLocal = process.env.DFX_NETWORK == "local";
+                  const baseUrl = isLocal ? `http://${userAssetCanisterIdString}.localhost:4943` : `https://${userAssetCanisterIdString}.raw.icp0.io`;
+                  const canisterAssetUrl = `${baseUrl}/arweave/${localDerivedArweaveId}`;
+
+                  console.log(`[useNftData ${tokenId}] Attempting to fetch: ${canisterAssetUrl}`);
+                  const response = await fetchWithRetry(canisterAssetUrl);
+                  
+                  if (!mounted) {
+                      console.log(`[useNftData ${tokenId}] Component unmounted during ICP fetch, aborting`);
+                      return;
+                  }
+                  
+                  const contentType = response.headers.get('Content-Type') ?? undefined;
+                  const contentLength = response.headers.get('Content-Length');
+                  console.log(`[useNftData ${tokenId}] ICP response headers - Content-Type: ${contentType}, Content-Length: ${contentLength}`);
+                  
+                  const blob = await response.blob();
+                  console.log(`[useNftData ${tokenId}] ICP blob created - size: ${blob.size} bytes, type: ${blob.type}`);
+                  
+                  if (blob.size === 0) {
+                      throw new Error('Received empty blob from ICP canister');
+                  }
+                  
+                  const objectUrl = URL.createObjectURL(blob);
+                  console.log(`[useNftData ${tokenId}] ICP object URL created: ${objectUrl}`);
+                  
+                  const icpUrls: ContentUrlInfo = {
+                      thumbnailUrl: null,
+                      coverUrl: null,
+                      fullUrl: objectUrl,
+                  };
+                  setAssetContentUrls(icpUrls);
+                  setAssetSource('ic_canister');
+                  
+                  // Create a minimal transaction object for ICP-loaded content
+                  const icpTransaction: ArweaveTransaction = {
+                      id: localDerivedArweaveId,
+                      owner: currentOwner.toText(),
+                      tags: []
+                  };
+                  setCurrentArweaveTx(icpTransaction);
+                  
+                  // For text content, extract the text
+                  let textContent = null;
+                  if (contentType?.includes('text/') || contentType?.includes('application/json')) {
+                      textContent = await blob.text();
+                      console.log(`[useNftData ${tokenId}] ICP text content extracted - length: ${textContent?.length || 0} chars`);
+                  }
+                  
+                  const contentDataItem: ContentDataItem = {
+                      url: canisterAssetUrl,
+                      textContent: textContent,
+                      imageObjectUrl: objectUrl,
+                      thumbnailUrl: null,
+                      error: null,
+                      data: blob,
+                      source: 'ic_canister',
+                      contentType: contentType,
+                      urls: icpUrls
+                  };
+                  dispatch(setContentData({ id: localDerivedArweaveId, content: contentDataItem }));
+                  console.log(`[useNftData ${tokenId}] SUCCESS: Asset ${localDerivedArweaveId} loaded from ICP canister ${userAssetCanisterIdString} (${contentType}, ${blob.size} bytes).`);
+                  assetLoadedFromICP = true;
+                  
+                  if (mounted) {
+                      setIsAssetLoading(false);
+                      setIsNftDetailsLoading(false);
+                      setError(null);
+                  }
+                  
+              } catch (icpError: any) {
+                  console.error(`[useNftData ${tokenId}] FAILED: Error fetching asset ${localDerivedArweaveId} from ICP canister ${userAssetCanisterIdString}:`, {
+                      error: icpError.message,
+                      stack: icpError.stack,
+                      name: icpError.name
+                  });
+                  // Don't set error state here - let it fall back to Arweave
               }
               console.log(`[BENCH] ICP_LOAD_ATTEMPT: ${localDerivedArweaveId} for token ${tokenId} - ${assetLoadedFromICP ? 'success' : 'failed_or_not_found'} - ${(performance.now() - icpLoadAttemptStart).toFixed(2)}ms`);
           } else {
               console.log(`[useNftData ${tokenId}] No asset canister found for owner ${ownerText}. Skipping ICP asset check.`);
           }
-      } else if (authCanisterMapLoading) {
-          console.log(`[useNftData ${tokenId}] Waiting for authCanisterMap to check ICP.`);
       }
 
 
@@ -230,7 +338,10 @@ export const useNftData = (tokenId: string | undefined) => {
         console.log(`[useNftData ${tokenId}] Proceeding to Arweave fallback for ${localDerivedArweaveId}.`);
         const arweaveFallbackStart = performance.now();
         if (mounted) setAssetSource('arweave');
-        let txToProcess = arweaveTxFromCache;
+        
+        // Get fresh data from Redux store inside the effect
+        const currentArweaveTxFromCache = arweaveTxFromCache;
+        let txToProcess = currentArweaveTxFromCache;
 
         if (!txToProcess) {
             console.log(`[useNftData ${tokenId}] Arweave metadata for ${localDerivedArweaveId} not in Redux cache. Fetching...`);
@@ -262,11 +373,16 @@ export const useNftData = (tokenId: string | undefined) => {
         }
         
         if (txToProcess && mounted) {
-            const existingContent = contentItemFromCache;
+            // Get fresh content data from Redux store inside the effect
+            const currentContentItemFromCache = contentItemFromCache;
+            const existingContent = currentContentItemFromCache;
             if (existingContent && existingContent.source === 'arweave' && existingContent.urls) {
                  console.log(`[useNftData ${tokenId}] Arweave content for ${localDerivedArweaveId} already in Redux contentData cache (likely from previous direct load).`);
                  setAssetContentUrls(existingContent.urls);
-                 if (mounted) setIsAssetLoading(false);
+                 if (mounted) {
+                     setIsAssetLoading(false);
+                     setIsNftDetailsLoading(false);
+                 }
             } else {
                 console.log(`[useNftData ${tokenId}] Loading Arweave content for ${localDerivedArweaveId} (direct)...`);
                 const arweaveContentLoadStart = performance.now();
@@ -282,7 +398,8 @@ export const useNftData = (tokenId: string | undefined) => {
                         };
                         dispatch(setContentData({ id: localDerivedArweaveId, content: contentDataItem }));
                         console.log(`[useNftData ${tokenId}] Arweave content for ${localDerivedArweaveId} prepared for direct display.`);
-                        if (mounted) setError(null);
+                        setError(null);
+                        setIsNftDetailsLoading(false);
                     }
                     console.log(`[BENCH] ARWEAVE_CONTENT_PREPARATION: ${localDerivedArweaveId} - success - ${(performance.now() - arweaveContentLoadStart).toFixed(2)}ms`);
                 } catch (contentError: any) {
@@ -293,15 +410,20 @@ export const useNftData = (tokenId: string | undefined) => {
                         handleRenderError(localDerivedArweaveId); 
                     }
                 } finally {
-                    if (mounted) setIsAssetLoading(false);
+                    if (mounted) {
+                        setIsAssetLoading(false);
+                        setIsNftDetailsLoading(false);
+                    }
                 }
             }
         } else if (!txToProcess && mounted) {
-             setIsAssetLoading(false); 
+             setIsAssetLoading(false);
+             setIsNftDetailsLoading(false);
         }
         console.log(`[BENCH] ARWEAVE_FALLBACK_PROCESSING: Token ${tokenId} - ${(performance.now() - arweaveFallbackStart).toFixed(2)}ms`);
       } else if (assetLoadedFromICP && mounted) {
         setIsAssetLoading(false);
+        setIsNftDetailsLoading(false);
       }
 
 
@@ -360,21 +482,16 @@ export const useNftData = (tokenId: string | undefined) => {
     deriveAndLoad();
     
     return () => {
-    }
+      mounted = false;
+      // Clean up any object URLs to prevent memory leaks
+      if (assetContentUrls?.fullUrl && assetContentUrls.fullUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(assetContentUrls.fullUrl);
+      }
+      const hookEndTime = performance.now();
+      console.log(`[BENCH] useNftData_TOTAL_DURATION: ${tokenId || 'undefined'} - ${(hookEndTime - hookStartTime).toFixed(2)}ms`);
+    };
 
-  }, [
-    tokenId, 
-    tokenType, 
-    dispatch, 
-    allUserAssetCanistersMap, 
-    authCanisterMapLoading,    
-    nftStaticDataFromCache?.arweaveId, 
-    nftStaticDataFromCache?.principal, 
-    nftStaticDataFromCache?.balances,  
-    ownerPrincipal, 
-    contentItemFromCache,
-    arweaveTxFromCache
-  ]);
+  }, [tokenId, tokenType]);
 
 
   const handleRenderError = (transactionId?: string) => {
@@ -382,22 +499,16 @@ export const useNftData = (tokenId: string | undefined) => {
     if (idToClear) {
         console.warn(`[useNftData ${tokenId}] Render error encountered for ${idToClear}. Clearing from Redux.`);
         dispatch(clearTransactionContent(idToClear));
-        if(mounted) {
-            setError("Asset rendering error. Cleared data. Please try refreshing or check console.");
-            setIsAssetLoading(false);
-            setAssetContentUrls(null);
-        }
+        setError("Asset rendering error. Cleared data. Please try refreshing or check console.");
+        setIsAssetLoading(false);
+        setAssetContentUrls(null);
     }
   };
   
   const finalContentItem = contentItemFromCache || (derivedArweaveId ? { id: derivedArweaveId, urls: assetContentUrls, source: assetSource } : null);
 
-  const trulyLoading = isNftDetailsLoading || isAssetLoading || isOwnerLoading || isBalanceLoading || 
-    (authCanisterMapLoading && 
-      (!ownerPrincipal || 
-        (allUserAssetCanistersMap && !allUserAssetCanistersMap.hasOwnProperty(ownerPrincipal.toText())) || !allUserAssetCanistersMap
-      )
-    );
+  // Simplified loading state logic - just check if any loading state is true
+  const trulyLoading = isNftDetailsLoading || isAssetLoading || isOwnerLoading || isBalanceLoading;
 
   return {
     isLoading: trulyLoading,

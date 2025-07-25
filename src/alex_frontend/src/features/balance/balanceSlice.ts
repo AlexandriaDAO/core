@@ -131,8 +131,18 @@ export const { clearError, setLastRefresh, setLoading, setTotal, setBurnable } =
 
 // Create a custom root reducer that combines the main slice with sub-feature slices
 const balanceReducer = (state: any = {}, action: any) => {
-  // First get the state from the main balance slice
-  const mainState = balanceSlice.reducer(state, action);
+  // Check if this is the initial empty state
+  const isInitialState = Object.keys(state).length === 0;
+  
+  // Extract the main state properties (excluding nested reducers)
+  const { icp, alex, lbry, ...mainStateProps } = state;
+  
+  // For initial state, pass undefined to get proper initial values
+  // Otherwise, pass the current main state props
+  const mainState = balanceSlice.reducer(
+    isInitialState ? undefined : mainStateProps, 
+    action
+  );
 
   // Then get states from the sub-slices
   const icpState = icpReducer(state?.icp, action);

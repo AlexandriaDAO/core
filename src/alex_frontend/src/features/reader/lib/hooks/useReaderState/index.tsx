@@ -124,30 +124,52 @@ export const useReaderState = (): IReaderState => {
 	useEffect(() => {
 		if (!book || !book.isOpen) return;
 
-		setChapters(book.navigation.toc);
+		// Check if navigation and toc exist before setting
+		if (book.navigation && book.navigation.toc) {
+			setChapters(book.navigation.toc);
+		} else {
+			// Set default empty array if navigation or toc is not available
+			setChapters([]);
+		}
 	}, [book, setChapters]);
 
 	useEffect(() => {
 		if (book && book.isOpen && isLoaded && renderLocation.current) {
+			// Additional validation before creating rendition
+			if (!book.packaging || !book.packaging.manifest) {
+				console.error("Cannot create rendition: Book missing package information");
+				return;
+			}
+
 			const node = renderLocation.current as HTMLDivElement;
-			// const width = window.getComputedStyle(node).getPropertyValue('width')
-			const newRendition = book.renderTo(node, {
-				width: "100%",
-				height: "100%",
-			});
 
-			rendition.current = newRendition;
+			try {
+				const newRendition = book.renderTo(node, {
+					width: "100%",
+					height: "100%",
+				});
 
-			// let location = newRendition.location;
-			// // display
-			// console.log(newRendition.location);
-			newRendition.display(newRendition.location?.start.cfi);
+				rendition.current = newRendition;
 
-			newRendition.on('rendered', ()=>{
-				setCurrentLocation(newRendition.location);
+				// Display with error handling
+				const startCfi = newRendition.location?.start?.cfi;
+				newRendition.display(startCfi).catch((err) => {
+					console.warn("Error displaying initial location:", err);
+					// Try to display from the beginning
+					newRendition.display();
+				});
 
-				setFirstPageLoaded(true);
-			})
+				newRendition.on('rendered', ()=>{
+					setCurrentLocation(newRendition.location);
+					setFirstPageLoaded(true);
+				});
+
+				newRendition.on('displayError', (error:any) => {
+					console.error("Rendition load error:", error);
+				});
+			} catch (error) {
+				console.error("Error creating rendition:", error);
+			}
 		}
 	}, [isLoaded]);
 
@@ -201,9 +223,22 @@ export const useReaderState = (): IReaderState => {
 				newBook
 					.ready
 					.then(() => {
+						// Validate that the book has essential package information
+						if (!newBook.packaging || !newBook.packaging.manifest) {
+							throw new Error("Invalid EPUB: Missing package information");
+						}
+
+						// Check if navigation exists before proceeding
+						if (!newBook.navigation || !newBook.navigation.toc) {
+							console.warn("EPUB missing navigation or toc");
+						}
+
 						newBook.loaded.metadata.then(metadata=>setMetadata(metadata))
 
-						newBook.coverUrl().then(url=>setCoverUrl(url))
+						newBook.coverUrl().then(url=>setCoverUrl(url)).catch(() => {
+							console.warn("Could not load cover URL");
+							setCoverUrl(null);
+						})
 
 						setIsLoaded(true);
 						setBook(newBook);
@@ -220,6 +255,13 @@ export const useReaderState = (): IReaderState => {
 						localStorage.setItem(newBook.key() + '-locations', newBook.locations.save());
 					}).catch((err) => {
 						console.log('Error while saving locations in localstorage',err);
+					})
+					.catch((err) => {
+						console.error('Error loading EPUB:', err);
+						// Don't set the book if there's an error
+						setIsLoaded(false);
+						setBook(null);
+						// You could also set an error state here if you have one
 					});
 			}
 		};

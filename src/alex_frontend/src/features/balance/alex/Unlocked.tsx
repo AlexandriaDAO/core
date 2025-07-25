@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { LoaderCircle, LockOpen, RotateCw, ArrowUpFromLine, DollarSign, TriangleAlert } from 'lucide-react';
@@ -8,19 +8,21 @@ import { Link } from "@tanstack/react-router";
 import fetchUnlockedAlex from './thunks/unlocked';
 import fetchAlexPrice from './thunks/price';
 import Withdraw from './components/Withdraw';
+import { useIcpSwapFactory } from '@/hooks/actors';
 
 interface AlexUnlockedBalanceProps {
   menu?: boolean;
 }
 
 const AlexUnlockedBalance: React.FC<AlexUnlockedBalanceProps> = ({ menu }) => {
+  const {actor} = useIcpSwapFactory()
   const dispatch = useAppDispatch();
   const { unlocked, unlockedLoading, price, priceLoading } = useAppSelector((state) => state.balance.alex);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     dispatch(fetchUnlockedAlex());
-    dispatch(fetchAlexPrice());
-  };
+    if(actor) dispatch(fetchAlexPrice(actor));
+  }, [actor]);
 
   if (menu) {
     return (

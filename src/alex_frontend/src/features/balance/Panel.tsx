@@ -20,8 +20,10 @@ import fetchAlexPrice from './alex/thunks/price';
 import fetchUnlockedLbry from './lbry/thunks/unlocked';
 import fetchLockedLbry from './lbry/thunks/locked';
 import { AlexActor, IcpLedgerActor, LbryActor, NftManagerActor } from '@/actors';
+import { useIcpSwapFactory } from '@/hooks/actors';
 
 const BalancePanel = () => {
+    const {actor} = useIcpSwapFactory();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
 
@@ -35,11 +37,11 @@ const BalancePanel = () => {
         dispatch(fetchIcpPrice());
         dispatch(fetchUnlockedAlex());
         dispatch(fetchLockedAlex());
-        dispatch(fetchAlexPrice());
+        if(actor) dispatch(fetchAlexPrice(actor));
         dispatch(fetchUnlockedLbry());
         dispatch(fetchLockedLbry());
         dispatch(setLastRefresh());
-    }, [dispatch]);
+    }, [actor]);
 
     useEffect(() => {
         refresh();

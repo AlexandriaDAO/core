@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import NftsPageSkeleton from '@/layouts/skeletons/emporium/NftsPageSkeleton';
+import EmporiumPageSkeleton from '@/layouts/skeletons/emporium/EmporiumPageSkeleton';
 import getMyTokens from '@/features/imporium/nfts/thunks/getMyTokens';
 import { store } from '@/store';
 
@@ -14,7 +14,7 @@ const Route = createFileRoute('/_auth/app/imporium/nfts')({
     }
     return false;
   },
-  pendingComponent: NftsPageSkeleton,
+  pendingComponent: EmporiumPageSkeleton,
 })
 
 

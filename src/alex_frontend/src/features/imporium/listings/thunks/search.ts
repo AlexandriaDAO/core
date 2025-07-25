@@ -5,24 +5,20 @@ import { emporium } from "../../../../../../declarations/emporium/index";
 import LedgerService from "@/utils/LedgerService";
 
 const search = createAsyncThunk<
-	Listing, // Return structure
+	Listing,
 	string,
 	{ rejectValue: string }
 >(
 	"imporium/listings/search",
 	async (query, { rejectWithValue }) => {
 		try {
+			const listings: Listing = {};
+
 			const result = await emporium.search_listing(query);
 
-			if (result.length === 0) {
-				return rejectWithValue("No nfts found");
-			}
+			if (result.length === 0) return listings;
 
 			const ledgerService = LedgerService();
-
-
-			// Process retrieved NFTs
-			const listings: Listing = {};
 
 			result.forEach(([tokenId, nft]) => {
 				if ( nft?.token_id !== undefined && nft?.price !== undefined && nft?.owner !== undefined) {
@@ -37,10 +33,6 @@ const search = createAsyncThunk<
 					listings[arweaveId] = listItem;
 				}
 			});
-
-			if (Object.keys(listings).length === 0) {
-				return rejectWithValue("No nfts found");
-			}
 
 			return listings;
 		} catch (error) {

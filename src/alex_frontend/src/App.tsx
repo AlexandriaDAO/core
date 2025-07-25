@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import ReduxProvider from "./providers/ReduxProvider";
 
@@ -18,15 +18,28 @@ import UserProvider from "./providers/UserProvider";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import ActorProvider from "./providers/ActorProvider";
 import IdentityProvider from "./providers/IdentityProvider";
+import NsfwProvider from "./providers/NsfwProvider";
 import ErrorFallback from "./components/fallbacks/ErrorFallback";
 
 
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { routeTree } from "@/routeTree.gen";
+import { SWRConfig } from 'swr';
+import ContentLoadingSpinner from "./components/ContentLoadingSpinner";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+
+
+// Create a client
+const queryClient = new QueryClient()
 
 // Create a new router instance
-const router = createRouter({ routeTree })
+const router = createRouter({
+  routeTree,
+  defaultPendingComponent: ContentLoadingSpinner,
+  defaultPendingMs: 0,          // Show immediately
+  defaultPendingMinMs: 0        // Keep visible for 0ms minimum
+})
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {
@@ -36,7 +49,13 @@ declare module '@tanstack/react-router' {
 }
 
 // Subscribe to events
-router.subscribe('onBeforeLoad', ({pathChanged}) => pathChanged && NProgress.start())
+router.subscribe('onBeforeLoad', ({pathChanged}) => {
+    if (pathChanged) {
+        NProgress.start();
+        // TanStack Query automatically handles request cancellation on route changes
+        // Both SWR and TanStack Query caches are preserved for performance benefits
+    }
+});
 router.subscribe('onLoad', () => NProgress.done())
 
 export default function App() {
@@ -62,18 +81,33 @@ export default function App() {
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-                <ReduxProvider>
-                    <IdentityProvider>
-                        <AuthProvider>
-                            <ActorProvider>
-                               <UserProvider>
-                                    {/* <AppRoutes /> */}
-                                    <RouterProvider router={router} />
-                                </UserProvider>
-                            </ActorProvider>
-                        </AuthProvider>
-                    </IdentityProvider>
-                </ReduxProvider>
+                 <QueryClientProvider client={queryClient}>
+                    <SWRConfig
+                        value={{
+                            revalidateOnFocus: false, // OPTIMIZATION: Disabled for better performance with long caches
+                            revalidateOnReconnect: true, // Keep for network reconnection
+                            dedupingInterval: 300000, // OPTIMIZATION: 5 minutes (longer deduping for our caching strategy)
+                            errorRetryCount: 2, // Limit retries for failed requests
+                            errorRetryInterval: 2000, // 2 second retry delay
+                            focusThrottleInterval: 30000, // OPTIMIZATION: 30 second throttle if focus revalidation needed
+                        }}
+                    >
+                        <ReduxProvider>
+                            <IdentityProvider>
+                                <AuthProvider>
+                                    <ActorProvider>
+                                    <UserProvider>
+                                            <NsfwProvider>
+                                                {/* <AppRoutes /> */}
+                                                <RouterProvider router={router} />
+                                            </NsfwProvider>
+                                        </UserProvider>
+                                    </ActorProvider>
+                                </AuthProvider>
+                            </IdentityProvider>
+                        </ReduxProvider>
+                    </SWRConfig>
+                 </QueryClientProvider>
             </ThemeProvider>
         </ErrorBoundary>
     )

@@ -1,5 +1,5 @@
 import { Button } from '@/lib/components/button';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ListFilter } from 'lucide-react';
 import { Badge } from '@/lib/components/badge';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
@@ -9,12 +9,13 @@ import getListings from '../thunks/getListings';
 
 const TimeSort: React.FC = () => {
     const dispatch = useAppDispatch();
-    const { sortByTime, found } = useAppSelector((state) => state.imporium.listings);
+    const { sortByTime, found, page, size, sortByPrice } = useAppSelector((state) => state.imporium.listings);
 
-    const handleSort = () => {
+    const handleSort = useCallback(() => {
+        dispatch(getListings({page, size, sortByPrice: null, sortByTime}));
+
         dispatch(toggleSortByTime());
-        dispatch(getListings());
-    }
+    }, [page, size, sortByPrice, sortByTime]);
 
     return (
         <Button onClick={handleSort} variant="outline" scale="md" rounded="lg" className='font-syne border-border relative' disabled={Object.keys(found).length > 0}>

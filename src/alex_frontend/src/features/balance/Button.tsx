@@ -30,8 +30,10 @@ import fetchAlexPrice from './alex/thunks/price';
 
 import fetchUnlockedLbry from './lbry/thunks/unlocked';
 import fetchLockedLbry from './lbry/thunks/locked';
+import { useIcpSwapFactory } from '@/hooks/actors';
 
 const BalanceButton = () => {
+    const {actor} = useIcpSwapFactory();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
 
@@ -49,13 +51,13 @@ const BalanceButton = () => {
 
         dispatch(fetchUnlockedAlex());
         dispatch(fetchLockedAlex());
-        dispatch(fetchAlexPrice());
+        if(actor) dispatch(fetchAlexPrice(actor));
 
         dispatch(fetchUnlockedLbry());
         dispatch(fetchLockedLbry());
 
         dispatch(setLastRefresh());
-    }, []);
+    }, [actor]);
 
     useEffect(()=>{
         refresh();

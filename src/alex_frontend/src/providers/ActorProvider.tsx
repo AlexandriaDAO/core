@@ -1,11 +1,13 @@
 import React from "react";
-import { UserActor, AssetManagerActor } from "@/actors";
+import { UserActor, AssetManagerActor, IcpSwapFactoryActor } from "@/actors";
 
 const ActorProvider = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<UserActor>
 			<AssetManagerActor>
-				{children}
+				<IcpSwapFactoryActor>
+					{children}
+				</IcpSwapFactoryActor>
 			</AssetManagerActor>
 		</UserActor>
 	);

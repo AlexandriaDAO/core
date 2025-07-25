@@ -207,22 +207,22 @@ function ExchangeLayout() {
                         >
                             Burn
                         </Link>
-                        <Link
-                            to="/exchange/redeem"
-                            className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
-                            activeProps={{
-                                className: "bg-primary text-primary-foreground shadow-md"
-                            }}
-                            inactiveProps={{
-                                className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
-                            }}
-                            activeOptions={{
-                                exact: true
-                            }}
-                        >
-                            Redeem
-                        </Link>
                     </>}
+                    <Link
+                        to="/exchange/redeem"
+                        className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
+                        activeProps={{
+                            className: "bg-primary text-primary-foreground shadow-md"
+                        }}
+                        inactiveProps={{
+                            className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
+                        }}
+                        activeOptions={{
+                            exact: true
+                        }}
+                    >
+                        Redeem
+                    </Link>
                     <Link
                         to="/exchange/stake"
                         className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"

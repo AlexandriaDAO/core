@@ -13,6 +13,7 @@ interface ImporiumState {
 	totalPages: number;
 	currentPage: number;
 
+	safe: boolean;
 	loading: boolean;
 	error: string | null;
 }
@@ -23,6 +24,7 @@ const initialState: ImporiumState = {
 	totalPages: 0,
 	currentPage: 0,
 
+	safe: true,
 	loading: false,
 	error: null,
 };
@@ -31,6 +33,9 @@ const imporiumSlice = createSlice({
 	name: "imporium",
 	initialState,
 	reducers: {
+		setSafe: (state, action: PayloadAction<boolean>) => {
+			state.safe = action.payload;
+		},
 		setLoading(state, action: PayloadAction<boolean>) {
 			state.loading = action.payload;
 		},
@@ -85,12 +90,22 @@ const imporiumSlice = createSlice({
 	}
 });
 
-export const { setLoading, setError, reset } = imporiumSlice.actions;
+export const { setSafe, setLoading, setError, reset } = imporiumSlice.actions;
 
 // Create a custom root reducer that combines the main slice with sub-feature slices
 const imporiumReducer = (state: any = {}, action: any) => {
-	// First get the state from the main imporium slice
-	const mainState = imporiumSlice.reducer(state, action);
+	// Check if this is the initial empty state
+	const isInitialState = Object.keys(state).length === 0;
+
+	// Extract the main state properties (excluding nested reducers)
+	const { nfts, listings, ...mainStateProps } = state;
+
+	// For initial state, pass undefined to get proper initial values
+	// Otherwise, pass the current main state props
+	const mainState = imporiumSlice.reducer(
+		isInitialState ? undefined : mainStateProps, 
+		action
+	);
 
 	// Then get states from the sub-slices
 	const nftsState = nftsReducer(state?.nfts, action);

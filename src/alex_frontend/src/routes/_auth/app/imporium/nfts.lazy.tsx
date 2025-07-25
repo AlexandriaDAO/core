@@ -1,7 +1,7 @@
 import React from 'react'
 import { createLazyFileRoute } from '@tanstack/react-router'
 import NftsPage from '@/pages/emporium/NftsPage'
-import NftsPageSkeleton from '@/layouts/skeletons/emporium/NftsPageSkeleton'
+import EmporiumPageSkeleton from '@/layouts/skeletons/emporium/EmporiumPageSkeleton'
 import { EmporiumActor, Icrc7Actor } from '@/actors'
 
 export const Route = createLazyFileRoute('/_auth/app/imporium/nfts')({
@@ -12,5 +12,5 @@ export const Route = createLazyFileRoute('/_auth/app/imporium/nfts')({
       </Icrc7Actor>
     </EmporiumActor>
   ),
-  pendingComponent: NftsPageSkeleton,
+  pendingComponent: EmporiumPageSkeleton,
 })

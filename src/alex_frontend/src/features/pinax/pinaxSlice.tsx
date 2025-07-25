@@ -1,13 +1,13 @@
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import fetchWallets from "./thunks/fetchWallets";
 import uploadFile from "./thunks/uploadFile";
-import mintNFT from "./thunks/mintNFT";
 import estimateCost from "./thunks/estimateCost";
 import { SerializedWallet } from "../wallets/walletsSlice";
 import fetchBalance from "./thunks/fetchBalance";
 import selectWallet from "./thunks/selectWallet";
 import getSpendingBalance from "../swap/thunks/lbryIcrc/getSpendingBalance";
 import checkEligibility from "./thunks/checkEligibility";
+import mint from "../nft/thunks/mint";
 
 export enum Step {
 	Select = 1,
@@ -184,17 +184,17 @@ const pinaxSlice = createSlice({
 				// state.progress = 0;
 			})
 
-			.addCase(mintNFT.pending, (state) => {
+			.addCase(mint.pending, (state) => {
 				state.minting = true;
 				state.minted = null;
 				state.mintError = null;
 			})
-			.addCase(mintNFT.fulfilled, (state, action:PayloadAction<string>) => {
+			.addCase(mint.fulfilled, (state, action:PayloadAction<string>) => {
 				state.minting = false;
 				// state.minted = action.payload;
 				state.minted = state.transaction;
 			})
-			.addCase(mintNFT.rejected, (state, action) => {
+			.addCase(mint.rejected, (state, action) => {
 				state.minting = false;
 				state.minted = null;
 				state.mintError = action.payload as string;

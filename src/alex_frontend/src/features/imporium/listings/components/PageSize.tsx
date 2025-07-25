@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { PageSizeOptions, setSize, setPage } from "../listingsSlice";
 import { useAppDispatch} from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
@@ -15,13 +15,14 @@ import getListings from '../thunks/getListings';
 
 const PageSize: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const { size, found } = useAppSelector((state) => state.imporium.listings);
+	const { size, found, sortByPrice, sortByTime } = useAppSelector((state) => state.imporium.listings);
 
-    const handleSizeChange = (value: string) => {
-        dispatch(setSize(Number(value)));
+    const handleSizeChange = useCallback((value: string) => {
+        const newSize = Number(value);
+        dispatch(setSize(newSize));
 		dispatch(setPage(0));
-        dispatch(getListings());
-    };
+        dispatch(getListings({ page: 0, size: newSize, sortByPrice, sortByTime }));
+    },[sortByPrice, sortByTime]);
 
 	return (
         <Select
