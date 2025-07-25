@@ -42,6 +42,8 @@ import balanceReducer from '@/features/balance/balanceSlice';
 import insightsReducer from '@/features/insights/insightsSlice';
 import historyReducer from '@/features/history/historySlice';
 import stakeReducer from '@/features/stake/stakeSlice';
+import permasearchReducer from '@/features/permasearch/store/slice';
+import alexandrianReducer from '@/features/alexandrian/alexandrianSlice';
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -88,6 +90,8 @@ const rootReducer = combineReducers({
 	insights: insightsReducer,
 	history: historyReducer,
 	stake: stakeReducer,
+	permasearch: permasearchReducer,
+	alexandrian: alexandrianReducer,
 });
 
 export default rootReducer;

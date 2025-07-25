@@ -4,7 +4,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import useNftManager from "@/hooks/actors/useNftManager";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import mintNFT from "../../thunks/mintNFT";
+import mint from "../../../nft/thunks/mint";
 import { Button } from "@/lib/components/button";
 import { Alert } from "@/components/Alert";
 
@@ -28,7 +28,12 @@ const MintNFT: React.FC = () => {
             return;
         }
 
-        dispatch(mintNFT({actor}));
+        if(!transaction) {
+            toast.error('Transaction not available');
+            return;
+        }
+
+        dispatch(mint({actor, transaction}));
     }
 
     useEffect(() => {
@@ -43,7 +48,7 @@ const MintNFT: React.FC = () => {
         // Mark this transaction as attempted to prevent repeated minting attempts
         mintAttemptedRef.current = transaction;
 
-        dispatch(mintNFT({actor}));
+        dispatch(mint({actor, transaction}));
     }, [transaction, actor, minting, minted, dispatch]);
 
 	return (

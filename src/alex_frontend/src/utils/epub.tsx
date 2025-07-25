@@ -1,33 +1,35 @@
 import Epub from "epubjs";
 
+
 export const getCover = async (url: string): Promise<string | null> => {
-  try {
-    const ebook = Epub(url, { openAs: "epub" });
-    
-    // Wait for the book to be loaded
-    await new Promise((resolve) => {
-      ebook.ready.then(resolve);
-      // Add a timeout in case the book doesn't load properly
-      setTimeout(resolve, 5000);
-    });
+	let ebook: any = null;
 
-    let coverUrl: string | null = null;
-    try {
-      coverUrl = await ebook.coverUrl();
-    } catch (coverError) {
-      console.warn("Error extracting cover from epub:", coverError);
-    }
+	try {
+		ebook = Epub(url, { openAs: "epub" });
 
-    // Attempt to destroy the ebook object
-    try {
-      ebook.destroy();
-    } catch (destroyError) {
-      console.warn("Error while destroying ebook object:", destroyError);
-    }
+		// Wait for the book to be ready without timeout race
+		await ebook.ready;
 
-    return coverUrl;
-  } catch (error) {
-    console.warn("Error processing epub:", error);
-    return null;
-  }
+		// Try to get cover URL
+		const coverUrl = await ebook.coverUrl();
+		
+		// Return null if no cover is available (not an error)
+		return coverUrl || null;
+	} catch (error) {
+		// Re-throw the error so SWR can handle it properly
+		// This indicates an actual error (can't open book, network issues, etc.)
+		throw new Error(`Unable to load book cover: ${error instanceof Error ? error.message : 'Unknown error'}`);
+	} finally {
+		// Ensure cleanup happens regardless of success/failure
+		if (ebook) {
+			try {
+				ebook.destroy();
+			} catch (destroyError) {
+				console.warn(
+					"Error while destroying ebook object:",
+					destroyError
+				);
+			}
+		}
+	}
 };

@@ -17,8 +17,6 @@ export interface AuthState {
 	canister: string | undefined,
 	canisters: Record<string, string>,
 
-	initialized: boolean,
-
 	loading: boolean;
 	error: string | null;
 
@@ -34,8 +32,6 @@ const initialState: AuthState = {
 	user: null,
 	canister: undefined,
 	canisters: {},
-
-	initialized: false,
 
 	loading: false,
 	error: null,
@@ -61,13 +57,10 @@ const authSlice = createSlice({
 		setLoading: (state, action) => {
 			state.loading = action.payload;
 		},
-		setInitialized: (state, action) => {
-			state.initialized = action.payload;
-		},
 	},
 	extraReducers: buildAuthExtraReducers
 });
 
-export const {setUser, setError, setLoading, setInitialized} = authSlice.actions;
+export const {setUser, setError, setLoading} = authSlice.actions;
 
 export default authSlice.reducer;

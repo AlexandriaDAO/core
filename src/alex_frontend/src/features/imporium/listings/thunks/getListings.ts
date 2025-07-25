@@ -2,7 +2,6 @@ import { natToArweaveId } from "@/utils/id_convert";
 import LedgerService from "@/utils/LedgerService";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { emporium } from "../../../../../../declarations/emporium";
-import { RootState } from "@/store";
 import { Listing, ListingItem } from "../types";
 
 interface MyListingsResponse {
@@ -12,15 +11,21 @@ interface MyListingsResponse {
 	pageSize: number;
 }
 
+interface GetListingsParams {
+	page: number;
+	size: number;
+	sortByPrice: boolean | null;
+	sortByTime: boolean | null;
+}
+
 export const getListings = createAsyncThunk<
 	MyListingsResponse,
-	void,
-	{ rejectValue: string, state: RootState }
+	GetListingsParams,
+	{ rejectValue: string }
 >(
 	"imporium/listings/getListings",
-	async (_, { rejectWithValue, getState }) => {
+	async ({ page, size, sortByPrice, sortByTime }, { rejectWithValue }) => {
 		try {
-			const { page, size, sortByPrice, sortByTime } = getState().imporium.listings;
 
 			const ledgerService = LedgerService();
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getUserLogs from "../thunks/getUserLog";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -18,15 +18,12 @@ import "./style.css"
 const UserLogs: React.FC = () => {
     const dispatch = useAppDispatch();
     const { actor } = useEmporium();
-    const { logs, totalPages, pageSize } = useAppSelector((state) => state.imporium);
-    const [page, setPage] = React.useState(0);
+    const { logs, totalPages, pageSize, currentPage } = useAppSelector((state) => state.imporium);
 
-    const handlePageClick = (event: { selected: number }) => {
-        const newPage = event.selected + 1;
-        setPage(event.selected);
+    const handlePageClick = useCallback((event: { selected: number }) => {
         if (!actor) return;
-        dispatch(getUserLogs({ actor, page: newPage, pageSize }));
-    };
+        dispatch(getUserLogs({ actor, page: event.selected + 1, pageSize }));
+    }, [actor, pageSize]);
 
     return (
         <div className="">
@@ -83,7 +80,7 @@ const UserLogs: React.FC = () => {
                     )}
                 </TableBody>
             </Table>
-            
+
             {/* Pagination */}
             {totalPages > 0 && (
                 <div className="flex justify-center my-8">
@@ -95,7 +92,7 @@ const UserLogs: React.FC = () => {
                         marginPagesDisplayed={2}
                         pageRangeDisplayed={3}
                         onPageChange={handlePageClick}
-                        forcePage={page}
+                        forcePage={currentPage > 0 ? currentPage - 1 : 0}
                         containerClassName="flex items-center gap-1"
                         pageLinkClassName="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-accent transition-colors duration-200"
                         previousLinkClassName="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-accent transition-colors duration-200"

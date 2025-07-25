@@ -65,14 +65,15 @@ function NonCanisterView() {
                         <AlertDialogTitle>Create Your Own Asset Canister?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This will cost 500 LBRY (approximately $5).
-                            <br /><br />
-                            Benefits of having your own asset canister include:
-                            <ul>
+                        </AlertDialogDescription>
+                        <div className="text-sm text-muted-foreground mt-2">
+                            <p>Benefits of having your own asset canister include:</p>
+                            <ul className="mt-2 space-y-1">
                                 <li>- It will be yours forever.</li>
                                 <li>- Assets will load much faster.</li>
                                 <li>- Enhanced in-app visibility and other perks.</li>
                             </ul>
-                        </AlertDialogDescription>
+                        </div>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>

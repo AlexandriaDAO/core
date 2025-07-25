@@ -12,7 +12,7 @@ import unlist from "./thunks/unlist";
 import edit from "./thunks/edit";
 import purchase from "./thunks/purchase";
 
-export const PageSizeOptions: number[] = [4, 8, 16, 48];
+export const PageSizeOptions: number[] = [8, 16, 32, 48, 64];
 
 const initialState: ListingsState = {
 	nfts: {},
@@ -80,7 +80,6 @@ const listingsSlice = createSlice({
 			.addCase(getListings.fulfilled, (state, action) => {
 				state.nfts = action.payload.nfts;
 				state.pages = action.payload.totalPages;
-				state.page = action.payload.currentPage;
 				state.size = action.payload.pageSize;
 
 				state.loading = false;

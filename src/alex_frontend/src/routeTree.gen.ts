@@ -10,399 +10,373 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as UpdateRouteImport } from './routes/update'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as SwapTransactionRouteImport } from './routes/swap/transaction'
+import { Route as NftTokenIdRouteImport } from './routes/nft.$tokenId'
+import { Route as ExchangeInsightsRouteImport } from './routes/exchange/insights'
+import { Route as AppPermafindRouteImport } from './routes/app/permafind'
+import { Route as AppAlexisRouteImport } from './routes/app/alexis'
+import { Route as AuthAppImporiumNftsRouteImport } from './routes/_auth/app/imporium/nfts'
+import { Route as AuthAppImporiumMyLogsRouteImport } from './routes/_auth/app/imporium/my-logs'
+import { Route as AuthAppImporiumMarketplaceRouteImport } from './routes/_auth/app/imporium/marketplace'
+import { Route as AuthAppImporiumMarketLogsRouteImport } from './routes/_auth/app/imporium/market-logs'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as SwapTransactionImport } from './routes/swap/transaction'
-import { Route as ExchangeInsightsImport } from './routes/exchange/insights'
-import { Route as AuthAppImporiumNftsImport } from './routes/_auth/app/imporium/nfts'
-import { Route as AuthAppImporiumMarketplaceImport } from './routes/_auth/app/imporium/marketplace'
-import { Route as AuthAppImporiumMarketLogsImport } from './routes/_auth/app/imporium/market-logs'
-import { Route as AuthAppImporiumListingsImport } from './routes/_auth/app/imporium/listings'
-
-// Create Virtual Routes
-
-const ManagerLazyImport = createFileRoute('/manager')()
-const InfoRouteLazyImport = createFileRoute('/info')()
-const ExchangeRouteLazyImport = createFileRoute('/exchange')()
-const AuthRouteLazyImport = createFileRoute('/_auth')()
-const IndexLazyImport = createFileRoute('/')()
-const SwapIndexLazyImport = createFileRoute('/swap/')()
-const InfoIndexLazyImport = createFileRoute('/info/')()
-const SwapTopupLazyImport = createFileRoute('/swap/topup')()
-const SwapSwapLazyImport = createFileRoute('/swap/swap')()
-const SwapStakeLazyImport = createFileRoute('/swap/stake')()
-const SwapSendLazyImport = createFileRoute('/swap/send')()
-const SwapRedeemLazyImport = createFileRoute('/swap/redeem')()
-const SwapReceiveLazyImport = createFileRoute('/swap/receive')()
-const SwapInsightsLazyImport = createFileRoute('/swap/insights')()
-const SwapHistoryLazyImport = createFileRoute('/swap/history')()
-const SwapBurnLazyImport = createFileRoute('/swap/burn')()
-const SwapBalanceLazyImport = createFileRoute('/swap/balance')()
-const NftTokenIdLazyImport = createFileRoute('/nft/$tokenId')()
-const InfoWhitepaperLazyImport = createFileRoute('/info/whitepaper')()
-const InfoFaqLazyImport = createFileRoute('/info/faq')()
-const InfoAuditLazyImport = createFileRoute('/info/audit')()
-const ExchangeStakeLazyImport = createFileRoute('/exchange/stake')()
-const ExchangeRedeemLazyImport = createFileRoute('/exchange/redeem')()
-const ExchangeHistoryLazyImport = createFileRoute('/exchange/history')()
-const AppSyllogosLazyImport = createFileRoute('/app/syllogos')()
-const AppPermasearchLazyImport = createFileRoute('/app/permasearch')()
-const AppEmporiumLazyImport = createFileRoute('/app/emporium')()
-const AppDialecticaLazyImport = createFileRoute('/app/dialectica')()
-const AppBibliothecaLazyImport = createFileRoute('/app/bibliotheca')()
-const AppAlexandrianLazyImport = createFileRoute('/app/alexandrian')()
-const AuthExchangeRouteLazyImport = createFileRoute('/_auth/exchange')()
-const AuthDashboardRouteLazyImport = createFileRoute('/_auth/dashboard')()
-const AppPerpetuaIndexLazyImport = createFileRoute('/app/perpetua/')()
-const AuthExchangeIndexLazyImport = createFileRoute('/_auth/exchange/')()
-const AuthExchangeBurnLazyImport = createFileRoute('/_auth/exchange/burn')()
-const AuthDashboardSettingsLazyImport = createFileRoute(
+const ManagerLazyRouteImport = createFileRoute('/manager')()
+const InfoRouteLazyRouteImport = createFileRoute('/info')()
+const ExchangeRouteLazyRouteImport = createFileRoute('/exchange')()
+const AuthRouteLazyRouteImport = createFileRoute('/_auth')()
+const SwapIndexLazyRouteImport = createFileRoute('/swap/')()
+const InfoIndexLazyRouteImport = createFileRoute('/info/')()
+const SwapTopupLazyRouteImport = createFileRoute('/swap/topup')()
+const SwapSwapLazyRouteImport = createFileRoute('/swap/swap')()
+const SwapStakeLazyRouteImport = createFileRoute('/swap/stake')()
+const SwapSendLazyRouteImport = createFileRoute('/swap/send')()
+const SwapRedeemLazyRouteImport = createFileRoute('/swap/redeem')()
+const SwapReceiveLazyRouteImport = createFileRoute('/swap/receive')()
+const SwapInsightsLazyRouteImport = createFileRoute('/swap/insights')()
+const SwapHistoryLazyRouteImport = createFileRoute('/swap/history')()
+const SwapBurnLazyRouteImport = createFileRoute('/swap/burn')()
+const SwapBalanceLazyRouteImport = createFileRoute('/swap/balance')()
+const InfoWhitepaperLazyRouteImport = createFileRoute('/info/whitepaper')()
+const InfoFaqLazyRouteImport = createFileRoute('/info/faq')()
+const InfoAuditLazyRouteImport = createFileRoute('/info/audit')()
+const ExchangeStakeLazyRouteImport = createFileRoute('/exchange/stake')()
+const ExchangeRedeemLazyRouteImport = createFileRoute('/exchange/redeem')()
+const ExchangeHistoryLazyRouteImport = createFileRoute('/exchange/history')()
+const AppSyllogosLazyRouteImport = createFileRoute('/app/syllogos')()
+const AppPermasearchLazyRouteImport = createFileRoute('/app/permasearch')()
+const AppEmporiumLazyRouteImport = createFileRoute('/app/emporium')()
+const AppDialecticaLazyRouteImport = createFileRoute('/app/dialectica')()
+const AppBibliothecaLazyRouteImport = createFileRoute('/app/bibliotheca')()
+const AppAlexandrianLazyRouteImport = createFileRoute('/app/alexandrian')()
+const AuthExchangeRouteLazyRouteImport = createFileRoute('/_auth/exchange')()
+const AuthDashboardRouteLazyRouteImport = createFileRoute('/_auth/dashboard')()
+const AppPerpetuaIndexLazyRouteImport = createFileRoute('/app/perpetua/')()
+const AuthExchangeIndexLazyRouteImport = createFileRoute('/_auth/exchange/')()
+const AuthExchangeBurnLazyRouteImport = createFileRoute(
+  '/_auth/exchange/burn',
+)()
+const AuthDashboardSettingsLazyRouteImport = createFileRoute(
   '/_auth/dashboard/settings',
 )()
-const AuthDashboardProfileLazyImport = createFileRoute(
+const AuthDashboardProfileLazyRouteImport = createFileRoute(
   '/_auth/dashboard/profile',
 )()
-const AuthDashboardIcpAssetsLazyImport = createFileRoute(
+const AuthDashboardIcpAssetsLazyRouteImport = createFileRoute(
   '/_auth/dashboard/icp-assets',
 )()
-const AuthDashboardArweaveAssetsLazyImport = createFileRoute(
+const AuthDashboardArweaveAssetsLazyRouteImport = createFileRoute(
   '/_auth/dashboard/arweave-assets',
 )()
-const AuthAppPinaxLazyImport = createFileRoute('/_auth/app/pinax')()
-const AuthDashboardLibrarianRouteLazyImport = createFileRoute(
+const AuthAppPinaxLazyRouteImport = createFileRoute('/_auth/app/pinax')()
+const AuthDashboardLibrarianRouteLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian',
 )()
-const AuthAppImporiumRouteLazyImport = createFileRoute('/_auth/app/imporium')()
-const AuthDashboardLibrarianIndexLazyImport = createFileRoute(
+const AuthAppImporiumRouteLazyRouteImport = createFileRoute(
+  '/_auth/app/imporium',
+)()
+const AuthDashboardLibrarianIndexLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian/',
 )()
-const AuthAppImporiumIndexLazyImport = createFileRoute('/_auth/app/imporium/')()
-const AppPerpetuaShelfShelfIdLazyImport = createFileRoute(
+const AuthAppImporiumIndexLazyRouteImport = createFileRoute(
+  '/_auth/app/imporium/',
+)()
+const AppPerpetuaShelfShelfIdLazyRouteImport = createFileRoute(
   '/app/perpetua/shelf/$shelfId',
 )()
-const AppPerpetuaItemItemIdLazyImport = createFileRoute(
+const AppPerpetuaItemItemIdLazyRouteImport = createFileRoute(
   '/app/perpetua/item/$itemId',
 )()
-const AuthDashboardProfileUpgradeLazyImport = createFileRoute(
+const AuthDashboardProfileUpgradeLazyRouteImport = createFileRoute(
   '/_auth/dashboard/profile/upgrade',
 )()
-const AuthDashboardLibrarianWalletsLazyImport = createFileRoute(
+const AuthDashboardLibrarianWalletsLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian/wallets',
 )()
-const AuthAppImporiumMyLogsLazyImport = createFileRoute(
-  '/_auth/app/imporium/my-logs',
-)()
-const AppPerpetuaUserUserIdIndexLazyImport = createFileRoute(
+const AppPerpetuaUserUserIdIndexLazyRouteImport = createFileRoute(
   '/app/perpetua/user/$userId/',
 )()
-const AppPerpetuaUserUserIdShelfShelfIdLazyImport = createFileRoute(
+const AppPerpetuaUserUserIdShelfShelfIdLazyRouteImport = createFileRoute(
   '/app/perpetua/user/$userId/shelf/$shelfId',
 )()
-const AppPerpetuaUserUserIdItemItemIdLazyImport = createFileRoute(
+const AppPerpetuaUserUserIdItemItemIdLazyRouteImport = createFileRoute(
   '/app/perpetua/user/$userId/item/$itemId',
 )()
 
-// Create/Update Routes
-
-const ManagerLazyRoute = ManagerLazyImport.update({
+const ManagerLazyRoute = ManagerLazyRouteImport.update({
   id: '/manager',
   path: '/manager',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/manager.lazy').then((d) => d.Route))
-
-const InfoRouteLazyRoute = InfoRouteLazyImport.update({
+const InfoRouteLazyRoute = InfoRouteLazyRouteImport.update({
   id: '/info',
   path: '/info',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/info/route.lazy').then((d) => d.Route))
-
-const ExchangeRouteLazyRoute = ExchangeRouteLazyImport.update({
+const ExchangeRouteLazyRoute = ExchangeRouteLazyRouteImport.update({
   id: '/exchange',
   path: '/exchange',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/exchange/route.lazy').then((d) => d.Route),
 )
-
-const AuthRouteLazyRoute = AuthRouteLazyImport.update({
+const AuthRouteLazyRoute = AuthRouteLazyRouteImport.update({
   id: '/_auth',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/_auth/route.lazy').then((d) => d.Route))
-
-const IndexLazyRoute = IndexLazyImport.update({
+const UpdateRoute = UpdateRouteImport.update({
+  id: '/update',
+  path: '/update',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
-
-const SwapIndexLazyRoute = SwapIndexLazyImport.update({
+const SwapIndexLazyRoute = SwapIndexLazyRouteImport.update({
   id: '/swap/',
   path: '/swap/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/index.lazy').then((d) => d.Route))
-
-const InfoIndexLazyRoute = InfoIndexLazyImport.update({
+const InfoIndexLazyRoute = InfoIndexLazyRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => InfoRouteLazyRoute,
 } as any).lazy(() => import('./routes/info/index.lazy').then((d) => d.Route))
-
-const SwapTopupLazyRoute = SwapTopupLazyImport.update({
+const SwapTopupLazyRoute = SwapTopupLazyRouteImport.update({
   id: '/swap/topup',
   path: '/swap/topup',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/topup.lazy').then((d) => d.Route))
-
-const SwapSwapLazyRoute = SwapSwapLazyImport.update({
+const SwapSwapLazyRoute = SwapSwapLazyRouteImport.update({
   id: '/swap/swap',
   path: '/swap/swap',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/swap.lazy').then((d) => d.Route))
-
-const SwapStakeLazyRoute = SwapStakeLazyImport.update({
+const SwapStakeLazyRoute = SwapStakeLazyRouteImport.update({
   id: '/swap/stake',
   path: '/swap/stake',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/stake.lazy').then((d) => d.Route))
-
-const SwapSendLazyRoute = SwapSendLazyImport.update({
+const SwapSendLazyRoute = SwapSendLazyRouteImport.update({
   id: '/swap/send',
   path: '/swap/send',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/send.lazy').then((d) => d.Route))
-
-const SwapRedeemLazyRoute = SwapRedeemLazyImport.update({
+const SwapRedeemLazyRoute = SwapRedeemLazyRouteImport.update({
   id: '/swap/redeem',
   path: '/swap/redeem',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/redeem.lazy').then((d) => d.Route))
-
-const SwapReceiveLazyRoute = SwapReceiveLazyImport.update({
+const SwapReceiveLazyRoute = SwapReceiveLazyRouteImport.update({
   id: '/swap/receive',
   path: '/swap/receive',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/receive.lazy').then((d) => d.Route))
-
-const SwapInsightsLazyRoute = SwapInsightsLazyImport.update({
+const SwapInsightsLazyRoute = SwapInsightsLazyRouteImport.update({
   id: '/swap/insights',
   path: '/swap/insights',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/insights.lazy').then((d) => d.Route))
-
-const SwapHistoryLazyRoute = SwapHistoryLazyImport.update({
+const SwapHistoryLazyRoute = SwapHistoryLazyRouteImport.update({
   id: '/swap/history',
   path: '/swap/history',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/history.lazy').then((d) => d.Route))
-
-const SwapBurnLazyRoute = SwapBurnLazyImport.update({
+const SwapBurnLazyRoute = SwapBurnLazyRouteImport.update({
   id: '/swap/burn',
   path: '/swap/burn',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/burn.lazy').then((d) => d.Route))
-
-const SwapBalanceLazyRoute = SwapBalanceLazyImport.update({
+const SwapBalanceLazyRoute = SwapBalanceLazyRouteImport.update({
   id: '/swap/balance',
   path: '/swap/balance',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/balance.lazy').then((d) => d.Route))
-
-const NftTokenIdLazyRoute = NftTokenIdLazyImport.update({
-  id: '/nft/$tokenId',
-  path: '/nft/$tokenId',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/nft.$tokenId.lazy').then((d) => d.Route))
-
-const InfoWhitepaperLazyRoute = InfoWhitepaperLazyImport.update({
+const InfoWhitepaperLazyRoute = InfoWhitepaperLazyRouteImport.update({
   id: '/whitepaper',
   path: '/whitepaper',
   getParentRoute: () => InfoRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/info/whitepaper.lazy').then((d) => d.Route),
 )
-
-const InfoFaqLazyRoute = InfoFaqLazyImport.update({
+const InfoFaqLazyRoute = InfoFaqLazyRouteImport.update({
   id: '/faq',
   path: '/faq',
   getParentRoute: () => InfoRouteLazyRoute,
 } as any).lazy(() => import('./routes/info/faq.lazy').then((d) => d.Route))
-
-const InfoAuditLazyRoute = InfoAuditLazyImport.update({
+const InfoAuditLazyRoute = InfoAuditLazyRouteImport.update({
   id: '/audit',
   path: '/audit',
   getParentRoute: () => InfoRouteLazyRoute,
 } as any).lazy(() => import('./routes/info/audit.lazy').then((d) => d.Route))
-
-const ExchangeStakeLazyRoute = ExchangeStakeLazyImport.update({
+const ExchangeStakeLazyRoute = ExchangeStakeLazyRouteImport.update({
   id: '/stake',
   path: '/stake',
   getParentRoute: () => ExchangeRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/exchange/stake.lazy').then((d) => d.Route),
 )
-
-const ExchangeRedeemLazyRoute = ExchangeRedeemLazyImport.update({
+const ExchangeRedeemLazyRoute = ExchangeRedeemLazyRouteImport.update({
   id: '/redeem',
   path: '/redeem',
   getParentRoute: () => ExchangeRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/exchange/redeem.lazy').then((d) => d.Route),
 )
-
-const ExchangeHistoryLazyRoute = ExchangeHistoryLazyImport.update({
+const ExchangeHistoryLazyRoute = ExchangeHistoryLazyRouteImport.update({
   id: '/history',
   path: '/history',
   getParentRoute: () => ExchangeRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/exchange/history.lazy').then((d) => d.Route),
 )
-
-const AppSyllogosLazyRoute = AppSyllogosLazyImport.update({
+const AppSyllogosLazyRoute = AppSyllogosLazyRouteImport.update({
   id: '/app/syllogos',
   path: '/app/syllogos',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/app/syllogos.lazy').then((d) => d.Route))
-
-const AppPermasearchLazyRoute = AppPermasearchLazyImport.update({
+const AppPermasearchLazyRoute = AppPermasearchLazyRouteImport.update({
   id: '/app/permasearch',
   path: '/app/permasearch',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/app/permasearch.lazy').then((d) => d.Route),
 )
-
-const AppEmporiumLazyRoute = AppEmporiumLazyImport.update({
+const AppEmporiumLazyRoute = AppEmporiumLazyRouteImport.update({
   id: '/app/emporium',
   path: '/app/emporium',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/app/emporium.lazy').then((d) => d.Route))
-
-const AppDialecticaLazyRoute = AppDialecticaLazyImport.update({
+const AppDialecticaLazyRoute = AppDialecticaLazyRouteImport.update({
   id: '/app/dialectica',
   path: '/app/dialectica',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/app/dialectica.lazy').then((d) => d.Route),
 )
-
-const AppBibliothecaLazyRoute = AppBibliothecaLazyImport.update({
+const AppBibliothecaLazyRoute = AppBibliothecaLazyRouteImport.update({
   id: '/app/bibliotheca',
   path: '/app/bibliotheca',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/app/bibliotheca.lazy').then((d) => d.Route),
 )
-
-const AppAlexandrianLazyRoute = AppAlexandrianLazyImport.update({
+const AppAlexandrianLazyRoute = AppAlexandrianLazyRouteImport.update({
   id: '/app/alexandrian',
   path: '/app/alexandrian',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/app/alexandrian.lazy').then((d) => d.Route),
 )
-
-const AuthExchangeRouteLazyRoute = AuthExchangeRouteLazyImport.update({
+const AuthExchangeRouteLazyRoute = AuthExchangeRouteLazyRouteImport.update({
   id: '/exchange',
   path: '/exchange',
   getParentRoute: () => AuthRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_auth/exchange/route.lazy').then((d) => d.Route),
 )
-
-const AuthDashboardRouteLazyRoute = AuthDashboardRouteLazyImport.update({
+const AuthDashboardRouteLazyRoute = AuthDashboardRouteLazyRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_auth/dashboard/route.lazy').then((d) => d.Route),
 )
-
-const SwapTransactionRoute = SwapTransactionImport.update({
+const SwapTransactionRoute = SwapTransactionRouteImport.update({
   id: '/swap/transaction',
   path: '/swap/transaction',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/swap/transaction.lazy').then((d) => d.Route),
 )
-
-const ExchangeInsightsRoute = ExchangeInsightsImport.update({
+const NftTokenIdRoute = NftTokenIdRouteImport.update({
+  id: '/nft/$tokenId',
+  path: '/nft/$tokenId',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/nft.$tokenId.lazy').then((d) => d.Route))
+const ExchangeInsightsRoute = ExchangeInsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
   getParentRoute: () => ExchangeRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/exchange/insights.lazy').then((d) => d.Route),
 )
-
-const AppPerpetuaIndexLazyRoute = AppPerpetuaIndexLazyImport.update({
+const AppPermafindRoute = AppPermafindRouteImport.update({
+  id: '/app/permafind',
+  path: '/app/permafind',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/app/permafind.lazy').then((d) => d.Route))
+const AppAlexisRoute = AppAlexisRouteImport.update({
+  id: '/app/alexis',
+  path: '/app/alexis',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/app/alexis.lazy').then((d) => d.Route))
+const AppPerpetuaIndexLazyRoute = AppPerpetuaIndexLazyRouteImport.update({
   id: '/app/perpetua/',
   path: '/app/perpetua/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/app/perpetua/index.lazy').then((d) => d.Route),
 )
-
-const AuthExchangeIndexLazyRoute = AuthExchangeIndexLazyImport.update({
+const AuthExchangeIndexLazyRoute = AuthExchangeIndexLazyRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthExchangeRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_auth/exchange/index.lazy').then((d) => d.Route),
 )
-
-const AuthExchangeBurnLazyRoute = AuthExchangeBurnLazyImport.update({
+const AuthExchangeBurnLazyRoute = AuthExchangeBurnLazyRouteImport.update({
   id: '/burn',
   path: '/burn',
   getParentRoute: () => AuthExchangeRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_auth/exchange/burn.lazy').then((d) => d.Route),
 )
-
-const AuthDashboardSettingsLazyRoute = AuthDashboardSettingsLazyImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthDashboardRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/dashboard/settings.lazy').then((d) => d.Route),
-)
-
-const AuthDashboardProfileLazyRoute = AuthDashboardProfileLazyImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthDashboardRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/dashboard/profile.lazy').then((d) => d.Route),
-)
-
-const AuthDashboardIcpAssetsLazyRoute = AuthDashboardIcpAssetsLazyImport.update(
-  {
+const AuthDashboardSettingsLazyRoute =
+  AuthDashboardSettingsLazyRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthDashboardRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/dashboard/settings.lazy').then((d) => d.Route),
+  )
+const AuthDashboardProfileLazyRoute =
+  AuthDashboardProfileLazyRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthDashboardRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/dashboard/profile.lazy').then((d) => d.Route),
+  )
+const AuthDashboardIcpAssetsLazyRoute =
+  AuthDashboardIcpAssetsLazyRouteImport.update({
     id: '/icp-assets',
     path: '/icp-assets',
     getParentRoute: () => AuthDashboardRouteLazyRoute,
-  } as any,
-).lazy(() =>
-  import('./routes/_auth/dashboard/icp-assets.lazy').then((d) => d.Route),
-)
-
+  } as any).lazy(() =>
+    import('./routes/_auth/dashboard/icp-assets.lazy').then((d) => d.Route),
+  )
 const AuthDashboardArweaveAssetsLazyRoute =
-  AuthDashboardArweaveAssetsLazyImport.update({
+  AuthDashboardArweaveAssetsLazyRouteImport.update({
     id: '/arweave-assets',
     path: '/arweave-assets',
     getParentRoute: () => AuthDashboardRouteLazyRoute,
   } as any).lazy(() =>
     import('./routes/_auth/dashboard/arweave-assets.lazy').then((d) => d.Route),
   )
-
-const AuthAppPinaxLazyRoute = AuthAppPinaxLazyImport.update({
+const AuthAppPinaxLazyRoute = AuthAppPinaxLazyRouteImport.update({
   id: '/app/pinax',
   path: '/app/pinax',
   getParentRoute: () => AuthRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_auth/app/pinax.lazy').then((d) => d.Route),
 )
-
 const AuthDashboardLibrarianRouteLazyRoute =
-  AuthDashboardLibrarianRouteLazyImport.update({
+  AuthDashboardLibrarianRouteLazyRouteImport.update({
     id: '/_librarian',
     getParentRoute: () => AuthDashboardRouteLazyRoute,
   } as any).lazy(() =>
@@ -410,17 +384,16 @@ const AuthDashboardLibrarianRouteLazyRoute =
       (d) => d.Route,
     ),
   )
-
-const AuthAppImporiumRouteLazyRoute = AuthAppImporiumRouteLazyImport.update({
-  id: '/app/imporium',
-  path: '/app/imporium',
-  getParentRoute: () => AuthRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/app/imporium/route.lazy').then((d) => d.Route),
-)
-
+const AuthAppImporiumRouteLazyRoute =
+  AuthAppImporiumRouteLazyRouteImport.update({
+    id: '/app/imporium',
+    path: '/app/imporium',
+    getParentRoute: () => AuthRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/app/imporium/route.lazy').then((d) => d.Route),
+  )
 const AuthDashboardLibrarianIndexLazyRoute =
-  AuthDashboardLibrarianIndexLazyImport.update({
+  AuthDashboardLibrarianIndexLazyRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthDashboardLibrarianRouteLazyRoute,
@@ -429,34 +402,32 @@ const AuthDashboardLibrarianIndexLazyRoute =
       (d) => d.Route,
     ),
   )
-
-const AuthAppImporiumIndexLazyRoute = AuthAppImporiumIndexLazyImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/app/imporium/index.lazy').then((d) => d.Route),
-)
-
+const AuthAppImporiumIndexLazyRoute =
+  AuthAppImporiumIndexLazyRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthAppImporiumRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/app/imporium/index.lazy').then((d) => d.Route),
+  )
 const AppPerpetuaShelfShelfIdLazyRoute =
-  AppPerpetuaShelfShelfIdLazyImport.update({
+  AppPerpetuaShelfShelfIdLazyRouteImport.update({
     id: '/app/perpetua/shelf/$shelfId',
     path: '/app/perpetua/shelf/$shelfId',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any).lazy(() =>
     import('./routes/app/perpetua/shelf.$shelfId.lazy').then((d) => d.Route),
   )
-
-const AppPerpetuaItemItemIdLazyRoute = AppPerpetuaItemItemIdLazyImport.update({
-  id: '/app/perpetua/item/$itemId',
-  path: '/app/perpetua/item/$itemId',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() =>
-  import('./routes/app/perpetua/item.$itemId.lazy').then((d) => d.Route),
-)
-
+const AppPerpetuaItemItemIdLazyRoute =
+  AppPerpetuaItemItemIdLazyRouteImport.update({
+    id: '/app/perpetua/item/$itemId',
+    path: '/app/perpetua/item/$itemId',
+    getParentRoute: () => rootRouteImport,
+  } as any).lazy(() =>
+    import('./routes/app/perpetua/item.$itemId.lazy').then((d) => d.Route),
+  )
 const AuthDashboardProfileUpgradeLazyRoute =
-  AuthDashboardProfileUpgradeLazyImport.update({
+  AuthDashboardProfileUpgradeLazyRouteImport.update({
     id: '/upgrade',
     path: '/upgrade',
     getParentRoute: () => AuthDashboardProfileLazyRoute,
@@ -465,9 +436,8 @@ const AuthDashboardProfileUpgradeLazyRoute =
       (d) => d.Route,
     ),
   )
-
 const AuthDashboardLibrarianWalletsLazyRoute =
-  AuthDashboardLibrarianWalletsLazyImport.update({
+  AuthDashboardLibrarianWalletsLazyRouteImport.update({
     id: '/wallets',
     path: '/wallets',
     getParentRoute: () => AuthDashboardLibrarianRouteLazyRoute,
@@ -476,496 +446,883 @@ const AuthDashboardLibrarianWalletsLazyRoute =
       (d) => d.Route,
     ),
   )
-
-const AuthAppImporiumMyLogsLazyRoute = AuthAppImporiumMyLogsLazyImport.update({
-  id: '/my-logs',
-  path: '/my-logs',
-  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/app/imporium/my-logs.lazy').then((d) => d.Route),
-)
-
-const AuthAppImporiumNftsRoute = AuthAppImporiumNftsImport.update({
+const AuthAppImporiumNftsRoute = AuthAppImporiumNftsRouteImport.update({
   id: '/nfts',
   path: '/nfts',
   getParentRoute: () => AuthAppImporiumRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_auth/app/imporium/nfts.lazy').then((d) => d.Route),
 )
-
-const AuthAppImporiumMarketplaceRoute = AuthAppImporiumMarketplaceImport.update(
-  {
+const AuthAppImporiumMyLogsRoute = AuthAppImporiumMyLogsRouteImport.update({
+  id: '/my-logs',
+  path: '/my-logs',
+  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/app/imporium/my-logs.lazy').then((d) => d.Route),
+)
+const AuthAppImporiumMarketplaceRoute =
+  AuthAppImporiumMarketplaceRouteImport.update({
     id: '/marketplace',
     path: '/marketplace',
     getParentRoute: () => AuthAppImporiumRouteLazyRoute,
-  } as any,
-).lazy(() =>
-  import('./routes/_auth/app/imporium/marketplace.lazy').then((d) => d.Route),
-)
-
-const AuthAppImporiumMarketLogsRoute = AuthAppImporiumMarketLogsImport.update({
-  id: '/market-logs',
-  path: '/market-logs',
-  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/app/imporium/market-logs.lazy').then((d) => d.Route),
-)
-
-const AuthAppImporiumListingsRoute = AuthAppImporiumListingsImport.update({
-  id: '/listings',
-  path: '/listings',
-  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/app/imporium/listings.lazy').then((d) => d.Route),
-)
-
+  } as any).lazy(() =>
+    import('./routes/_auth/app/imporium/marketplace.lazy').then((d) => d.Route),
+  )
+const AuthAppImporiumMarketLogsRoute =
+  AuthAppImporiumMarketLogsRouteImport.update({
+    id: '/market-logs',
+    path: '/market-logs',
+    getParentRoute: () => AuthAppImporiumRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/_auth/app/imporium/market-logs.lazy').then((d) => d.Route),
+  )
 const AppPerpetuaUserUserIdIndexLazyRoute =
-  AppPerpetuaUserUserIdIndexLazyImport.update({
+  AppPerpetuaUserUserIdIndexLazyRouteImport.update({
     id: '/app/perpetua/user/$userId/',
     path: '/app/perpetua/user/$userId/',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any).lazy(() =>
     import('./routes/app/perpetua/user/$userId/index.lazy').then(
       (d) => d.Route,
     ),
   )
-
 const AppPerpetuaUserUserIdShelfShelfIdLazyRoute =
-  AppPerpetuaUserUserIdShelfShelfIdLazyImport.update({
+  AppPerpetuaUserUserIdShelfShelfIdLazyRouteImport.update({
     id: '/app/perpetua/user/$userId/shelf/$shelfId',
     path: '/app/perpetua/user/$userId/shelf/$shelfId',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any).lazy(() =>
     import('./routes/app/perpetua/user/$userId/shelf.$shelfId.lazy').then(
       (d) => d.Route,
     ),
   )
-
 const AppPerpetuaUserUserIdItemItemIdLazyRoute =
-  AppPerpetuaUserUserIdItemItemIdLazyImport.update({
+  AppPerpetuaUserUserIdItemItemIdLazyRouteImport.update({
     id: '/app/perpetua/user/$userId/item/$itemId',
     path: '/app/perpetua/user/$userId/item/$itemId',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any).lazy(() =>
     import('./routes/app/perpetua/user/$userId/item.$itemId.lazy').then(
       (d) => d.Route,
     ),
   )
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/update': typeof UpdateRoute
+  '/exchange': typeof AuthExchangeRouteLazyRouteWithChildren
+  '/info': typeof InfoRouteLazyRouteWithChildren
+  '/manager': typeof ManagerLazyRoute
+  '/app/alexis': typeof AppAlexisRoute
+  '/app/permafind': typeof AppPermafindRoute
+  '/exchange/insights': typeof ExchangeInsightsRoute
+  '/nft/$tokenId': typeof NftTokenIdRoute
+  '/swap/transaction': typeof SwapTransactionRoute
+  '/dashboard': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
+  '/app/alexandrian': typeof AppAlexandrianLazyRoute
+  '/app/bibliotheca': typeof AppBibliothecaLazyRoute
+  '/app/dialectica': typeof AppDialecticaLazyRoute
+  '/app/emporium': typeof AppEmporiumLazyRoute
+  '/app/permasearch': typeof AppPermasearchLazyRoute
+  '/app/syllogos': typeof AppSyllogosLazyRoute
+  '/exchange/history': typeof ExchangeHistoryLazyRoute
+  '/exchange/redeem': typeof ExchangeRedeemLazyRoute
+  '/exchange/stake': typeof ExchangeStakeLazyRoute
+  '/info/audit': typeof InfoAuditLazyRoute
+  '/info/faq': typeof InfoFaqLazyRoute
+  '/info/whitepaper': typeof InfoWhitepaperLazyRoute
+  '/swap/balance': typeof SwapBalanceLazyRoute
+  '/swap/burn': typeof SwapBurnLazyRoute
+  '/swap/history': typeof SwapHistoryLazyRoute
+  '/swap/insights': typeof SwapInsightsLazyRoute
+  '/swap/receive': typeof SwapReceiveLazyRoute
+  '/swap/redeem': typeof SwapRedeemLazyRoute
+  '/swap/send': typeof SwapSendLazyRoute
+  '/swap/stake': typeof SwapStakeLazyRoute
+  '/swap/swap': typeof SwapSwapLazyRoute
+  '/swap/topup': typeof SwapTopupLazyRoute
+  '/info/': typeof InfoIndexLazyRoute
+  '/swap': typeof SwapIndexLazyRoute
+  '/app/imporium': typeof AuthAppImporiumRouteLazyRouteWithChildren
+  '/app/pinax': typeof AuthAppPinaxLazyRoute
+  '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
+  '/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
+  '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
+  '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
+  '/exchange/burn': typeof AuthExchangeBurnLazyRoute
+  '/exchange/': typeof AuthExchangeIndexLazyRoute
+  '/app/perpetua': typeof AppPerpetuaIndexLazyRoute
+  '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
+  '/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
+  '/app/imporium/my-logs': typeof AuthAppImporiumMyLogsRoute
+  '/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
+  '/dashboard/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
+  '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
+  '/app/perpetua/item/$itemId': typeof AppPerpetuaItemItemIdLazyRoute
+  '/app/perpetua/shelf/$shelfId': typeof AppPerpetuaShelfShelfIdLazyRoute
+  '/app/imporium/': typeof AuthAppImporiumIndexLazyRoute
+  '/dashboard/': typeof AuthDashboardLibrarianIndexLazyRoute
+  '/app/perpetua/user/$userId': typeof AppPerpetuaUserUserIdIndexLazyRoute
+  '/app/perpetua/user/$userId/item/$itemId': typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
+  '/app/perpetua/user/$userId/shelf/$shelfId': typeof AppPerpetuaUserUserIdShelfShelfIdLazyRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/update': typeof UpdateRoute
+  '/exchange': typeof AuthExchangeIndexLazyRoute
+  '/manager': typeof ManagerLazyRoute
+  '/app/alexis': typeof AppAlexisRoute
+  '/app/permafind': typeof AppPermafindRoute
+  '/exchange/insights': typeof ExchangeInsightsRoute
+  '/nft/$tokenId': typeof NftTokenIdRoute
+  '/swap/transaction': typeof SwapTransactionRoute
+  '/dashboard': typeof AuthDashboardLibrarianIndexLazyRoute
+  '/app/alexandrian': typeof AppAlexandrianLazyRoute
+  '/app/bibliotheca': typeof AppBibliothecaLazyRoute
+  '/app/dialectica': typeof AppDialecticaLazyRoute
+  '/app/emporium': typeof AppEmporiumLazyRoute
+  '/app/permasearch': typeof AppPermasearchLazyRoute
+  '/app/syllogos': typeof AppSyllogosLazyRoute
+  '/exchange/history': typeof ExchangeHistoryLazyRoute
+  '/exchange/redeem': typeof ExchangeRedeemLazyRoute
+  '/exchange/stake': typeof ExchangeStakeLazyRoute
+  '/info/audit': typeof InfoAuditLazyRoute
+  '/info/faq': typeof InfoFaqLazyRoute
+  '/info/whitepaper': typeof InfoWhitepaperLazyRoute
+  '/swap/balance': typeof SwapBalanceLazyRoute
+  '/swap/burn': typeof SwapBurnLazyRoute
+  '/swap/history': typeof SwapHistoryLazyRoute
+  '/swap/insights': typeof SwapInsightsLazyRoute
+  '/swap/receive': typeof SwapReceiveLazyRoute
+  '/swap/redeem': typeof SwapRedeemLazyRoute
+  '/swap/send': typeof SwapSendLazyRoute
+  '/swap/stake': typeof SwapStakeLazyRoute
+  '/swap/swap': typeof SwapSwapLazyRoute
+  '/swap/topup': typeof SwapTopupLazyRoute
+  '/info': typeof InfoIndexLazyRoute
+  '/swap': typeof SwapIndexLazyRoute
+  '/app/pinax': typeof AuthAppPinaxLazyRoute
+  '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
+  '/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
+  '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
+  '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
+  '/exchange/burn': typeof AuthExchangeBurnLazyRoute
+  '/app/perpetua': typeof AppPerpetuaIndexLazyRoute
+  '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
+  '/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
+  '/app/imporium/my-logs': typeof AuthAppImporiumMyLogsRoute
+  '/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
+  '/dashboard/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
+  '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
+  '/app/perpetua/item/$itemId': typeof AppPerpetuaItemItemIdLazyRoute
+  '/app/perpetua/shelf/$shelfId': typeof AppPerpetuaShelfShelfIdLazyRoute
+  '/app/imporium': typeof AuthAppImporiumIndexLazyRoute
+  '/app/perpetua/user/$userId': typeof AppPerpetuaUserUserIdIndexLazyRoute
+  '/app/perpetua/user/$userId/item/$itemId': typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
+  '/app/perpetua/user/$userId/shelf/$shelfId': typeof AppPerpetuaUserUserIdShelfShelfIdLazyRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/update': typeof UpdateRoute
+  '/_auth': typeof AuthRouteLazyRouteWithChildren
+  '/exchange': typeof ExchangeRouteLazyRouteWithChildren
+  '/info': typeof InfoRouteLazyRouteWithChildren
+  '/manager': typeof ManagerLazyRoute
+  '/app/alexis': typeof AppAlexisRoute
+  '/app/permafind': typeof AppPermafindRoute
+  '/exchange/insights': typeof ExchangeInsightsRoute
+  '/nft/$tokenId': typeof NftTokenIdRoute
+  '/swap/transaction': typeof SwapTransactionRoute
+  '/_auth/dashboard': typeof AuthDashboardRouteLazyRouteWithChildren
+  '/_auth/exchange': typeof AuthExchangeRouteLazyRouteWithChildren
+  '/app/alexandrian': typeof AppAlexandrianLazyRoute
+  '/app/bibliotheca': typeof AppBibliothecaLazyRoute
+  '/app/dialectica': typeof AppDialecticaLazyRoute
+  '/app/emporium': typeof AppEmporiumLazyRoute
+  '/app/permasearch': typeof AppPermasearchLazyRoute
+  '/app/syllogos': typeof AppSyllogosLazyRoute
+  '/exchange/history': typeof ExchangeHistoryLazyRoute
+  '/exchange/redeem': typeof ExchangeRedeemLazyRoute
+  '/exchange/stake': typeof ExchangeStakeLazyRoute
+  '/info/audit': typeof InfoAuditLazyRoute
+  '/info/faq': typeof InfoFaqLazyRoute
+  '/info/whitepaper': typeof InfoWhitepaperLazyRoute
+  '/swap/balance': typeof SwapBalanceLazyRoute
+  '/swap/burn': typeof SwapBurnLazyRoute
+  '/swap/history': typeof SwapHistoryLazyRoute
+  '/swap/insights': typeof SwapInsightsLazyRoute
+  '/swap/receive': typeof SwapReceiveLazyRoute
+  '/swap/redeem': typeof SwapRedeemLazyRoute
+  '/swap/send': typeof SwapSendLazyRoute
+  '/swap/stake': typeof SwapStakeLazyRoute
+  '/swap/swap': typeof SwapSwapLazyRoute
+  '/swap/topup': typeof SwapTopupLazyRoute
+  '/info/': typeof InfoIndexLazyRoute
+  '/swap/': typeof SwapIndexLazyRoute
+  '/_auth/app/imporium': typeof AuthAppImporiumRouteLazyRouteWithChildren
+  '/_auth/dashboard/_librarian': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
+  '/_auth/app/pinax': typeof AuthAppPinaxLazyRoute
+  '/_auth/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
+  '/_auth/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
+  '/_auth/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
+  '/_auth/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
+  '/_auth/exchange/burn': typeof AuthExchangeBurnLazyRoute
+  '/_auth/exchange/': typeof AuthExchangeIndexLazyRoute
+  '/app/perpetua/': typeof AppPerpetuaIndexLazyRoute
+  '/_auth/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
+  '/_auth/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
+  '/_auth/app/imporium/my-logs': typeof AuthAppImporiumMyLogsRoute
+  '/_auth/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
+  '/_auth/dashboard/_librarian/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
+  '/_auth/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
+  '/app/perpetua/item/$itemId': typeof AppPerpetuaItemItemIdLazyRoute
+  '/app/perpetua/shelf/$shelfId': typeof AppPerpetuaShelfShelfIdLazyRoute
+  '/_auth/app/imporium/': typeof AuthAppImporiumIndexLazyRoute
+  '/_auth/dashboard/_librarian/': typeof AuthDashboardLibrarianIndexLazyRoute
+  '/app/perpetua/user/$userId/': typeof AppPerpetuaUserUserIdIndexLazyRoute
+  '/app/perpetua/user/$userId/item/$itemId': typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
+  '/app/perpetua/user/$userId/shelf/$shelfId': typeof AppPerpetuaUserUserIdShelfShelfIdLazyRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/update'
+    | '/exchange'
+    | '/info'
+    | '/manager'
+    | '/app/alexis'
+    | '/app/permafind'
+    | '/exchange/insights'
+    | '/nft/$tokenId'
+    | '/swap/transaction'
+    | '/dashboard'
+    | '/app/alexandrian'
+    | '/app/bibliotheca'
+    | '/app/dialectica'
+    | '/app/emporium'
+    | '/app/permasearch'
+    | '/app/syllogos'
+    | '/exchange/history'
+    | '/exchange/redeem'
+    | '/exchange/stake'
+    | '/info/audit'
+    | '/info/faq'
+    | '/info/whitepaper'
+    | '/swap/balance'
+    | '/swap/burn'
+    | '/swap/history'
+    | '/swap/insights'
+    | '/swap/receive'
+    | '/swap/redeem'
+    | '/swap/send'
+    | '/swap/stake'
+    | '/swap/swap'
+    | '/swap/topup'
+    | '/info/'
+    | '/swap'
+    | '/app/imporium'
+    | '/app/pinax'
+    | '/dashboard/arweave-assets'
+    | '/dashboard/icp-assets'
+    | '/dashboard/profile'
+    | '/dashboard/settings'
+    | '/exchange/burn'
+    | '/exchange/'
+    | '/app/perpetua'
+    | '/app/imporium/market-logs'
+    | '/app/imporium/marketplace'
+    | '/app/imporium/my-logs'
+    | '/app/imporium/nfts'
+    | '/dashboard/wallets'
+    | '/dashboard/profile/upgrade'
+    | '/app/perpetua/item/$itemId'
+    | '/app/perpetua/shelf/$shelfId'
+    | '/app/imporium/'
+    | '/dashboard/'
+    | '/app/perpetua/user/$userId'
+    | '/app/perpetua/user/$userId/item/$itemId'
+    | '/app/perpetua/user/$userId/shelf/$shelfId'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/update'
+    | '/exchange'
+    | '/manager'
+    | '/app/alexis'
+    | '/app/permafind'
+    | '/exchange/insights'
+    | '/nft/$tokenId'
+    | '/swap/transaction'
+    | '/dashboard'
+    | '/app/alexandrian'
+    | '/app/bibliotheca'
+    | '/app/dialectica'
+    | '/app/emporium'
+    | '/app/permasearch'
+    | '/app/syllogos'
+    | '/exchange/history'
+    | '/exchange/redeem'
+    | '/exchange/stake'
+    | '/info/audit'
+    | '/info/faq'
+    | '/info/whitepaper'
+    | '/swap/balance'
+    | '/swap/burn'
+    | '/swap/history'
+    | '/swap/insights'
+    | '/swap/receive'
+    | '/swap/redeem'
+    | '/swap/send'
+    | '/swap/stake'
+    | '/swap/swap'
+    | '/swap/topup'
+    | '/info'
+    | '/swap'
+    | '/app/pinax'
+    | '/dashboard/arweave-assets'
+    | '/dashboard/icp-assets'
+    | '/dashboard/profile'
+    | '/dashboard/settings'
+    | '/exchange/burn'
+    | '/app/perpetua'
+    | '/app/imporium/market-logs'
+    | '/app/imporium/marketplace'
+    | '/app/imporium/my-logs'
+    | '/app/imporium/nfts'
+    | '/dashboard/wallets'
+    | '/dashboard/profile/upgrade'
+    | '/app/perpetua/item/$itemId'
+    | '/app/perpetua/shelf/$shelfId'
+    | '/app/imporium'
+    | '/app/perpetua/user/$userId'
+    | '/app/perpetua/user/$userId/item/$itemId'
+    | '/app/perpetua/user/$userId/shelf/$shelfId'
+  id:
+    | '__root__'
+    | '/'
+    | '/update'
+    | '/_auth'
+    | '/exchange'
+    | '/info'
+    | '/manager'
+    | '/app/alexis'
+    | '/app/permafind'
+    | '/exchange/insights'
+    | '/nft/$tokenId'
+    | '/swap/transaction'
+    | '/_auth/dashboard'
+    | '/_auth/exchange'
+    | '/app/alexandrian'
+    | '/app/bibliotheca'
+    | '/app/dialectica'
+    | '/app/emporium'
+    | '/app/permasearch'
+    | '/app/syllogos'
+    | '/exchange/history'
+    | '/exchange/redeem'
+    | '/exchange/stake'
+    | '/info/audit'
+    | '/info/faq'
+    | '/info/whitepaper'
+    | '/swap/balance'
+    | '/swap/burn'
+    | '/swap/history'
+    | '/swap/insights'
+    | '/swap/receive'
+    | '/swap/redeem'
+    | '/swap/send'
+    | '/swap/stake'
+    | '/swap/swap'
+    | '/swap/topup'
+    | '/info/'
+    | '/swap/'
+    | '/_auth/app/imporium'
+    | '/_auth/dashboard/_librarian'
+    | '/_auth/app/pinax'
+    | '/_auth/dashboard/arweave-assets'
+    | '/_auth/dashboard/icp-assets'
+    | '/_auth/dashboard/profile'
+    | '/_auth/dashboard/settings'
+    | '/_auth/exchange/burn'
+    | '/_auth/exchange/'
+    | '/app/perpetua/'
+    | '/_auth/app/imporium/market-logs'
+    | '/_auth/app/imporium/marketplace'
+    | '/_auth/app/imporium/my-logs'
+    | '/_auth/app/imporium/nfts'
+    | '/_auth/dashboard/_librarian/wallets'
+    | '/_auth/dashboard/profile/upgrade'
+    | '/app/perpetua/item/$itemId'
+    | '/app/perpetua/shelf/$shelfId'
+    | '/_auth/app/imporium/'
+    | '/_auth/dashboard/_librarian/'
+    | '/app/perpetua/user/$userId/'
+    | '/app/perpetua/user/$userId/item/$itemId'
+    | '/app/perpetua/user/$userId/shelf/$shelfId'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  UpdateRoute: typeof UpdateRoute
+  AuthRouteLazyRoute: typeof AuthRouteLazyRouteWithChildren
+  ExchangeRouteLazyRoute: typeof ExchangeRouteLazyRouteWithChildren
+  InfoRouteLazyRoute: typeof InfoRouteLazyRouteWithChildren
+  ManagerLazyRoute: typeof ManagerLazyRoute
+  AppAlexisRoute: typeof AppAlexisRoute
+  AppPermafindRoute: typeof AppPermafindRoute
+  NftTokenIdRoute: typeof NftTokenIdRoute
+  SwapTransactionRoute: typeof SwapTransactionRoute
+  AppAlexandrianLazyRoute: typeof AppAlexandrianLazyRoute
+  AppBibliothecaLazyRoute: typeof AppBibliothecaLazyRoute
+  AppDialecticaLazyRoute: typeof AppDialecticaLazyRoute
+  AppEmporiumLazyRoute: typeof AppEmporiumLazyRoute
+  AppPermasearchLazyRoute: typeof AppPermasearchLazyRoute
+  AppSyllogosLazyRoute: typeof AppSyllogosLazyRoute
+  SwapBalanceLazyRoute: typeof SwapBalanceLazyRoute
+  SwapBurnLazyRoute: typeof SwapBurnLazyRoute
+  SwapHistoryLazyRoute: typeof SwapHistoryLazyRoute
+  SwapInsightsLazyRoute: typeof SwapInsightsLazyRoute
+  SwapReceiveLazyRoute: typeof SwapReceiveLazyRoute
+  SwapRedeemLazyRoute: typeof SwapRedeemLazyRoute
+  SwapSendLazyRoute: typeof SwapSendLazyRoute
+  SwapStakeLazyRoute: typeof SwapStakeLazyRoute
+  SwapSwapLazyRoute: typeof SwapSwapLazyRoute
+  SwapTopupLazyRoute: typeof SwapTopupLazyRoute
+  SwapIndexLazyRoute: typeof SwapIndexLazyRoute
+  AppPerpetuaIndexLazyRoute: typeof AppPerpetuaIndexLazyRoute
+  AppPerpetuaItemItemIdLazyRoute: typeof AppPerpetuaItemItemIdLazyRoute
+  AppPerpetuaShelfShelfIdLazyRoute: typeof AppPerpetuaShelfShelfIdLazyRoute
+  AppPerpetuaUserUserIdIndexLazyRoute: typeof AppPerpetuaUserUserIdIndexLazyRoute
+  AppPerpetuaUserUserIdItemItemIdLazyRoute: typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
+  AppPerpetuaUserUserIdShelfShelfIdLazyRoute: typeof AppPerpetuaUserUserIdShelfShelfIdLazyRoute
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/_auth': {
-      id: '/_auth'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthRouteLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/exchange': {
-      id: '/exchange'
-      path: '/exchange'
-      fullPath: '/exchange'
-      preLoaderRoute: typeof ExchangeRouteLazyImport
-      parentRoute: typeof rootRoute
+    '/manager': {
+      id: '/manager'
+      path: '/manager'
+      fullPath: '/manager'
+      preLoaderRoute: typeof ManagerLazyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/info': {
       id: '/info'
       path: '/info'
       fullPath: '/info'
-      preLoaderRoute: typeof InfoRouteLazyImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof InfoRouteLazyRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/manager': {
-      id: '/manager'
-      path: '/manager'
-      fullPath: '/manager'
-      preLoaderRoute: typeof ManagerLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/exchange/insights': {
-      id: '/exchange/insights'
-      path: '/insights'
-      fullPath: '/exchange/insights'
-      preLoaderRoute: typeof ExchangeInsightsImport
-      parentRoute: typeof ExchangeRouteLazyImport
-    }
-    '/swap/transaction': {
-      id: '/swap/transaction'
-      path: '/swap/transaction'
-      fullPath: '/swap/transaction'
-      preLoaderRoute: typeof SwapTransactionImport
-      parentRoute: typeof rootRoute
-    }
-    '/_auth/dashboard': {
-      id: '/_auth/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthDashboardRouteLazyImport
-      parentRoute: typeof AuthRouteLazyImport
-    }
-    '/_auth/exchange': {
-      id: '/_auth/exchange'
+    '/exchange': {
+      id: '/exchange'
       path: '/exchange'
       fullPath: '/exchange'
-      preLoaderRoute: typeof AuthExchangeRouteLazyImport
-      parentRoute: typeof AuthRouteLazyImport
+      preLoaderRoute: typeof ExchangeRouteLazyRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/app/alexandrian': {
-      id: '/app/alexandrian'
-      path: '/app/alexandrian'
-      fullPath: '/app/alexandrian'
-      preLoaderRoute: typeof AppAlexandrianLazyImport
-      parentRoute: typeof rootRoute
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthRouteLazyRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/app/bibliotheca': {
-      id: '/app/bibliotheca'
-      path: '/app/bibliotheca'
-      fullPath: '/app/bibliotheca'
-      preLoaderRoute: typeof AppBibliothecaLazyImport
-      parentRoute: typeof rootRoute
+    '/update': {
+      id: '/update'
+      path: '/update'
+      fullPath: '/update'
+      preLoaderRoute: typeof UpdateRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/app/dialectica': {
-      id: '/app/dialectica'
-      path: '/app/dialectica'
-      fullPath: '/app/dialectica'
-      preLoaderRoute: typeof AppDialecticaLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/emporium': {
-      id: '/app/emporium'
-      path: '/app/emporium'
-      fullPath: '/app/emporium'
-      preLoaderRoute: typeof AppEmporiumLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/permasearch': {
-      id: '/app/permasearch'
-      path: '/app/permasearch'
-      fullPath: '/app/permasearch'
-      preLoaderRoute: typeof AppPermasearchLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/syllogos': {
-      id: '/app/syllogos'
-      path: '/app/syllogos'
-      fullPath: '/app/syllogos'
-      preLoaderRoute: typeof AppSyllogosLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/exchange/history': {
-      id: '/exchange/history'
-      path: '/history'
-      fullPath: '/exchange/history'
-      preLoaderRoute: typeof ExchangeHistoryLazyImport
-      parentRoute: typeof ExchangeRouteLazyImport
-    }
-    '/exchange/redeem': {
-      id: '/exchange/redeem'
-      path: '/redeem'
-      fullPath: '/exchange/redeem'
-      preLoaderRoute: typeof ExchangeRedeemLazyImport
-      parentRoute: typeof ExchangeRouteLazyImport
-    }
-    '/exchange/stake': {
-      id: '/exchange/stake'
-      path: '/stake'
-      fullPath: '/exchange/stake'
-      preLoaderRoute: typeof ExchangeStakeLazyImport
-      parentRoute: typeof ExchangeRouteLazyImport
-    }
-    '/info/audit': {
-      id: '/info/audit'
-      path: '/audit'
-      fullPath: '/info/audit'
-      preLoaderRoute: typeof InfoAuditLazyImport
-      parentRoute: typeof InfoRouteLazyImport
-    }
-    '/info/faq': {
-      id: '/info/faq'
-      path: '/faq'
-      fullPath: '/info/faq'
-      preLoaderRoute: typeof InfoFaqLazyImport
-      parentRoute: typeof InfoRouteLazyImport
-    }
-    '/info/whitepaper': {
-      id: '/info/whitepaper'
-      path: '/whitepaper'
-      fullPath: '/info/whitepaper'
-      preLoaderRoute: typeof InfoWhitepaperLazyImport
-      parentRoute: typeof InfoRouteLazyImport
-    }
-    '/nft/$tokenId': {
-      id: '/nft/$tokenId'
-      path: '/nft/$tokenId'
-      fullPath: '/nft/$tokenId'
-      preLoaderRoute: typeof NftTokenIdLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/swap/balance': {
-      id: '/swap/balance'
-      path: '/swap/balance'
-      fullPath: '/swap/balance'
-      preLoaderRoute: typeof SwapBalanceLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/swap/burn': {
-      id: '/swap/burn'
-      path: '/swap/burn'
-      fullPath: '/swap/burn'
-      preLoaderRoute: typeof SwapBurnLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/swap/history': {
-      id: '/swap/history'
-      path: '/swap/history'
-      fullPath: '/swap/history'
-      preLoaderRoute: typeof SwapHistoryLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/swap/insights': {
-      id: '/swap/insights'
-      path: '/swap/insights'
-      fullPath: '/swap/insights'
-      preLoaderRoute: typeof SwapInsightsLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/swap/receive': {
-      id: '/swap/receive'
-      path: '/swap/receive'
-      fullPath: '/swap/receive'
-      preLoaderRoute: typeof SwapReceiveLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/swap/redeem': {
-      id: '/swap/redeem'
-      path: '/swap/redeem'
-      fullPath: '/swap/redeem'
-      preLoaderRoute: typeof SwapRedeemLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/swap/send': {
-      id: '/swap/send'
-      path: '/swap/send'
-      fullPath: '/swap/send'
-      preLoaderRoute: typeof SwapSendLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/swap/stake': {
-      id: '/swap/stake'
-      path: '/swap/stake'
-      fullPath: '/swap/stake'
-      preLoaderRoute: typeof SwapStakeLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/swap/swap': {
-      id: '/swap/swap'
-      path: '/swap/swap'
-      fullPath: '/swap/swap'
-      preLoaderRoute: typeof SwapSwapLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/swap/topup': {
-      id: '/swap/topup'
-      path: '/swap/topup'
-      fullPath: '/swap/topup'
-      preLoaderRoute: typeof SwapTopupLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/info/': {
-      id: '/info/'
+    '/': {
+      id: '/'
       path: '/'
-      fullPath: '/info/'
-      preLoaderRoute: typeof InfoIndexLazyImport
-      parentRoute: typeof InfoRouteLazyImport
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/swap/': {
       id: '/swap/'
       path: '/swap'
       fullPath: '/swap'
-      preLoaderRoute: typeof SwapIndexLazyImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof SwapIndexLazyRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_auth/app/imporium': {
-      id: '/_auth/app/imporium'
-      path: '/app/imporium'
-      fullPath: '/app/imporium'
-      preLoaderRoute: typeof AuthAppImporiumRouteLazyImport
-      parentRoute: typeof AuthRouteLazyImport
-    }
-    '/_auth/dashboard/_librarian': {
-      id: '/_auth/dashboard/_librarian'
-      path: ''
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthDashboardLibrarianRouteLazyImport
-      parentRoute: typeof AuthDashboardRouteLazyImport
-    }
-    '/_auth/app/pinax': {
-      id: '/_auth/app/pinax'
-      path: '/app/pinax'
-      fullPath: '/app/pinax'
-      preLoaderRoute: typeof AuthAppPinaxLazyImport
-      parentRoute: typeof AuthRouteLazyImport
-    }
-    '/_auth/dashboard/arweave-assets': {
-      id: '/_auth/dashboard/arweave-assets'
-      path: '/arweave-assets'
-      fullPath: '/dashboard/arweave-assets'
-      preLoaderRoute: typeof AuthDashboardArweaveAssetsLazyImport
-      parentRoute: typeof AuthDashboardRouteLazyImport
-    }
-    '/_auth/dashboard/icp-assets': {
-      id: '/_auth/dashboard/icp-assets'
-      path: '/icp-assets'
-      fullPath: '/dashboard/icp-assets'
-      preLoaderRoute: typeof AuthDashboardIcpAssetsLazyImport
-      parentRoute: typeof AuthDashboardRouteLazyImport
-    }
-    '/_auth/dashboard/profile': {
-      id: '/_auth/dashboard/profile'
-      path: '/profile'
-      fullPath: '/dashboard/profile'
-      preLoaderRoute: typeof AuthDashboardProfileLazyImport
-      parentRoute: typeof AuthDashboardRouteLazyImport
-    }
-    '/_auth/dashboard/settings': {
-      id: '/_auth/dashboard/settings'
-      path: '/settings'
-      fullPath: '/dashboard/settings'
-      preLoaderRoute: typeof AuthDashboardSettingsLazyImport
-      parentRoute: typeof AuthDashboardRouteLazyImport
-    }
-    '/_auth/exchange/burn': {
-      id: '/_auth/exchange/burn'
-      path: '/burn'
-      fullPath: '/exchange/burn'
-      preLoaderRoute: typeof AuthExchangeBurnLazyImport
-      parentRoute: typeof AuthExchangeRouteLazyImport
-    }
-    '/_auth/exchange/': {
-      id: '/_auth/exchange/'
+    '/info/': {
+      id: '/info/'
       path: '/'
-      fullPath: '/exchange/'
-      preLoaderRoute: typeof AuthExchangeIndexLazyImport
-      parentRoute: typeof AuthExchangeRouteLazyImport
+      fullPath: '/info/'
+      preLoaderRoute: typeof InfoIndexLazyRouteImport
+      parentRoute: typeof InfoRouteLazyRoute
+    }
+    '/swap/topup': {
+      id: '/swap/topup'
+      path: '/swap/topup'
+      fullPath: '/swap/topup'
+      preLoaderRoute: typeof SwapTopupLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap/swap': {
+      id: '/swap/swap'
+      path: '/swap/swap'
+      fullPath: '/swap/swap'
+      preLoaderRoute: typeof SwapSwapLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap/stake': {
+      id: '/swap/stake'
+      path: '/swap/stake'
+      fullPath: '/swap/stake'
+      preLoaderRoute: typeof SwapStakeLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap/send': {
+      id: '/swap/send'
+      path: '/swap/send'
+      fullPath: '/swap/send'
+      preLoaderRoute: typeof SwapSendLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap/redeem': {
+      id: '/swap/redeem'
+      path: '/swap/redeem'
+      fullPath: '/swap/redeem'
+      preLoaderRoute: typeof SwapRedeemLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap/receive': {
+      id: '/swap/receive'
+      path: '/swap/receive'
+      fullPath: '/swap/receive'
+      preLoaderRoute: typeof SwapReceiveLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap/insights': {
+      id: '/swap/insights'
+      path: '/swap/insights'
+      fullPath: '/swap/insights'
+      preLoaderRoute: typeof SwapInsightsLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap/history': {
+      id: '/swap/history'
+      path: '/swap/history'
+      fullPath: '/swap/history'
+      preLoaderRoute: typeof SwapHistoryLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap/burn': {
+      id: '/swap/burn'
+      path: '/swap/burn'
+      fullPath: '/swap/burn'
+      preLoaderRoute: typeof SwapBurnLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap/balance': {
+      id: '/swap/balance'
+      path: '/swap/balance'
+      fullPath: '/swap/balance'
+      preLoaderRoute: typeof SwapBalanceLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/info/whitepaper': {
+      id: '/info/whitepaper'
+      path: '/whitepaper'
+      fullPath: '/info/whitepaper'
+      preLoaderRoute: typeof InfoWhitepaperLazyRouteImport
+      parentRoute: typeof InfoRouteLazyRoute
+    }
+    '/info/faq': {
+      id: '/info/faq'
+      path: '/faq'
+      fullPath: '/info/faq'
+      preLoaderRoute: typeof InfoFaqLazyRouteImport
+      parentRoute: typeof InfoRouteLazyRoute
+    }
+    '/info/audit': {
+      id: '/info/audit'
+      path: '/audit'
+      fullPath: '/info/audit'
+      preLoaderRoute: typeof InfoAuditLazyRouteImport
+      parentRoute: typeof InfoRouteLazyRoute
+    }
+    '/exchange/stake': {
+      id: '/exchange/stake'
+      path: '/stake'
+      fullPath: '/exchange/stake'
+      preLoaderRoute: typeof ExchangeStakeLazyRouteImport
+      parentRoute: typeof ExchangeRouteLazyRoute
+    }
+    '/exchange/redeem': {
+      id: '/exchange/redeem'
+      path: '/redeem'
+      fullPath: '/exchange/redeem'
+      preLoaderRoute: typeof ExchangeRedeemLazyRouteImport
+      parentRoute: typeof ExchangeRouteLazyRoute
+    }
+    '/exchange/history': {
+      id: '/exchange/history'
+      path: '/history'
+      fullPath: '/exchange/history'
+      preLoaderRoute: typeof ExchangeHistoryLazyRouteImport
+      parentRoute: typeof ExchangeRouteLazyRoute
+    }
+    '/app/syllogos': {
+      id: '/app/syllogos'
+      path: '/app/syllogos'
+      fullPath: '/app/syllogos'
+      preLoaderRoute: typeof AppSyllogosLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/permasearch': {
+      id: '/app/permasearch'
+      path: '/app/permasearch'
+      fullPath: '/app/permasearch'
+      preLoaderRoute: typeof AppPermasearchLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/emporium': {
+      id: '/app/emporium'
+      path: '/app/emporium'
+      fullPath: '/app/emporium'
+      preLoaderRoute: typeof AppEmporiumLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/dialectica': {
+      id: '/app/dialectica'
+      path: '/app/dialectica'
+      fullPath: '/app/dialectica'
+      preLoaderRoute: typeof AppDialecticaLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/bibliotheca': {
+      id: '/app/bibliotheca'
+      path: '/app/bibliotheca'
+      fullPath: '/app/bibliotheca'
+      preLoaderRoute: typeof AppBibliothecaLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/alexandrian': {
+      id: '/app/alexandrian'
+      path: '/app/alexandrian'
+      fullPath: '/app/alexandrian'
+      preLoaderRoute: typeof AppAlexandrianLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/exchange': {
+      id: '/_auth/exchange'
+      path: '/exchange'
+      fullPath: '/exchange'
+      preLoaderRoute: typeof AuthExchangeRouteLazyRouteImport
+      parentRoute: typeof AuthRouteLazyRoute
+    }
+    '/_auth/dashboard': {
+      id: '/_auth/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthDashboardRouteLazyRouteImport
+      parentRoute: typeof AuthRouteLazyRoute
+    }
+    '/swap/transaction': {
+      id: '/swap/transaction'
+      path: '/swap/transaction'
+      fullPath: '/swap/transaction'
+      preLoaderRoute: typeof SwapTransactionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nft/$tokenId': {
+      id: '/nft/$tokenId'
+      path: '/nft/$tokenId'
+      fullPath: '/nft/$tokenId'
+      preLoaderRoute: typeof NftTokenIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exchange/insights': {
+      id: '/exchange/insights'
+      path: '/insights'
+      fullPath: '/exchange/insights'
+      preLoaderRoute: typeof ExchangeInsightsRouteImport
+      parentRoute: typeof ExchangeRouteLazyRoute
+    }
+    '/app/permafind': {
+      id: '/app/permafind'
+      path: '/app/permafind'
+      fullPath: '/app/permafind'
+      preLoaderRoute: typeof AppPermafindRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/alexis': {
+      id: '/app/alexis'
+      path: '/app/alexis'
+      fullPath: '/app/alexis'
+      preLoaderRoute: typeof AppAlexisRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/app/perpetua/': {
       id: '/app/perpetua/'
       path: '/app/perpetua'
       fullPath: '/app/perpetua'
-      preLoaderRoute: typeof AppPerpetuaIndexLazyImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AppPerpetuaIndexLazyRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_auth/app/imporium/listings': {
-      id: '/_auth/app/imporium/listings'
-      path: '/listings'
-      fullPath: '/app/imporium/listings'
-      preLoaderRoute: typeof AuthAppImporiumListingsImport
-      parentRoute: typeof AuthAppImporiumRouteLazyImport
-    }
-    '/_auth/app/imporium/market-logs': {
-      id: '/_auth/app/imporium/market-logs'
-      path: '/market-logs'
-      fullPath: '/app/imporium/market-logs'
-      preLoaderRoute: typeof AuthAppImporiumMarketLogsImport
-      parentRoute: typeof AuthAppImporiumRouteLazyImport
-    }
-    '/_auth/app/imporium/marketplace': {
-      id: '/_auth/app/imporium/marketplace'
-      path: '/marketplace'
-      fullPath: '/app/imporium/marketplace'
-      preLoaderRoute: typeof AuthAppImporiumMarketplaceImport
-      parentRoute: typeof AuthAppImporiumRouteLazyImport
-    }
-    '/_auth/app/imporium/nfts': {
-      id: '/_auth/app/imporium/nfts'
-      path: '/nfts'
-      fullPath: '/app/imporium/nfts'
-      preLoaderRoute: typeof AuthAppImporiumNftsImport
-      parentRoute: typeof AuthAppImporiumRouteLazyImport
-    }
-    '/_auth/app/imporium/my-logs': {
-      id: '/_auth/app/imporium/my-logs'
-      path: '/my-logs'
-      fullPath: '/app/imporium/my-logs'
-      preLoaderRoute: typeof AuthAppImporiumMyLogsLazyImport
-      parentRoute: typeof AuthAppImporiumRouteLazyImport
-    }
-    '/_auth/dashboard/_librarian/wallets': {
-      id: '/_auth/dashboard/_librarian/wallets'
-      path: '/wallets'
-      fullPath: '/dashboard/wallets'
-      preLoaderRoute: typeof AuthDashboardLibrarianWalletsLazyImport
-      parentRoute: typeof AuthDashboardLibrarianRouteLazyImport
-    }
-    '/_auth/dashboard/profile/upgrade': {
-      id: '/_auth/dashboard/profile/upgrade'
-      path: '/upgrade'
-      fullPath: '/dashboard/profile/upgrade'
-      preLoaderRoute: typeof AuthDashboardProfileUpgradeLazyImport
-      parentRoute: typeof AuthDashboardProfileLazyImport
-    }
-    '/app/perpetua/item/$itemId': {
-      id: '/app/perpetua/item/$itemId'
-      path: '/app/perpetua/item/$itemId'
-      fullPath: '/app/perpetua/item/$itemId'
-      preLoaderRoute: typeof AppPerpetuaItemItemIdLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/perpetua/shelf/$shelfId': {
-      id: '/app/perpetua/shelf/$shelfId'
-      path: '/app/perpetua/shelf/$shelfId'
-      fullPath: '/app/perpetua/shelf/$shelfId'
-      preLoaderRoute: typeof AppPerpetuaShelfShelfIdLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/_auth/app/imporium/': {
-      id: '/_auth/app/imporium/'
+    '/_auth/exchange/': {
+      id: '/_auth/exchange/'
       path: '/'
-      fullPath: '/app/imporium/'
-      preLoaderRoute: typeof AuthAppImporiumIndexLazyImport
-      parentRoute: typeof AuthAppImporiumRouteLazyImport
+      fullPath: '/exchange/'
+      preLoaderRoute: typeof AuthExchangeIndexLazyRouteImport
+      parentRoute: typeof AuthExchangeRouteLazyRoute
+    }
+    '/_auth/exchange/burn': {
+      id: '/_auth/exchange/burn'
+      path: '/burn'
+      fullPath: '/exchange/burn'
+      preLoaderRoute: typeof AuthExchangeBurnLazyRouteImport
+      parentRoute: typeof AuthExchangeRouteLazyRoute
+    }
+    '/_auth/dashboard/settings': {
+      id: '/_auth/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof AuthDashboardSettingsLazyRouteImport
+      parentRoute: typeof AuthDashboardRouteLazyRoute
+    }
+    '/_auth/dashboard/profile': {
+      id: '/_auth/dashboard/profile'
+      path: '/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof AuthDashboardProfileLazyRouteImport
+      parentRoute: typeof AuthDashboardRouteLazyRoute
+    }
+    '/_auth/dashboard/icp-assets': {
+      id: '/_auth/dashboard/icp-assets'
+      path: '/icp-assets'
+      fullPath: '/dashboard/icp-assets'
+      preLoaderRoute: typeof AuthDashboardIcpAssetsLazyRouteImport
+      parentRoute: typeof AuthDashboardRouteLazyRoute
+    }
+    '/_auth/dashboard/arweave-assets': {
+      id: '/_auth/dashboard/arweave-assets'
+      path: '/arweave-assets'
+      fullPath: '/dashboard/arweave-assets'
+      preLoaderRoute: typeof AuthDashboardArweaveAssetsLazyRouteImport
+      parentRoute: typeof AuthDashboardRouteLazyRoute
+    }
+    '/_auth/app/pinax': {
+      id: '/_auth/app/pinax'
+      path: '/app/pinax'
+      fullPath: '/app/pinax'
+      preLoaderRoute: typeof AuthAppPinaxLazyRouteImport
+      parentRoute: typeof AuthRouteLazyRoute
+    }
+    '/_auth/dashboard/_librarian': {
+      id: '/_auth/dashboard/_librarian'
+      path: ''
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthDashboardLibrarianRouteLazyRouteImport
+      parentRoute: typeof AuthDashboardRouteLazyRoute
+    }
+    '/_auth/app/imporium': {
+      id: '/_auth/app/imporium'
+      path: '/app/imporium'
+      fullPath: '/app/imporium'
+      preLoaderRoute: typeof AuthAppImporiumRouteLazyRouteImport
+      parentRoute: typeof AuthRouteLazyRoute
     }
     '/_auth/dashboard/_librarian/': {
       id: '/_auth/dashboard/_librarian/'
       path: '/'
       fullPath: '/dashboard/'
-      preLoaderRoute: typeof AuthDashboardLibrarianIndexLazyImport
-      parentRoute: typeof AuthDashboardLibrarianRouteLazyImport
+      preLoaderRoute: typeof AuthDashboardLibrarianIndexLazyRouteImport
+      parentRoute: typeof AuthDashboardLibrarianRouteLazyRoute
+    }
+    '/_auth/app/imporium/': {
+      id: '/_auth/app/imporium/'
+      path: '/'
+      fullPath: '/app/imporium/'
+      preLoaderRoute: typeof AuthAppImporiumIndexLazyRouteImport
+      parentRoute: typeof AuthAppImporiumRouteLazyRoute
+    }
+    '/app/perpetua/shelf/$shelfId': {
+      id: '/app/perpetua/shelf/$shelfId'
+      path: '/app/perpetua/shelf/$shelfId'
+      fullPath: '/app/perpetua/shelf/$shelfId'
+      preLoaderRoute: typeof AppPerpetuaShelfShelfIdLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/perpetua/item/$itemId': {
+      id: '/app/perpetua/item/$itemId'
+      path: '/app/perpetua/item/$itemId'
+      fullPath: '/app/perpetua/item/$itemId'
+      preLoaderRoute: typeof AppPerpetuaItemItemIdLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/dashboard/profile/upgrade': {
+      id: '/_auth/dashboard/profile/upgrade'
+      path: '/upgrade'
+      fullPath: '/dashboard/profile/upgrade'
+      preLoaderRoute: typeof AuthDashboardProfileUpgradeLazyRouteImport
+      parentRoute: typeof AuthDashboardProfileLazyRoute
+    }
+    '/_auth/dashboard/_librarian/wallets': {
+      id: '/_auth/dashboard/_librarian/wallets'
+      path: '/wallets'
+      fullPath: '/dashboard/wallets'
+      preLoaderRoute: typeof AuthDashboardLibrarianWalletsLazyRouteImport
+      parentRoute: typeof AuthDashboardLibrarianRouteLazyRoute
+    }
+    '/_auth/app/imporium/nfts': {
+      id: '/_auth/app/imporium/nfts'
+      path: '/nfts'
+      fullPath: '/app/imporium/nfts'
+      preLoaderRoute: typeof AuthAppImporiumNftsRouteImport
+      parentRoute: typeof AuthAppImporiumRouteLazyRoute
+    }
+    '/_auth/app/imporium/my-logs': {
+      id: '/_auth/app/imporium/my-logs'
+      path: '/my-logs'
+      fullPath: '/app/imporium/my-logs'
+      preLoaderRoute: typeof AuthAppImporiumMyLogsRouteImport
+      parentRoute: typeof AuthAppImporiumRouteLazyRoute
+    }
+    '/_auth/app/imporium/marketplace': {
+      id: '/_auth/app/imporium/marketplace'
+      path: '/marketplace'
+      fullPath: '/app/imporium/marketplace'
+      preLoaderRoute: typeof AuthAppImporiumMarketplaceRouteImport
+      parentRoute: typeof AuthAppImporiumRouteLazyRoute
+    }
+    '/_auth/app/imporium/market-logs': {
+      id: '/_auth/app/imporium/market-logs'
+      path: '/market-logs'
+      fullPath: '/app/imporium/market-logs'
+      preLoaderRoute: typeof AuthAppImporiumMarketLogsRouteImport
+      parentRoute: typeof AuthAppImporiumRouteLazyRoute
     }
     '/app/perpetua/user/$userId/': {
       id: '/app/perpetua/user/$userId/'
       path: '/app/perpetua/user/$userId'
       fullPath: '/app/perpetua/user/$userId'
-      preLoaderRoute: typeof AppPerpetuaUserUserIdIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/app/perpetua/user/$userId/item/$itemId': {
-      id: '/app/perpetua/user/$userId/item/$itemId'
-      path: '/app/perpetua/user/$userId/item/$itemId'
-      fullPath: '/app/perpetua/user/$userId/item/$itemId'
-      preLoaderRoute: typeof AppPerpetuaUserUserIdItemItemIdLazyImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AppPerpetuaUserUserIdIndexLazyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/app/perpetua/user/$userId/shelf/$shelfId': {
       id: '/app/perpetua/user/$userId/shelf/$shelfId'
       path: '/app/perpetua/user/$userId/shelf/$shelfId'
       fullPath: '/app/perpetua/user/$userId/shelf/$shelfId'
-      preLoaderRoute: typeof AppPerpetuaUserUserIdShelfShelfIdLazyImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AppPerpetuaUserUserIdShelfShelfIdLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/perpetua/user/$userId/item/$itemId': {
+      id: '/app/perpetua/user/$userId/item/$itemId'
+      path: '/app/perpetua/user/$userId/item/$itemId'
+      fullPath: '/app/perpetua/user/$userId/item/$itemId'
+      preLoaderRoute: typeof AppPerpetuaUserUserIdItemItemIdLazyRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-// Create and export the route tree
 
 interface AuthDashboardLibrarianRouteLazyRouteChildren {
   AuthDashboardLibrarianWalletsLazyRoute: typeof AuthDashboardLibrarianWalletsLazyRoute
@@ -1037,21 +1394,19 @@ const AuthExchangeRouteLazyRouteWithChildren =
   )
 
 interface AuthAppImporiumRouteLazyRouteChildren {
-  AuthAppImporiumListingsRoute: typeof AuthAppImporiumListingsRoute
   AuthAppImporiumMarketLogsRoute: typeof AuthAppImporiumMarketLogsRoute
   AuthAppImporiumMarketplaceRoute: typeof AuthAppImporiumMarketplaceRoute
+  AuthAppImporiumMyLogsRoute: typeof AuthAppImporiumMyLogsRoute
   AuthAppImporiumNftsRoute: typeof AuthAppImporiumNftsRoute
-  AuthAppImporiumMyLogsLazyRoute: typeof AuthAppImporiumMyLogsLazyRoute
   AuthAppImporiumIndexLazyRoute: typeof AuthAppImporiumIndexLazyRoute
 }
 
 const AuthAppImporiumRouteLazyRouteChildren: AuthAppImporiumRouteLazyRouteChildren =
   {
-    AuthAppImporiumListingsRoute: AuthAppImporiumListingsRoute,
     AuthAppImporiumMarketLogsRoute: AuthAppImporiumMarketLogsRoute,
     AuthAppImporiumMarketplaceRoute: AuthAppImporiumMarketplaceRoute,
+    AuthAppImporiumMyLogsRoute: AuthAppImporiumMyLogsRoute,
     AuthAppImporiumNftsRoute: AuthAppImporiumNftsRoute,
-    AuthAppImporiumMyLogsLazyRoute: AuthAppImporiumMyLogsLazyRoute,
     AuthAppImporiumIndexLazyRoute: AuthAppImporiumIndexLazyRoute,
   }
 
@@ -1113,397 +1468,16 @@ const InfoRouteLazyRouteWithChildren = InfoRouteLazyRoute._addFileChildren(
   InfoRouteLazyRouteChildren,
 )
 
-export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '': typeof AuthRouteLazyRouteWithChildren
-  '/exchange': typeof AuthExchangeRouteLazyRouteWithChildren
-  '/info': typeof InfoRouteLazyRouteWithChildren
-  '/manager': typeof ManagerLazyRoute
-  '/exchange/insights': typeof ExchangeInsightsRoute
-  '/swap/transaction': typeof SwapTransactionRoute
-  '/dashboard': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
-  '/app/alexandrian': typeof AppAlexandrianLazyRoute
-  '/app/bibliotheca': typeof AppBibliothecaLazyRoute
-  '/app/dialectica': typeof AppDialecticaLazyRoute
-  '/app/emporium': typeof AppEmporiumLazyRoute
-  '/app/permasearch': typeof AppPermasearchLazyRoute
-  '/app/syllogos': typeof AppSyllogosLazyRoute
-  '/exchange/history': typeof ExchangeHistoryLazyRoute
-  '/exchange/redeem': typeof ExchangeRedeemLazyRoute
-  '/exchange/stake': typeof ExchangeStakeLazyRoute
-  '/info/audit': typeof InfoAuditLazyRoute
-  '/info/faq': typeof InfoFaqLazyRoute
-  '/info/whitepaper': typeof InfoWhitepaperLazyRoute
-  '/nft/$tokenId': typeof NftTokenIdLazyRoute
-  '/swap/balance': typeof SwapBalanceLazyRoute
-  '/swap/burn': typeof SwapBurnLazyRoute
-  '/swap/history': typeof SwapHistoryLazyRoute
-  '/swap/insights': typeof SwapInsightsLazyRoute
-  '/swap/receive': typeof SwapReceiveLazyRoute
-  '/swap/redeem': typeof SwapRedeemLazyRoute
-  '/swap/send': typeof SwapSendLazyRoute
-  '/swap/stake': typeof SwapStakeLazyRoute
-  '/swap/swap': typeof SwapSwapLazyRoute
-  '/swap/topup': typeof SwapTopupLazyRoute
-  '/info/': typeof InfoIndexLazyRoute
-  '/swap': typeof SwapIndexLazyRoute
-  '/app/imporium': typeof AuthAppImporiumRouteLazyRouteWithChildren
-  '/app/pinax': typeof AuthAppPinaxLazyRoute
-  '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
-  '/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
-  '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
-  '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
-  '/exchange/burn': typeof AuthExchangeBurnLazyRoute
-  '/exchange/': typeof AuthExchangeIndexLazyRoute
-  '/app/perpetua': typeof AppPerpetuaIndexLazyRoute
-  '/app/imporium/listings': typeof AuthAppImporiumListingsRoute
-  '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
-  '/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
-  '/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
-  '/app/imporium/my-logs': typeof AuthAppImporiumMyLogsLazyRoute
-  '/dashboard/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
-  '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
-  '/app/perpetua/item/$itemId': typeof AppPerpetuaItemItemIdLazyRoute
-  '/app/perpetua/shelf/$shelfId': typeof AppPerpetuaShelfShelfIdLazyRoute
-  '/app/imporium/': typeof AuthAppImporiumIndexLazyRoute
-  '/dashboard/': typeof AuthDashboardLibrarianIndexLazyRoute
-  '/app/perpetua/user/$userId': typeof AppPerpetuaUserUserIdIndexLazyRoute
-  '/app/perpetua/user/$userId/item/$itemId': typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
-  '/app/perpetua/user/$userId/shelf/$shelfId': typeof AppPerpetuaUserUserIdShelfShelfIdLazyRoute
-}
-
-export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '': typeof AuthRouteLazyRouteWithChildren
-  '/exchange': typeof AuthExchangeIndexLazyRoute
-  '/manager': typeof ManagerLazyRoute
-  '/exchange/insights': typeof ExchangeInsightsRoute
-  '/swap/transaction': typeof SwapTransactionRoute
-  '/dashboard': typeof AuthDashboardLibrarianIndexLazyRoute
-  '/app/alexandrian': typeof AppAlexandrianLazyRoute
-  '/app/bibliotheca': typeof AppBibliothecaLazyRoute
-  '/app/dialectica': typeof AppDialecticaLazyRoute
-  '/app/emporium': typeof AppEmporiumLazyRoute
-  '/app/permasearch': typeof AppPermasearchLazyRoute
-  '/app/syllogos': typeof AppSyllogosLazyRoute
-  '/exchange/history': typeof ExchangeHistoryLazyRoute
-  '/exchange/redeem': typeof ExchangeRedeemLazyRoute
-  '/exchange/stake': typeof ExchangeStakeLazyRoute
-  '/info/audit': typeof InfoAuditLazyRoute
-  '/info/faq': typeof InfoFaqLazyRoute
-  '/info/whitepaper': typeof InfoWhitepaperLazyRoute
-  '/nft/$tokenId': typeof NftTokenIdLazyRoute
-  '/swap/balance': typeof SwapBalanceLazyRoute
-  '/swap/burn': typeof SwapBurnLazyRoute
-  '/swap/history': typeof SwapHistoryLazyRoute
-  '/swap/insights': typeof SwapInsightsLazyRoute
-  '/swap/receive': typeof SwapReceiveLazyRoute
-  '/swap/redeem': typeof SwapRedeemLazyRoute
-  '/swap/send': typeof SwapSendLazyRoute
-  '/swap/stake': typeof SwapStakeLazyRoute
-  '/swap/swap': typeof SwapSwapLazyRoute
-  '/swap/topup': typeof SwapTopupLazyRoute
-  '/info': typeof InfoIndexLazyRoute
-  '/swap': typeof SwapIndexLazyRoute
-  '/app/pinax': typeof AuthAppPinaxLazyRoute
-  '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
-  '/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
-  '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
-  '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
-  '/exchange/burn': typeof AuthExchangeBurnLazyRoute
-  '/app/perpetua': typeof AppPerpetuaIndexLazyRoute
-  '/app/imporium/listings': typeof AuthAppImporiumListingsRoute
-  '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
-  '/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
-  '/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
-  '/app/imporium/my-logs': typeof AuthAppImporiumMyLogsLazyRoute
-  '/dashboard/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
-  '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
-  '/app/perpetua/item/$itemId': typeof AppPerpetuaItemItemIdLazyRoute
-  '/app/perpetua/shelf/$shelfId': typeof AppPerpetuaShelfShelfIdLazyRoute
-  '/app/imporium': typeof AuthAppImporiumIndexLazyRoute
-  '/app/perpetua/user/$userId': typeof AppPerpetuaUserUserIdIndexLazyRoute
-  '/app/perpetua/user/$userId/item/$itemId': typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
-  '/app/perpetua/user/$userId/shelf/$shelfId': typeof AppPerpetuaUserUserIdShelfShelfIdLazyRoute
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
-  '/_auth': typeof AuthRouteLazyRouteWithChildren
-  '/exchange': typeof ExchangeRouteLazyRouteWithChildren
-  '/info': typeof InfoRouteLazyRouteWithChildren
-  '/manager': typeof ManagerLazyRoute
-  '/exchange/insights': typeof ExchangeInsightsRoute
-  '/swap/transaction': typeof SwapTransactionRoute
-  '/_auth/dashboard': typeof AuthDashboardRouteLazyRouteWithChildren
-  '/_auth/exchange': typeof AuthExchangeRouteLazyRouteWithChildren
-  '/app/alexandrian': typeof AppAlexandrianLazyRoute
-  '/app/bibliotheca': typeof AppBibliothecaLazyRoute
-  '/app/dialectica': typeof AppDialecticaLazyRoute
-  '/app/emporium': typeof AppEmporiumLazyRoute
-  '/app/permasearch': typeof AppPermasearchLazyRoute
-  '/app/syllogos': typeof AppSyllogosLazyRoute
-  '/exchange/history': typeof ExchangeHistoryLazyRoute
-  '/exchange/redeem': typeof ExchangeRedeemLazyRoute
-  '/exchange/stake': typeof ExchangeStakeLazyRoute
-  '/info/audit': typeof InfoAuditLazyRoute
-  '/info/faq': typeof InfoFaqLazyRoute
-  '/info/whitepaper': typeof InfoWhitepaperLazyRoute
-  '/nft/$tokenId': typeof NftTokenIdLazyRoute
-  '/swap/balance': typeof SwapBalanceLazyRoute
-  '/swap/burn': typeof SwapBurnLazyRoute
-  '/swap/history': typeof SwapHistoryLazyRoute
-  '/swap/insights': typeof SwapInsightsLazyRoute
-  '/swap/receive': typeof SwapReceiveLazyRoute
-  '/swap/redeem': typeof SwapRedeemLazyRoute
-  '/swap/send': typeof SwapSendLazyRoute
-  '/swap/stake': typeof SwapStakeLazyRoute
-  '/swap/swap': typeof SwapSwapLazyRoute
-  '/swap/topup': typeof SwapTopupLazyRoute
-  '/info/': typeof InfoIndexLazyRoute
-  '/swap/': typeof SwapIndexLazyRoute
-  '/_auth/app/imporium': typeof AuthAppImporiumRouteLazyRouteWithChildren
-  '/_auth/dashboard/_librarian': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
-  '/_auth/app/pinax': typeof AuthAppPinaxLazyRoute
-  '/_auth/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
-  '/_auth/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
-  '/_auth/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
-  '/_auth/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
-  '/_auth/exchange/burn': typeof AuthExchangeBurnLazyRoute
-  '/_auth/exchange/': typeof AuthExchangeIndexLazyRoute
-  '/app/perpetua/': typeof AppPerpetuaIndexLazyRoute
-  '/_auth/app/imporium/listings': typeof AuthAppImporiumListingsRoute
-  '/_auth/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
-  '/_auth/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
-  '/_auth/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
-  '/_auth/app/imporium/my-logs': typeof AuthAppImporiumMyLogsLazyRoute
-  '/_auth/dashboard/_librarian/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
-  '/_auth/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
-  '/app/perpetua/item/$itemId': typeof AppPerpetuaItemItemIdLazyRoute
-  '/app/perpetua/shelf/$shelfId': typeof AppPerpetuaShelfShelfIdLazyRoute
-  '/_auth/app/imporium/': typeof AuthAppImporiumIndexLazyRoute
-  '/_auth/dashboard/_librarian/': typeof AuthDashboardLibrarianIndexLazyRoute
-  '/app/perpetua/user/$userId/': typeof AppPerpetuaUserUserIdIndexLazyRoute
-  '/app/perpetua/user/$userId/item/$itemId': typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
-  '/app/perpetua/user/$userId/shelf/$shelfId': typeof AppPerpetuaUserUserIdShelfShelfIdLazyRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | ''
-    | '/exchange'
-    | '/info'
-    | '/manager'
-    | '/exchange/insights'
-    | '/swap/transaction'
-    | '/dashboard'
-    | '/app/alexandrian'
-    | '/app/bibliotheca'
-    | '/app/dialectica'
-    | '/app/emporium'
-    | '/app/permasearch'
-    | '/app/syllogos'
-    | '/exchange/history'
-    | '/exchange/redeem'
-    | '/exchange/stake'
-    | '/info/audit'
-    | '/info/faq'
-    | '/info/whitepaper'
-    | '/nft/$tokenId'
-    | '/swap/balance'
-    | '/swap/burn'
-    | '/swap/history'
-    | '/swap/insights'
-    | '/swap/receive'
-    | '/swap/redeem'
-    | '/swap/send'
-    | '/swap/stake'
-    | '/swap/swap'
-    | '/swap/topup'
-    | '/info/'
-    | '/swap'
-    | '/app/imporium'
-    | '/app/pinax'
-    | '/dashboard/arweave-assets'
-    | '/dashboard/icp-assets'
-    | '/dashboard/profile'
-    | '/dashboard/settings'
-    | '/exchange/burn'
-    | '/exchange/'
-    | '/app/perpetua'
-    | '/app/imporium/listings'
-    | '/app/imporium/market-logs'
-    | '/app/imporium/marketplace'
-    | '/app/imporium/nfts'
-    | '/app/imporium/my-logs'
-    | '/dashboard/wallets'
-    | '/dashboard/profile/upgrade'
-    | '/app/perpetua/item/$itemId'
-    | '/app/perpetua/shelf/$shelfId'
-    | '/app/imporium/'
-    | '/dashboard/'
-    | '/app/perpetua/user/$userId'
-    | '/app/perpetua/user/$userId/item/$itemId'
-    | '/app/perpetua/user/$userId/shelf/$shelfId'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | ''
-    | '/exchange'
-    | '/manager'
-    | '/exchange/insights'
-    | '/swap/transaction'
-    | '/dashboard'
-    | '/app/alexandrian'
-    | '/app/bibliotheca'
-    | '/app/dialectica'
-    | '/app/emporium'
-    | '/app/permasearch'
-    | '/app/syllogos'
-    | '/exchange/history'
-    | '/exchange/redeem'
-    | '/exchange/stake'
-    | '/info/audit'
-    | '/info/faq'
-    | '/info/whitepaper'
-    | '/nft/$tokenId'
-    | '/swap/balance'
-    | '/swap/burn'
-    | '/swap/history'
-    | '/swap/insights'
-    | '/swap/receive'
-    | '/swap/redeem'
-    | '/swap/send'
-    | '/swap/stake'
-    | '/swap/swap'
-    | '/swap/topup'
-    | '/info'
-    | '/swap'
-    | '/app/pinax'
-    | '/dashboard/arweave-assets'
-    | '/dashboard/icp-assets'
-    | '/dashboard/profile'
-    | '/dashboard/settings'
-    | '/exchange/burn'
-    | '/app/perpetua'
-    | '/app/imporium/listings'
-    | '/app/imporium/market-logs'
-    | '/app/imporium/marketplace'
-    | '/app/imporium/nfts'
-    | '/app/imporium/my-logs'
-    | '/dashboard/wallets'
-    | '/dashboard/profile/upgrade'
-    | '/app/perpetua/item/$itemId'
-    | '/app/perpetua/shelf/$shelfId'
-    | '/app/imporium'
-    | '/app/perpetua/user/$userId'
-    | '/app/perpetua/user/$userId/item/$itemId'
-    | '/app/perpetua/user/$userId/shelf/$shelfId'
-  id:
-    | '__root__'
-    | '/'
-    | '/_auth'
-    | '/exchange'
-    | '/info'
-    | '/manager'
-    | '/exchange/insights'
-    | '/swap/transaction'
-    | '/_auth/dashboard'
-    | '/_auth/exchange'
-    | '/app/alexandrian'
-    | '/app/bibliotheca'
-    | '/app/dialectica'
-    | '/app/emporium'
-    | '/app/permasearch'
-    | '/app/syllogos'
-    | '/exchange/history'
-    | '/exchange/redeem'
-    | '/exchange/stake'
-    | '/info/audit'
-    | '/info/faq'
-    | '/info/whitepaper'
-    | '/nft/$tokenId'
-    | '/swap/balance'
-    | '/swap/burn'
-    | '/swap/history'
-    | '/swap/insights'
-    | '/swap/receive'
-    | '/swap/redeem'
-    | '/swap/send'
-    | '/swap/stake'
-    | '/swap/swap'
-    | '/swap/topup'
-    | '/info/'
-    | '/swap/'
-    | '/_auth/app/imporium'
-    | '/_auth/dashboard/_librarian'
-    | '/_auth/app/pinax'
-    | '/_auth/dashboard/arweave-assets'
-    | '/_auth/dashboard/icp-assets'
-    | '/_auth/dashboard/profile'
-    | '/_auth/dashboard/settings'
-    | '/_auth/exchange/burn'
-    | '/_auth/exchange/'
-    | '/app/perpetua/'
-    | '/_auth/app/imporium/listings'
-    | '/_auth/app/imporium/market-logs'
-    | '/_auth/app/imporium/marketplace'
-    | '/_auth/app/imporium/nfts'
-    | '/_auth/app/imporium/my-logs'
-    | '/_auth/dashboard/_librarian/wallets'
-    | '/_auth/dashboard/profile/upgrade'
-    | '/app/perpetua/item/$itemId'
-    | '/app/perpetua/shelf/$shelfId'
-    | '/_auth/app/imporium/'
-    | '/_auth/dashboard/_librarian/'
-    | '/app/perpetua/user/$userId/'
-    | '/app/perpetua/user/$userId/item/$itemId'
-    | '/app/perpetua/user/$userId/shelf/$shelfId'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  AuthRouteLazyRoute: typeof AuthRouteLazyRouteWithChildren
-  ExchangeRouteLazyRoute: typeof ExchangeRouteLazyRouteWithChildren
-  InfoRouteLazyRoute: typeof InfoRouteLazyRouteWithChildren
-  ManagerLazyRoute: typeof ManagerLazyRoute
-  SwapTransactionRoute: typeof SwapTransactionRoute
-  AppAlexandrianLazyRoute: typeof AppAlexandrianLazyRoute
-  AppBibliothecaLazyRoute: typeof AppBibliothecaLazyRoute
-  AppDialecticaLazyRoute: typeof AppDialecticaLazyRoute
-  AppEmporiumLazyRoute: typeof AppEmporiumLazyRoute
-  AppPermasearchLazyRoute: typeof AppPermasearchLazyRoute
-  AppSyllogosLazyRoute: typeof AppSyllogosLazyRoute
-  NftTokenIdLazyRoute: typeof NftTokenIdLazyRoute
-  SwapBalanceLazyRoute: typeof SwapBalanceLazyRoute
-  SwapBurnLazyRoute: typeof SwapBurnLazyRoute
-  SwapHistoryLazyRoute: typeof SwapHistoryLazyRoute
-  SwapInsightsLazyRoute: typeof SwapInsightsLazyRoute
-  SwapReceiveLazyRoute: typeof SwapReceiveLazyRoute
-  SwapRedeemLazyRoute: typeof SwapRedeemLazyRoute
-  SwapSendLazyRoute: typeof SwapSendLazyRoute
-  SwapStakeLazyRoute: typeof SwapStakeLazyRoute
-  SwapSwapLazyRoute: typeof SwapSwapLazyRoute
-  SwapTopupLazyRoute: typeof SwapTopupLazyRoute
-  SwapIndexLazyRoute: typeof SwapIndexLazyRoute
-  AppPerpetuaIndexLazyRoute: typeof AppPerpetuaIndexLazyRoute
-  AppPerpetuaItemItemIdLazyRoute: typeof AppPerpetuaItemItemIdLazyRoute
-  AppPerpetuaShelfShelfIdLazyRoute: typeof AppPerpetuaShelfShelfIdLazyRoute
-  AppPerpetuaUserUserIdIndexLazyRoute: typeof AppPerpetuaUserUserIdIndexLazyRoute
-  AppPerpetuaUserUserIdItemItemIdLazyRoute: typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
-  AppPerpetuaUserUserIdShelfShelfIdLazyRoute: typeof AppPerpetuaUserUserIdShelfShelfIdLazyRoute
-}
-
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
+  IndexRoute: IndexRoute,
+  UpdateRoute: UpdateRoute,
   AuthRouteLazyRoute: AuthRouteLazyRouteWithChildren,
   ExchangeRouteLazyRoute: ExchangeRouteLazyRouteWithChildren,
   InfoRouteLazyRoute: InfoRouteLazyRouteWithChildren,
   ManagerLazyRoute: ManagerLazyRoute,
+  AppAlexisRoute: AppAlexisRoute,
+  AppPermafindRoute: AppPermafindRoute,
+  NftTokenIdRoute: NftTokenIdRoute,
   SwapTransactionRoute: SwapTransactionRoute,
   AppAlexandrianLazyRoute: AppAlexandrianLazyRoute,
   AppBibliothecaLazyRoute: AppBibliothecaLazyRoute,
@@ -1511,7 +1485,6 @@ const rootRouteChildren: RootRouteChildren = {
   AppEmporiumLazyRoute: AppEmporiumLazyRoute,
   AppPermasearchLazyRoute: AppPermasearchLazyRoute,
   AppSyllogosLazyRoute: AppSyllogosLazyRoute,
-  NftTokenIdLazyRoute: NftTokenIdLazyRoute,
   SwapBalanceLazyRoute: SwapBalanceLazyRoute,
   SwapBurnLazyRoute: SwapBurnLazyRoute,
   SwapHistoryLazyRoute: SwapHistoryLazyRoute,
@@ -1532,295 +1505,6 @@ const rootRouteChildren: RootRouteChildren = {
   AppPerpetuaUserUserIdShelfShelfIdLazyRoute:
     AppPerpetuaUserUserIdShelfShelfIdLazyRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/_auth",
-        "/exchange",
-        "/info",
-        "/manager",
-        "/swap/transaction",
-        "/app/alexandrian",
-        "/app/bibliotheca",
-        "/app/dialectica",
-        "/app/emporium",
-        "/app/permasearch",
-        "/app/syllogos",
-        "/nft/$tokenId",
-        "/swap/balance",
-        "/swap/burn",
-        "/swap/history",
-        "/swap/insights",
-        "/swap/receive",
-        "/swap/redeem",
-        "/swap/send",
-        "/swap/stake",
-        "/swap/swap",
-        "/swap/topup",
-        "/swap/",
-        "/app/perpetua/",
-        "/app/perpetua/item/$itemId",
-        "/app/perpetua/shelf/$shelfId",
-        "/app/perpetua/user/$userId/",
-        "/app/perpetua/user/$userId/item/$itemId",
-        "/app/perpetua/user/$userId/shelf/$shelfId"
-      ]
-    },
-    "/": {
-      "filePath": "index.lazy.tsx"
-    },
-    "/_auth": {
-      "filePath": "_auth/route.lazy.tsx",
-      "children": [
-        "/_auth/dashboard",
-        "/_auth/exchange",
-        "/_auth/app/imporium",
-        "/_auth/app/pinax"
-      ]
-    },
-    "/exchange": {
-      "filePath": "exchange/route.lazy.tsx",
-      "children": [
-        "/exchange/insights",
-        "/exchange/history",
-        "/exchange/redeem",
-        "/exchange/stake"
-      ]
-    },
-    "/info": {
-      "filePath": "info/route.lazy.tsx",
-      "children": [
-        "/info/audit",
-        "/info/faq",
-        "/info/whitepaper",
-        "/info/"
-      ]
-    },
-    "/manager": {
-      "filePath": "manager.lazy.tsx"
-    },
-    "/exchange/insights": {
-      "filePath": "exchange/insights.tsx",
-      "parent": "/exchange"
-    },
-    "/swap/transaction": {
-      "filePath": "swap/transaction.tsx"
-    },
-    "/_auth/dashboard": {
-      "filePath": "_auth/dashboard/route.lazy.tsx",
-      "parent": "/_auth",
-      "children": [
-        "/_auth/dashboard/_librarian",
-        "/_auth/dashboard/arweave-assets",
-        "/_auth/dashboard/icp-assets",
-        "/_auth/dashboard/profile",
-        "/_auth/dashboard/settings"
-      ]
-    },
-    "/_auth/exchange": {
-      "filePath": "_auth/exchange/route.lazy.tsx",
-      "parent": "/_auth",
-      "children": [
-        "/_auth/exchange/burn",
-        "/_auth/exchange/"
-      ]
-    },
-    "/app/alexandrian": {
-      "filePath": "app/alexandrian.lazy.tsx"
-    },
-    "/app/bibliotheca": {
-      "filePath": "app/bibliotheca.lazy.tsx"
-    },
-    "/app/dialectica": {
-      "filePath": "app/dialectica.lazy.tsx"
-    },
-    "/app/emporium": {
-      "filePath": "app/emporium.lazy.tsx"
-    },
-    "/app/permasearch": {
-      "filePath": "app/permasearch.lazy.tsx"
-    },
-    "/app/syllogos": {
-      "filePath": "app/syllogos.lazy.tsx"
-    },
-    "/exchange/history": {
-      "filePath": "exchange/history.lazy.tsx",
-      "parent": "/exchange"
-    },
-    "/exchange/redeem": {
-      "filePath": "exchange/redeem.lazy.tsx",
-      "parent": "/exchange"
-    },
-    "/exchange/stake": {
-      "filePath": "exchange/stake.lazy.tsx",
-      "parent": "/exchange"
-    },
-    "/info/audit": {
-      "filePath": "info/audit.lazy.tsx",
-      "parent": "/info"
-    },
-    "/info/faq": {
-      "filePath": "info/faq.lazy.tsx",
-      "parent": "/info"
-    },
-    "/info/whitepaper": {
-      "filePath": "info/whitepaper.lazy.tsx",
-      "parent": "/info"
-    },
-    "/nft/$tokenId": {
-      "filePath": "nft.$tokenId.lazy.tsx"
-    },
-    "/swap/balance": {
-      "filePath": "swap/balance.lazy.tsx"
-    },
-    "/swap/burn": {
-      "filePath": "swap/burn.lazy.tsx"
-    },
-    "/swap/history": {
-      "filePath": "swap/history.lazy.tsx"
-    },
-    "/swap/insights": {
-      "filePath": "swap/insights.lazy.tsx"
-    },
-    "/swap/receive": {
-      "filePath": "swap/receive.lazy.tsx"
-    },
-    "/swap/redeem": {
-      "filePath": "swap/redeem.lazy.tsx"
-    },
-    "/swap/send": {
-      "filePath": "swap/send.lazy.tsx"
-    },
-    "/swap/stake": {
-      "filePath": "swap/stake.lazy.tsx"
-    },
-    "/swap/swap": {
-      "filePath": "swap/swap.lazy.tsx"
-    },
-    "/swap/topup": {
-      "filePath": "swap/topup.lazy.tsx"
-    },
-    "/info/": {
-      "filePath": "info/index.lazy.tsx",
-      "parent": "/info"
-    },
-    "/swap/": {
-      "filePath": "swap/index.lazy.tsx"
-    },
-    "/_auth/app/imporium": {
-      "filePath": "_auth/app/imporium/route.lazy.tsx",
-      "parent": "/_auth",
-      "children": [
-        "/_auth/app/imporium/listings",
-        "/_auth/app/imporium/market-logs",
-        "/_auth/app/imporium/marketplace",
-        "/_auth/app/imporium/nfts",
-        "/_auth/app/imporium/my-logs",
-        "/_auth/app/imporium/"
-      ]
-    },
-    "/_auth/dashboard/_librarian": {
-      "filePath": "_auth/dashboard/_librarian/route.lazy.tsx",
-      "parent": "/_auth/dashboard",
-      "children": [
-        "/_auth/dashboard/_librarian/wallets",
-        "/_auth/dashboard/_librarian/"
-      ]
-    },
-    "/_auth/app/pinax": {
-      "filePath": "_auth/app/pinax.lazy.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/dashboard/arweave-assets": {
-      "filePath": "_auth/dashboard/arweave-assets.lazy.tsx",
-      "parent": "/_auth/dashboard"
-    },
-    "/_auth/dashboard/icp-assets": {
-      "filePath": "_auth/dashboard/icp-assets.lazy.tsx",
-      "parent": "/_auth/dashboard"
-    },
-    "/_auth/dashboard/profile": {
-      "filePath": "_auth/dashboard/profile.lazy.tsx",
-      "parent": "/_auth/dashboard",
-      "children": [
-        "/_auth/dashboard/profile/upgrade"
-      ]
-    },
-    "/_auth/dashboard/settings": {
-      "filePath": "_auth/dashboard/settings.lazy.tsx",
-      "parent": "/_auth/dashboard"
-    },
-    "/_auth/exchange/burn": {
-      "filePath": "_auth/exchange/burn.lazy.tsx",
-      "parent": "/_auth/exchange"
-    },
-    "/_auth/exchange/": {
-      "filePath": "_auth/exchange/index.lazy.tsx",
-      "parent": "/_auth/exchange"
-    },
-    "/app/perpetua/": {
-      "filePath": "app/perpetua/index.lazy.tsx"
-    },
-    "/_auth/app/imporium/listings": {
-      "filePath": "_auth/app/imporium/listings.tsx",
-      "parent": "/_auth/app/imporium"
-    },
-    "/_auth/app/imporium/market-logs": {
-      "filePath": "_auth/app/imporium/market-logs.tsx",
-      "parent": "/_auth/app/imporium"
-    },
-    "/_auth/app/imporium/marketplace": {
-      "filePath": "_auth/app/imporium/marketplace.tsx",
-      "parent": "/_auth/app/imporium"
-    },
-    "/_auth/app/imporium/nfts": {
-      "filePath": "_auth/app/imporium/nfts.tsx",
-      "parent": "/_auth/app/imporium"
-    },
-    "/_auth/app/imporium/my-logs": {
-      "filePath": "_auth/app/imporium/my-logs.lazy.tsx",
-      "parent": "/_auth/app/imporium"
-    },
-    "/_auth/dashboard/_librarian/wallets": {
-      "filePath": "_auth/dashboard/_librarian/wallets.lazy.tsx",
-      "parent": "/_auth/dashboard/_librarian"
-    },
-    "/_auth/dashboard/profile/upgrade": {
-      "filePath": "_auth/dashboard/profile.upgrade.lazy.tsx",
-      "parent": "/_auth/dashboard/profile"
-    },
-    "/app/perpetua/item/$itemId": {
-      "filePath": "app/perpetua/item.$itemId.lazy.tsx"
-    },
-    "/app/perpetua/shelf/$shelfId": {
-      "filePath": "app/perpetua/shelf.$shelfId.lazy.tsx"
-    },
-    "/_auth/app/imporium/": {
-      "filePath": "_auth/app/imporium/index.lazy.tsx",
-      "parent": "/_auth/app/imporium"
-    },
-    "/_auth/dashboard/_librarian/": {
-      "filePath": "_auth/dashboard/_librarian/index.lazy.tsx",
-      "parent": "/_auth/dashboard/_librarian"
-    },
-    "/app/perpetua/user/$userId/": {
-      "filePath": "app/perpetua/user/$userId/index.lazy.tsx"
-    },
-    "/app/perpetua/user/$userId/item/$itemId": {
-      "filePath": "app/perpetua/user/$userId/item.$itemId.lazy.tsx"
-    },
-    "/app/perpetua/user/$userId/shelf/$shelfId": {
-      "filePath": "app/perpetua/user/$userId/shelf.$shelfId.lazy.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

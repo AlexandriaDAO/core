@@ -17,7 +17,7 @@ const Copy: React.FC<CopyProps> = ({ text, size = "base" }) => {
         await wait(2000);
         setSuccess(false);
     }
-    
+
     const sizeClasses = {
         sm: {
             button: "p-0.5 rounded-full transition-colors",

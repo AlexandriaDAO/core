@@ -37,7 +37,7 @@ export const FILE_TYPES = {
     description: "Video and audio files"
   },
   ebooks: {
-    types: ["application/epub+zip"],
+    types: ["application/epub+zip", "application/epub", "application/x-mobipocket-ebook", "application/vnd.amazon.ebook"],
     icon: <BookOpen className="w-7 h-7 text-muted-foreground" strokeWidth={1.5} />,
     label: "E-books",
     maxSize: 30 * 1024 * 1024, // 30MB

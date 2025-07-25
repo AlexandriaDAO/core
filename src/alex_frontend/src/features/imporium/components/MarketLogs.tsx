@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketLogs from "../thunks/getMarketLogs";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -16,14 +16,12 @@ import Copy from "@/components/Copy";
 
 const MarketLogs: React.FC = () => {
     const dispatch = useAppDispatch();
-    const { logs, totalPages, pageSize } = useAppSelector((state) => state.imporium);
-    const [page, setPage] = React.useState(0);
+    const { logs, totalPages, pageSize, currentPage } = useAppSelector((state) => state.imporium);
 
-    const handlePageClick = (event: { selected: number }) => {
+    const handlePageClick = useCallback((event: { selected: number }) => {
         const newPage = event.selected + 1; // ReactPaginate is 0-based, our API is 1-based
-        setPage(event.selected);
         dispatch(getMarketLogs({ page: newPage, pageSize }));
-    };
+    }, [dispatch, pageSize]);
 
     return (
         <div className="">
@@ -96,7 +94,7 @@ const MarketLogs: React.FC = () => {
                         marginPagesDisplayed={2}
                         pageRangeDisplayed={3}
                         onPageChange={handlePageClick}
-                        forcePage={page}
+                        forcePage={currentPage > 0 ? currentPage - 1 : 0}
                         containerClassName="flex items-center gap-1"
                         pageLinkClassName="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-accent transition-colors duration-200"
                         previousLinkClassName="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-accent transition-colors duration-200"
