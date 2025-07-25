@@ -6,6 +6,12 @@ const getAlexPrice = createAsyncThunk<string, ActorSubclass<_SERVICE>, { rejectV
   "alex/getAlexPrice",
   async (actor, { rejectWithValue }) => {
     try {
+      // Skip price fetching in local development
+      if (process.env.DFX_NETWORK === "local") {
+        console.log("Skipping ALEX price fetch in local development");
+        return "1.0"; // Default price for local testing
+      }
+      
       const poolData = await actor.getPoolsForToken(
         "ysy5f-2qaaa-aaaap-qkmmq-cai"
       );

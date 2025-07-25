@@ -301,3 +301,9 @@ echo "  alex_frontend"
 echo ""
 echo "Frontend URL: http://$(dfx canister id alex_frontend).localhost:4943"
 echo "========================================="
+
+# Fix the .env file to ensure correct canister IDs are preserved
+echo "Fixing .env file with correct canister IDs..."
+sed -i "s/CANISTER_ID_ICP_LEDGER_CANISTER=.*/CANISTER_ID_ICP_LEDGER_CANISTER='ryjl3-tyaaa-aaaaa-aaaba-cai'/" .env
+sed -i "s/CANISTER_ID_XRC=.*/CANISTER_ID_XRC='uf6dk-hyaaa-aaaaq-qaaaq-cai'/" .env
+echo "Fixed .env file with correct canister IDs"

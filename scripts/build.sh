@@ -143,7 +143,7 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
         record {  
           \"$DEFAULT_ACCOUNT_ID\";  
           record {  
-            e8s = 8_681_981_000_000_000 : nat64;  
+            e8s = 100_000_000_000_000_000 : nat64;  
           };  
           \"$ALICE_ACCOUNT_ID\";  
           record {  

@@ -11,6 +11,12 @@ const price = createAsyncThunk<
 	{ rejectValue: string }
 >('balance/alex/price', async (_, { rejectWithValue }) => {
 	try {
+		// Skip price fetching in local development
+		if (process.env.DFX_NETWORK === 'local') {
+			console.log('Skipping ALEX price fetch in local development');
+			return 1.0; // Default price for local testing
+		}
+
 		// Check if ICP Swap Factory actor is available
 		if (!icp_swap_factory) {
 			return rejectWithValue('ICP Swap Factory canister not available');
