@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect } from "react";
 import { Alert } from "@/components/Alert";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { TopupBalanceWarning } from "@/components/TopupBalanceWarning";
+import TopupBalanceWarning from "@/components/TopupBalanceWarning";
 import { UnauthenticatedWarning } from "@/components/UnauthenticatedWarning";
 
 // Redux actions for UI state
@@ -12,42 +11,14 @@ import { setPage } from "@/features/alexandrian/alexandrianSlice";
 import fetchUsers from "@/features/alexandrian/thunks/fetchUsers";
 
 // TanStack Query hook for token data
-import useAlexandrianTokens from "@/features/alexandrian/hooks/useAlexandrianTokens";
+import useTokens from "@/features/alexandrian/hooks/useTokens";
 
 // Components
-import {
-	FilterBar,
-	TokensGrid,
-	PaginationControls,
-} from "@/features/alexandrian/components";
+import { FilterBar, TokensGrid, PaginationControls } from "@/features/alexandrian/components";
 
 function AlexisPage() {
 	const dispatch = useAppDispatch();
-	const { user } = useAppSelector((state) => state.auth);
-
-	// Redux state for UI filters and user data
-	const { selectedUser, collectionType, sortOrder, page, pageSize, sortBy } =
-		useAppSelector((state) => state.alexandrian);
-
-	// TanStack Query hook for token data with automatic caching and cancellation
-	const {
-		tokens,
-		totalPages,
-		totalItems,
-		loading,
-		updating,
-		error,
-		refresh,
-		updateTokenOwnership,
-	} = useAlexandrianTokens({
-		collectionType,
-		user: selectedUser,
-		page,
-		pageSize,
-		sortOrder,
-		sortBy,
-		currentUserPrincipal: user?.principal,
-	});
+	const {tokens, totalPages, loading, updating, error, refresh } = useTokens();
 
 	// Load users on mount (keeping Redux for now)
 	useEffect(() => {
@@ -92,7 +63,7 @@ function AlexisPage() {
 
 				{error && <Alert variant="danger" title="Error">{error}</Alert>}
 
-				<TokensGrid tokens={tokens} loading={loading} updateTokenOwnership={updateTokenOwnership} />
+				<TokensGrid tokens={tokens} loading={loading} />
 
 				<PaginationControls totalPages={totalPages} disabled={disabled} onPageClick={handlePageClick} />
 			</div>

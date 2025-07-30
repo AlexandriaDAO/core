@@ -4,10 +4,14 @@ import { Link } from "@tanstack/react-router";
 import { AlertCircle } from "lucide-react";
 import { Alert } from "./Alert";
 
-export function TopupBalanceWarning() {
+interface TopupBalanceWarningProps {
+	minimumBalance?: number;
+}
+
+const TopupBalanceWarning: React.FC<TopupBalanceWarningProps> = ({ minimumBalance = 10 }) => {
 	const { lbry: { locked } } = useAppSelector((state) => state.balance);
 
-	if (locked < 0 || locked > 10) return null;
+	if (locked < 0 || locked > minimumBalance) return null;
 
 	return (
 		<Alert
@@ -31,3 +35,6 @@ export function TopupBalanceWarning() {
 		</Alert>
 	);
 }
+
+
+export default TopupBalanceWarning;

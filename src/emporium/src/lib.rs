@@ -11,6 +11,9 @@ pub use update::*;
 mod queries;
 pub use queries::*;
 
+mod listings;
+pub use listings::{ListingsQuery, ListingsResponse, SortBy, SortOrder, get_listings};
+
 
 mod guard;
 pub use guard::{*};

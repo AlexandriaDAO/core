@@ -7,7 +7,6 @@ export const convertTokenData = async (
 	tokenAdapter: TokenAdapter,
 	principalId: string,
 	collectionType: 'NFT' | 'SBT',
-	ownedTokenIds: Set<string>,
 	signal?: AbortSignal
 ): Promise<Record<string, AlexandrianToken>> => {
 	const tokens: Record<string, AlexandrianToken> = {};
@@ -28,8 +27,7 @@ export const convertTokenData = async (
 				tokenId,
 				tokenAdapter,
 				principalId,
-				collectionType,
-				ownedTokenIds
+				collectionType
 			);
 			return tokenData;
 		});
@@ -52,8 +50,7 @@ const convertSingleToken = async (
 	tokenId: bigint,
 	tokenAdapter: TokenAdapter,
 	principalId: string,
-	collectionType: 'NFT' | 'SBT',
-	ownedTokenIds: Set<string>
+	collectionType: 'NFT' | 'SBT'
 ): Promise<AlexandrianToken | null> => {
 	try {
 		let ownerPrincipal = principalId;
@@ -76,7 +73,6 @@ const convertSingleToken = async (
 			collection: collectionType,
 			canister: tokenData.canister,
 			createdAt: Date.now(),
-			owned: ownedTokenIds.has(tokenId.toString()),
 		};
 	} catch (error) {
 		console.warn(`Failed to convert token ${tokenId}:`, error);

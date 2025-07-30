@@ -35,8 +35,8 @@ export const useAddToShelf = () => {
 		try {
 			let tokenToAdd = token;
 
-			// If token is not owned, mint it first
-			if (!token.owned) {
+			// If token is not owned by current user, mint it first
+			if (token.owner !== user.principal) {
 				try {
 					await dispatch(mint({
 						actor: nftManagerActor,
@@ -44,7 +44,7 @@ export const useAddToShelf = () => {
 					})).unwrap();
 
 					// Update token ownership status
-					tokenToAdd = { ...token, owned: true };
+					tokenToAdd = { ...token, owner: user.principal };
 				} catch (error) {
 					// Error messages are already handled in the mint thunk
 					return;

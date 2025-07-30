@@ -2,14 +2,13 @@ import { createTokenAdapter } from "../adapters/TokenAdapter";
 import { TokenFetchParams, TokenFetchResult } from "../types";
 import { fetchAllTokens } from "./fetchAllTokens";
 import { fetchUserTokens } from "./fetchUserTokens";
-import { fetchTokenOwnership } from "./fetchTokenOwnership";
 import { convertTokenData } from "../utils/convertTokenData";
 import { sortTokensByBalance } from "../utils/sortTokens";
 import { fetchBalances } from "./fetchBalances";
 import { calculatePagination } from "../utils/calculatePagination";
 
 // Create the main fetcher function with type-safe parameters
-export const createTokenFetcher = (currentUserPrincipal?: string) => {
+export const createTokenFetcher = () => {
 	return async (params: TokenFetchParams, signal?: AbortSignal): Promise<TokenFetchResult> => {
 
 		// Check for cancellation right away
@@ -36,20 +35,16 @@ export const createTokenFetcher = (currentUserPrincipal?: string) => {
 			totalCount = result.totalCount;
 		}
 
-		// Step 2: Check ownership for the current user (for showing "owned" status)
-		const ownedTokenIds = await fetchTokenOwnership(tokenAdapter, currentUserPrincipal, signal);
-
-		// Step 3: Convert token IDs to full token data
+		// Step 2: Convert token IDs to full token data
 		const tokens = await convertTokenData(
 			tokenIds,
 			tokenAdapter,
 			params.user || "all",
 			params.collectionType,
-			ownedTokenIds,
 			signal
 		);
 
-		// Step 4: Apply custom sorting if requested
+		// Step 3: Apply custom sorting if requested
 		let sortedTokens = tokens;
 
 		if (params.sortBy === 'alex' || params.sortBy === 'lbry') {
@@ -65,7 +60,7 @@ export const createTokenFetcher = (currentUserPrincipal?: string) => {
 		// For 'default' sorting, tokens are already sorted by the API, so no action needed
 
 
-		// Step 5: Calculate pagination info
+		// Step 4: Calculate pagination info
 		const { totalItems, totalPages } = calculatePagination(totalCount, params.pageSize);
 
 		// Final cancellation check

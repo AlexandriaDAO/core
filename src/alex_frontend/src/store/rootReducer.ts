@@ -36,7 +36,7 @@ import emporiumReducer from "@/apps/app/Emporium/emporiumSlice";
 
 import arweaveAssetsReducer from '@/features/arweave-assets/arweaveAssetsSlice';
 import icpAssetsReducer from '@/features/icp-assets/icpAssetsSlice';
-import imporiumReducer from '@/features/imporium/imporiumSlice';
+import marketplaceReducer from '@/features/marketplace/marketplaceSlice';
 import userDisplayReducer from './slices/userDisplaySlice';
 import balanceReducer from '@/features/balance/balanceSlice';
 import insightsReducer from '@/features/insights/insightsSlice';
@@ -81,7 +81,7 @@ const rootReducer = combineReducers({
 	nftData: nftDataReducer,
 	emporium: emporiumReducer,
 	assetManager:assetManagerReducer,
-	imporium: imporiumReducer,
+	marketplace: marketplaceReducer,
 
 	arweaveAssets: arweaveAssetsReducer,
 	icpAssets: icpAssetsReducer,
