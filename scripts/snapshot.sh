@@ -21,6 +21,12 @@ dfx canister stop alex_wallet --network ic
 dfx canister snapshot create alex_wallet --replace 00000000000000000000000001f0531e0101 --network ic
 dfx canister start alex_wallet --network ic
 
+# alex_backend
+dfx canister stop alex_backend --network ic
+dfx canister snapshot create alex_backend --replace 00000000000000000000000001f0531b0101 --network ic
+dfx canister start alex_backend --network ic
+
+
 # user (done)
 dfx canister stop user --network ic
 dfx canister snapshot create user --replace 00000000000000010000000001f0531d0101 --network ic

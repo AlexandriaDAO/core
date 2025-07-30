@@ -1,15 +1,15 @@
-type Keys = record { public_key : text; slot : nat8; private_key : text };
-type Result = variant { Ok; Err : text };
-type SourceCard = record {
-  title : text;
-  user_query : text;
-  post_id : nat64;
-  content : text;
-  heading : text;
-  author : text;
-  summary : text;
-  bookmarked : bool;
+type HttpRequest = record {
+  url : text;
+  method : text;
+  body : blob;
+  headers : vec record { text; text };
 };
+type HttpResponse = record {
+  body : blob;
+  headers : vec record { text; text };
+  status_code : nat16;
+};
+type Result = variant { Ok : text; Err : text };
 type UserNFTInfo = record {
   "principal" : principal;
   username : text;
@@ -18,15 +18,8 @@ type UserNFTInfo = record {
   has_nfts : bool;
 };
 service : () -> {
-  bookmark_sc : (nat64) -> ();
-  delete_keys : (nat8) -> (Result);
-  delete_sc : (nat64) -> ();
-  get_bookmarks : () -> (vec opt SourceCard) query;
-  get_keys : () -> (vec Keys) query;
-  get_librarian_keys : (principal) -> (vec Keys) query;
-  get_sc : (nat64) -> (opt SourceCard) query;
   get_stored_nft_users : () -> (vec UserNFTInfo) query;
-  save_keys : (text, text, nat8) -> (Result);
-  save_sc : (text, text, text, text, text, text) -> (nat64);
-  whoami : () -> (principal) query;
+  http_request : (HttpRequest) -> (HttpResponse) query;
+  start_alex_supply_timer : () -> (Result);
+  update_alex_supply : () -> (Result);
 }

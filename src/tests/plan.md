@@ -1,9 +1,6 @@
 Before next mainnet push:
 
 
-
-
-
 #### Bigger Features (lower priority):
 - Loading is much faster without the nsfw check, and also permasearch page load is much longer when we make it by default. Instead we should allow people to search without NSFW checks, and let them check the individual nft that they want to mint. So we could do a no safe-search where no mints happen, a full safe search like we do now, and a mint-mode, where there's no default safe search but a check when someone goes to mint something.
 - The upload payment is not enforced in the backend and a sophisticated user could bypass it by changing the redux state.
@@ -61,7 +58,9 @@ NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I 09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 3y657-6y3dm-dmdo2-6dgg5-z2br2-kwpt2-l7hdo-6etpm-eygih-f35ll-vae)
+
+
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal cx6oe-xwspk-7wdwp-y342m-5epm6-vqffe-jqgz2-n6qu7-gwlnk-5dhvp-kqe)
 
 
 

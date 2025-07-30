@@ -2,8 +2,8 @@ import React from "react";
 import { Link } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 
-const Route = createFileRoute("/update")({
-	component: UpdatePage,
+export const Route = createFileRoute("/update")({
+	loader: () => void 0,
 });
 
 
