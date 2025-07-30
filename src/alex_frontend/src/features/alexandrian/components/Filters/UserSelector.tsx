@@ -19,6 +19,9 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { setSelectedUser } from "../../alexandrianSlice";
 
+// Emporium canister ID for "Listed" option
+const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
+
 export function UserSelector() {
 	const dispatch = useAppDispatch();
 	const { selectedUser, users, collectionType } = useAppSelector((state) => state.alexandrian);
@@ -26,6 +29,7 @@ export function UserSelector() {
 
 	const getUserDisplayName = (userId: string | null) => {
 		if (!userId) return "Most Recent";
+		if (userId === emporium_canister_id) return "Listed Items";
 		const foundUser = users.find((u) => u.principal === userId);
 		return foundUser ? foundUser.username : userId;
 	};
@@ -68,6 +72,15 @@ export function UserSelector() {
 									)}
 								/>
 								Most Recent
+							</CommandItem>
+							<CommandItem onSelect={() => handleUserSelect(emporium_canister_id)}>
+								<CheckIcon
+									className={cn(
+										"mr-2 h-4 w-4",
+										selectedUser === emporium_canister_id ? "opacity-100" : "opacity-0"
+									)}
+								/>
+								Listed
 							</CommandItem>
 							{getApplicableUsers().map((user) => (
 								<CommandItem

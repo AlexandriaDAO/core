@@ -18,10 +18,9 @@ import { Route as NftTokenIdRouteImport } from './routes/nft.$tokenId'
 import { Route as ExchangeInsightsRouteImport } from './routes/exchange/insights'
 import { Route as AppPermafindRouteImport } from './routes/app/permafind'
 import { Route as AppAlexisRouteImport } from './routes/app/alexis'
-import { Route as AuthAppImporiumNftsRouteImport } from './routes/_auth/app/imporium/nfts'
-import { Route as AuthAppImporiumMyLogsRouteImport } from './routes/_auth/app/imporium/my-logs'
-import { Route as AuthAppImporiumMarketplaceRouteImport } from './routes/_auth/app/imporium/marketplace'
-import { Route as AuthAppImporiumMarketLogsRouteImport } from './routes/_auth/app/imporium/market-logs'
+import { Route as AuthAppEmporiumIndexRouteImport } from './routes/_auth/app/emporium/index'
+import { Route as AuthAppEmporiumMyLogsRouteImport } from './routes/_auth/app/emporium/my-logs'
+import { Route as AuthAppEmporiumMarketLogsRouteImport } from './routes/_auth/app/emporium/market-logs'
 
 const ManagerLazyRouteImport = createFileRoute('/manager')()
 const InfoRouteLazyRouteImport = createFileRoute('/info')()
@@ -47,7 +46,6 @@ const ExchangeRedeemLazyRouteImport = createFileRoute('/exchange/redeem')()
 const ExchangeHistoryLazyRouteImport = createFileRoute('/exchange/history')()
 const AppSyllogosLazyRouteImport = createFileRoute('/app/syllogos')()
 const AppPermasearchLazyRouteImport = createFileRoute('/app/permasearch')()
-const AppEmporiumLazyRouteImport = createFileRoute('/app/emporium')()
 const AppDialecticaLazyRouteImport = createFileRoute('/app/dialectica')()
 const AppBibliothecaLazyRouteImport = createFileRoute('/app/bibliotheca')()
 const AppAlexandrianLazyRouteImport = createFileRoute('/app/alexandrian')()
@@ -74,14 +72,11 @@ const AuthAppPinaxLazyRouteImport = createFileRoute('/_auth/app/pinax')()
 const AuthDashboardLibrarianRouteLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian',
 )()
-const AuthAppImporiumRouteLazyRouteImport = createFileRoute(
-  '/_auth/app/imporium',
+const AuthAppEmporiumRouteLazyRouteImport = createFileRoute(
+  '/_auth/app/emporium',
 )()
 const AuthDashboardLibrarianIndexLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian/',
-)()
-const AuthAppImporiumIndexLazyRouteImport = createFileRoute(
-  '/_auth/app/imporium/',
 )()
 const AppPerpetuaShelfShelfIdLazyRouteImport = createFileRoute(
   '/app/perpetua/shelf/$shelfId',
@@ -246,11 +241,6 @@ const AppPermasearchLazyRoute = AppPermasearchLazyRouteImport.update({
 } as any).lazy(() =>
   import('./routes/app/permasearch.lazy').then((d) => d.Route),
 )
-const AppEmporiumLazyRoute = AppEmporiumLazyRouteImport.update({
-  id: '/app/emporium',
-  path: '/app/emporium',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/app/emporium.lazy').then((d) => d.Route))
 const AppDialecticaLazyRoute = AppDialecticaLazyRouteImport.update({
   id: '/app/dialectica',
   path: '/app/dialectica',
@@ -384,13 +374,13 @@ const AuthDashboardLibrarianRouteLazyRoute =
       (d) => d.Route,
     ),
   )
-const AuthAppImporiumRouteLazyRoute =
-  AuthAppImporiumRouteLazyRouteImport.update({
-    id: '/app/imporium',
-    path: '/app/imporium',
+const AuthAppEmporiumRouteLazyRoute =
+  AuthAppEmporiumRouteLazyRouteImport.update({
+    id: '/app/emporium',
+    path: '/app/emporium',
     getParentRoute: () => AuthRouteLazyRoute,
   } as any).lazy(() =>
-    import('./routes/_auth/app/imporium/route.lazy').then((d) => d.Route),
+    import('./routes/_auth/app/emporium/route.lazy').then((d) => d.Route),
   )
 const AuthDashboardLibrarianIndexLazyRoute =
   AuthDashboardLibrarianIndexLazyRouteImport.update({
@@ -402,14 +392,13 @@ const AuthDashboardLibrarianIndexLazyRoute =
       (d) => d.Route,
     ),
   )
-const AuthAppImporiumIndexLazyRoute =
-  AuthAppImporiumIndexLazyRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthAppImporiumRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./routes/_auth/app/imporium/index.lazy').then((d) => d.Route),
-  )
+const AuthAppEmporiumIndexRoute = AuthAppEmporiumIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthAppEmporiumRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/app/emporium/index.lazy').then((d) => d.Route),
+)
 const AppPerpetuaShelfShelfIdLazyRoute =
   AppPerpetuaShelfShelfIdLazyRouteImport.update({
     id: '/app/perpetua/shelf/$shelfId',
@@ -446,35 +435,20 @@ const AuthDashboardLibrarianWalletsLazyRoute =
       (d) => d.Route,
     ),
   )
-const AuthAppImporiumNftsRoute = AuthAppImporiumNftsRouteImport.update({
-  id: '/nfts',
-  path: '/nfts',
-  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/app/imporium/nfts.lazy').then((d) => d.Route),
-)
-const AuthAppImporiumMyLogsRoute = AuthAppImporiumMyLogsRouteImport.update({
+const AuthAppEmporiumMyLogsRoute = AuthAppEmporiumMyLogsRouteImport.update({
   id: '/my-logs',
   path: '/my-logs',
-  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
+  getParentRoute: () => AuthAppEmporiumRouteLazyRoute,
 } as any).lazy(() =>
-  import('./routes/_auth/app/imporium/my-logs.lazy').then((d) => d.Route),
+  import('./routes/_auth/app/emporium/my-logs.lazy').then((d) => d.Route),
 )
-const AuthAppImporiumMarketplaceRoute =
-  AuthAppImporiumMarketplaceRouteImport.update({
-    id: '/marketplace',
-    path: '/marketplace',
-    getParentRoute: () => AuthAppImporiumRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./routes/_auth/app/imporium/marketplace.lazy').then((d) => d.Route),
-  )
-const AuthAppImporiumMarketLogsRoute =
-  AuthAppImporiumMarketLogsRouteImport.update({
+const AuthAppEmporiumMarketLogsRoute =
+  AuthAppEmporiumMarketLogsRouteImport.update({
     id: '/market-logs',
     path: '/market-logs',
-    getParentRoute: () => AuthAppImporiumRouteLazyRoute,
+    getParentRoute: () => AuthAppEmporiumRouteLazyRoute,
   } as any).lazy(() =>
-    import('./routes/_auth/app/imporium/market-logs.lazy').then((d) => d.Route),
+    import('./routes/_auth/app/emporium/market-logs.lazy').then((d) => d.Route),
   )
 const AppPerpetuaUserUserIdIndexLazyRoute =
   AppPerpetuaUserUserIdIndexLazyRouteImport.update({
@@ -522,7 +496,6 @@ export interface FileRoutesByFullPath {
   '/app/alexandrian': typeof AppAlexandrianLazyRoute
   '/app/bibliotheca': typeof AppBibliothecaLazyRoute
   '/app/dialectica': typeof AppDialecticaLazyRoute
-  '/app/emporium': typeof AppEmporiumLazyRoute
   '/app/permasearch': typeof AppPermasearchLazyRoute
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
@@ -543,7 +516,7 @@ export interface FileRoutesByFullPath {
   '/swap/topup': typeof SwapTopupLazyRoute
   '/info/': typeof InfoIndexLazyRoute
   '/swap': typeof SwapIndexLazyRoute
-  '/app/imporium': typeof AuthAppImporiumRouteLazyRouteWithChildren
+  '/app/emporium': typeof AuthAppEmporiumRouteLazyRouteWithChildren
   '/app/pinax': typeof AuthAppPinaxLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
   '/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
@@ -552,15 +525,13 @@ export interface FileRoutesByFullPath {
   '/exchange/burn': typeof AuthExchangeBurnLazyRoute
   '/exchange/': typeof AuthExchangeIndexLazyRoute
   '/app/perpetua': typeof AppPerpetuaIndexLazyRoute
-  '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
-  '/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
-  '/app/imporium/my-logs': typeof AuthAppImporiumMyLogsRoute
-  '/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
+  '/app/emporium/market-logs': typeof AuthAppEmporiumMarketLogsRoute
+  '/app/emporium/my-logs': typeof AuthAppEmporiumMyLogsRoute
   '/dashboard/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
   '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/app/perpetua/item/$itemId': typeof AppPerpetuaItemItemIdLazyRoute
   '/app/perpetua/shelf/$shelfId': typeof AppPerpetuaShelfShelfIdLazyRoute
-  '/app/imporium/': typeof AuthAppImporiumIndexLazyRoute
+  '/app/emporium/': typeof AuthAppEmporiumIndexRoute
   '/dashboard/': typeof AuthDashboardLibrarianIndexLazyRoute
   '/app/perpetua/user/$userId': typeof AppPerpetuaUserUserIdIndexLazyRoute
   '/app/perpetua/user/$userId/item/$itemId': typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
@@ -580,7 +551,6 @@ export interface FileRoutesByTo {
   '/app/alexandrian': typeof AppAlexandrianLazyRoute
   '/app/bibliotheca': typeof AppBibliothecaLazyRoute
   '/app/dialectica': typeof AppDialecticaLazyRoute
-  '/app/emporium': typeof AppEmporiumLazyRoute
   '/app/permasearch': typeof AppPermasearchLazyRoute
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
@@ -608,15 +578,13 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/exchange/burn': typeof AuthExchangeBurnLazyRoute
   '/app/perpetua': typeof AppPerpetuaIndexLazyRoute
-  '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
-  '/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
-  '/app/imporium/my-logs': typeof AuthAppImporiumMyLogsRoute
-  '/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
+  '/app/emporium/market-logs': typeof AuthAppEmporiumMarketLogsRoute
+  '/app/emporium/my-logs': typeof AuthAppEmporiumMyLogsRoute
   '/dashboard/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
   '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/app/perpetua/item/$itemId': typeof AppPerpetuaItemItemIdLazyRoute
   '/app/perpetua/shelf/$shelfId': typeof AppPerpetuaShelfShelfIdLazyRoute
-  '/app/imporium': typeof AuthAppImporiumIndexLazyRoute
+  '/app/emporium': typeof AuthAppEmporiumIndexRoute
   '/app/perpetua/user/$userId': typeof AppPerpetuaUserUserIdIndexLazyRoute
   '/app/perpetua/user/$userId/item/$itemId': typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
   '/app/perpetua/user/$userId/shelf/$shelfId': typeof AppPerpetuaUserUserIdShelfShelfIdLazyRoute
@@ -639,7 +607,6 @@ export interface FileRoutesById {
   '/app/alexandrian': typeof AppAlexandrianLazyRoute
   '/app/bibliotheca': typeof AppBibliothecaLazyRoute
   '/app/dialectica': typeof AppDialecticaLazyRoute
-  '/app/emporium': typeof AppEmporiumLazyRoute
   '/app/permasearch': typeof AppPermasearchLazyRoute
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
@@ -660,7 +627,7 @@ export interface FileRoutesById {
   '/swap/topup': typeof SwapTopupLazyRoute
   '/info/': typeof InfoIndexLazyRoute
   '/swap/': typeof SwapIndexLazyRoute
-  '/_auth/app/imporium': typeof AuthAppImporiumRouteLazyRouteWithChildren
+  '/_auth/app/emporium': typeof AuthAppEmporiumRouteLazyRouteWithChildren
   '/_auth/dashboard/_librarian': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   '/_auth/app/pinax': typeof AuthAppPinaxLazyRoute
   '/_auth/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
@@ -670,15 +637,13 @@ export interface FileRoutesById {
   '/_auth/exchange/burn': typeof AuthExchangeBurnLazyRoute
   '/_auth/exchange/': typeof AuthExchangeIndexLazyRoute
   '/app/perpetua/': typeof AppPerpetuaIndexLazyRoute
-  '/_auth/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
-  '/_auth/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
-  '/_auth/app/imporium/my-logs': typeof AuthAppImporiumMyLogsRoute
-  '/_auth/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
+  '/_auth/app/emporium/market-logs': typeof AuthAppEmporiumMarketLogsRoute
+  '/_auth/app/emporium/my-logs': typeof AuthAppEmporiumMyLogsRoute
   '/_auth/dashboard/_librarian/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
   '/_auth/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/app/perpetua/item/$itemId': typeof AppPerpetuaItemItemIdLazyRoute
   '/app/perpetua/shelf/$shelfId': typeof AppPerpetuaShelfShelfIdLazyRoute
-  '/_auth/app/imporium/': typeof AuthAppImporiumIndexLazyRoute
+  '/_auth/app/emporium/': typeof AuthAppEmporiumIndexRoute
   '/_auth/dashboard/_librarian/': typeof AuthDashboardLibrarianIndexLazyRoute
   '/app/perpetua/user/$userId/': typeof AppPerpetuaUserUserIdIndexLazyRoute
   '/app/perpetua/user/$userId/item/$itemId': typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
@@ -701,7 +666,6 @@ export interface FileRouteTypes {
     | '/app/alexandrian'
     | '/app/bibliotheca'
     | '/app/dialectica'
-    | '/app/emporium'
     | '/app/permasearch'
     | '/app/syllogos'
     | '/exchange/history'
@@ -722,7 +686,7 @@ export interface FileRouteTypes {
     | '/swap/topup'
     | '/info/'
     | '/swap'
-    | '/app/imporium'
+    | '/app/emporium'
     | '/app/pinax'
     | '/dashboard/arweave-assets'
     | '/dashboard/icp-assets'
@@ -731,15 +695,13 @@ export interface FileRouteTypes {
     | '/exchange/burn'
     | '/exchange/'
     | '/app/perpetua'
-    | '/app/imporium/market-logs'
-    | '/app/imporium/marketplace'
-    | '/app/imporium/my-logs'
-    | '/app/imporium/nfts'
+    | '/app/emporium/market-logs'
+    | '/app/emporium/my-logs'
     | '/dashboard/wallets'
     | '/dashboard/profile/upgrade'
     | '/app/perpetua/item/$itemId'
     | '/app/perpetua/shelf/$shelfId'
-    | '/app/imporium/'
+    | '/app/emporium/'
     | '/dashboard/'
     | '/app/perpetua/user/$userId'
     | '/app/perpetua/user/$userId/item/$itemId'
@@ -759,7 +721,6 @@ export interface FileRouteTypes {
     | '/app/alexandrian'
     | '/app/bibliotheca'
     | '/app/dialectica'
-    | '/app/emporium'
     | '/app/permasearch'
     | '/app/syllogos'
     | '/exchange/history'
@@ -787,15 +748,13 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/exchange/burn'
     | '/app/perpetua'
-    | '/app/imporium/market-logs'
-    | '/app/imporium/marketplace'
-    | '/app/imporium/my-logs'
-    | '/app/imporium/nfts'
+    | '/app/emporium/market-logs'
+    | '/app/emporium/my-logs'
     | '/dashboard/wallets'
     | '/dashboard/profile/upgrade'
     | '/app/perpetua/item/$itemId'
     | '/app/perpetua/shelf/$shelfId'
-    | '/app/imporium'
+    | '/app/emporium'
     | '/app/perpetua/user/$userId'
     | '/app/perpetua/user/$userId/item/$itemId'
     | '/app/perpetua/user/$userId/shelf/$shelfId'
@@ -817,7 +776,6 @@ export interface FileRouteTypes {
     | '/app/alexandrian'
     | '/app/bibliotheca'
     | '/app/dialectica'
-    | '/app/emporium'
     | '/app/permasearch'
     | '/app/syllogos'
     | '/exchange/history'
@@ -838,7 +796,7 @@ export interface FileRouteTypes {
     | '/swap/topup'
     | '/info/'
     | '/swap/'
-    | '/_auth/app/imporium'
+    | '/_auth/app/emporium'
     | '/_auth/dashboard/_librarian'
     | '/_auth/app/pinax'
     | '/_auth/dashboard/arweave-assets'
@@ -848,15 +806,13 @@ export interface FileRouteTypes {
     | '/_auth/exchange/burn'
     | '/_auth/exchange/'
     | '/app/perpetua/'
-    | '/_auth/app/imporium/market-logs'
-    | '/_auth/app/imporium/marketplace'
-    | '/_auth/app/imporium/my-logs'
-    | '/_auth/app/imporium/nfts'
+    | '/_auth/app/emporium/market-logs'
+    | '/_auth/app/emporium/my-logs'
     | '/_auth/dashboard/_librarian/wallets'
     | '/_auth/dashboard/profile/upgrade'
     | '/app/perpetua/item/$itemId'
     | '/app/perpetua/shelf/$shelfId'
-    | '/_auth/app/imporium/'
+    | '/_auth/app/emporium/'
     | '/_auth/dashboard/_librarian/'
     | '/app/perpetua/user/$userId/'
     | '/app/perpetua/user/$userId/item/$itemId'
@@ -877,7 +833,6 @@ export interface RootRouteChildren {
   AppAlexandrianLazyRoute: typeof AppAlexandrianLazyRoute
   AppBibliothecaLazyRoute: typeof AppBibliothecaLazyRoute
   AppDialecticaLazyRoute: typeof AppDialecticaLazyRoute
-  AppEmporiumLazyRoute: typeof AppEmporiumLazyRoute
   AppPermasearchLazyRoute: typeof AppPermasearchLazyRoute
   AppSyllogosLazyRoute: typeof AppSyllogosLazyRoute
   SwapBalanceLazyRoute: typeof SwapBalanceLazyRoute
@@ -1083,13 +1038,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPermasearchLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/emporium': {
-      id: '/app/emporium'
-      path: '/app/emporium'
-      fullPath: '/app/emporium'
-      preLoaderRoute: typeof AppEmporiumLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/app/dialectica': {
       id: '/app/dialectica'
       path: '/app/dialectica'
@@ -1223,11 +1171,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardLibrarianRouteLazyRouteImport
       parentRoute: typeof AuthDashboardRouteLazyRoute
     }
-    '/_auth/app/imporium': {
-      id: '/_auth/app/imporium'
-      path: '/app/imporium'
-      fullPath: '/app/imporium'
-      preLoaderRoute: typeof AuthAppImporiumRouteLazyRouteImport
+    '/_auth/app/emporium': {
+      id: '/_auth/app/emporium'
+      path: '/app/emporium'
+      fullPath: '/app/emporium'
+      preLoaderRoute: typeof AuthAppEmporiumRouteLazyRouteImport
       parentRoute: typeof AuthRouteLazyRoute
     }
     '/_auth/dashboard/_librarian/': {
@@ -1237,12 +1185,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardLibrarianIndexLazyRouteImport
       parentRoute: typeof AuthDashboardLibrarianRouteLazyRoute
     }
-    '/_auth/app/imporium/': {
-      id: '/_auth/app/imporium/'
+    '/_auth/app/emporium/': {
+      id: '/_auth/app/emporium/'
       path: '/'
-      fullPath: '/app/imporium/'
-      preLoaderRoute: typeof AuthAppImporiumIndexLazyRouteImport
-      parentRoute: typeof AuthAppImporiumRouteLazyRoute
+      fullPath: '/app/emporium/'
+      preLoaderRoute: typeof AuthAppEmporiumIndexRouteImport
+      parentRoute: typeof AuthAppEmporiumRouteLazyRoute
     }
     '/app/perpetua/shelf/$shelfId': {
       id: '/app/perpetua/shelf/$shelfId'
@@ -1272,33 +1220,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardLibrarianWalletsLazyRouteImport
       parentRoute: typeof AuthDashboardLibrarianRouteLazyRoute
     }
-    '/_auth/app/imporium/nfts': {
-      id: '/_auth/app/imporium/nfts'
-      path: '/nfts'
-      fullPath: '/app/imporium/nfts'
-      preLoaderRoute: typeof AuthAppImporiumNftsRouteImport
-      parentRoute: typeof AuthAppImporiumRouteLazyRoute
-    }
-    '/_auth/app/imporium/my-logs': {
-      id: '/_auth/app/imporium/my-logs'
+    '/_auth/app/emporium/my-logs': {
+      id: '/_auth/app/emporium/my-logs'
       path: '/my-logs'
-      fullPath: '/app/imporium/my-logs'
-      preLoaderRoute: typeof AuthAppImporiumMyLogsRouteImport
-      parentRoute: typeof AuthAppImporiumRouteLazyRoute
+      fullPath: '/app/emporium/my-logs'
+      preLoaderRoute: typeof AuthAppEmporiumMyLogsRouteImport
+      parentRoute: typeof AuthAppEmporiumRouteLazyRoute
     }
-    '/_auth/app/imporium/marketplace': {
-      id: '/_auth/app/imporium/marketplace'
-      path: '/marketplace'
-      fullPath: '/app/imporium/marketplace'
-      preLoaderRoute: typeof AuthAppImporiumMarketplaceRouteImport
-      parentRoute: typeof AuthAppImporiumRouteLazyRoute
-    }
-    '/_auth/app/imporium/market-logs': {
-      id: '/_auth/app/imporium/market-logs'
+    '/_auth/app/emporium/market-logs': {
+      id: '/_auth/app/emporium/market-logs'
       path: '/market-logs'
-      fullPath: '/app/imporium/market-logs'
-      preLoaderRoute: typeof AuthAppImporiumMarketLogsRouteImport
-      parentRoute: typeof AuthAppImporiumRouteLazyRoute
+      fullPath: '/app/emporium/market-logs'
+      preLoaderRoute: typeof AuthAppEmporiumMarketLogsRouteImport
+      parentRoute: typeof AuthAppEmporiumRouteLazyRoute
     }
     '/app/perpetua/user/$userId/': {
       id: '/app/perpetua/user/$userId/'
@@ -1393,39 +1327,35 @@ const AuthExchangeRouteLazyRouteWithChildren =
     AuthExchangeRouteLazyRouteChildren,
   )
 
-interface AuthAppImporiumRouteLazyRouteChildren {
-  AuthAppImporiumMarketLogsRoute: typeof AuthAppImporiumMarketLogsRoute
-  AuthAppImporiumMarketplaceRoute: typeof AuthAppImporiumMarketplaceRoute
-  AuthAppImporiumMyLogsRoute: typeof AuthAppImporiumMyLogsRoute
-  AuthAppImporiumNftsRoute: typeof AuthAppImporiumNftsRoute
-  AuthAppImporiumIndexLazyRoute: typeof AuthAppImporiumIndexLazyRoute
+interface AuthAppEmporiumRouteLazyRouteChildren {
+  AuthAppEmporiumMarketLogsRoute: typeof AuthAppEmporiumMarketLogsRoute
+  AuthAppEmporiumMyLogsRoute: typeof AuthAppEmporiumMyLogsRoute
+  AuthAppEmporiumIndexRoute: typeof AuthAppEmporiumIndexRoute
 }
 
-const AuthAppImporiumRouteLazyRouteChildren: AuthAppImporiumRouteLazyRouteChildren =
+const AuthAppEmporiumRouteLazyRouteChildren: AuthAppEmporiumRouteLazyRouteChildren =
   {
-    AuthAppImporiumMarketLogsRoute: AuthAppImporiumMarketLogsRoute,
-    AuthAppImporiumMarketplaceRoute: AuthAppImporiumMarketplaceRoute,
-    AuthAppImporiumMyLogsRoute: AuthAppImporiumMyLogsRoute,
-    AuthAppImporiumNftsRoute: AuthAppImporiumNftsRoute,
-    AuthAppImporiumIndexLazyRoute: AuthAppImporiumIndexLazyRoute,
+    AuthAppEmporiumMarketLogsRoute: AuthAppEmporiumMarketLogsRoute,
+    AuthAppEmporiumMyLogsRoute: AuthAppEmporiumMyLogsRoute,
+    AuthAppEmporiumIndexRoute: AuthAppEmporiumIndexRoute,
   }
 
-const AuthAppImporiumRouteLazyRouteWithChildren =
-  AuthAppImporiumRouteLazyRoute._addFileChildren(
-    AuthAppImporiumRouteLazyRouteChildren,
+const AuthAppEmporiumRouteLazyRouteWithChildren =
+  AuthAppEmporiumRouteLazyRoute._addFileChildren(
+    AuthAppEmporiumRouteLazyRouteChildren,
   )
 
 interface AuthRouteLazyRouteChildren {
   AuthDashboardRouteLazyRoute: typeof AuthDashboardRouteLazyRouteWithChildren
   AuthExchangeRouteLazyRoute: typeof AuthExchangeRouteLazyRouteWithChildren
-  AuthAppImporiumRouteLazyRoute: typeof AuthAppImporiumRouteLazyRouteWithChildren
+  AuthAppEmporiumRouteLazyRoute: typeof AuthAppEmporiumRouteLazyRouteWithChildren
   AuthAppPinaxLazyRoute: typeof AuthAppPinaxLazyRoute
 }
 
 const AuthRouteLazyRouteChildren: AuthRouteLazyRouteChildren = {
   AuthDashboardRouteLazyRoute: AuthDashboardRouteLazyRouteWithChildren,
   AuthExchangeRouteLazyRoute: AuthExchangeRouteLazyRouteWithChildren,
-  AuthAppImporiumRouteLazyRoute: AuthAppImporiumRouteLazyRouteWithChildren,
+  AuthAppEmporiumRouteLazyRoute: AuthAppEmporiumRouteLazyRouteWithChildren,
   AuthAppPinaxLazyRoute: AuthAppPinaxLazyRoute,
 }
 
@@ -1482,7 +1412,6 @@ const rootRouteChildren: RootRouteChildren = {
   AppAlexandrianLazyRoute: AppAlexandrianLazyRoute,
   AppBibliothecaLazyRoute: AppBibliothecaLazyRoute,
   AppDialecticaLazyRoute: AppDialecticaLazyRoute,
-  AppEmporiumLazyRoute: AppEmporiumLazyRoute,
   AppPermasearchLazyRoute: AppPermasearchLazyRoute,
   AppSyllogosLazyRoute: AppSyllogosLazyRoute,
   SwapBalanceLazyRoute: SwapBalanceLazyRoute,

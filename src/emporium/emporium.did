@@ -1,8 +1,27 @@
-type Listing = record {
+type ArweaveNft = record {
+  status : NftStatus;
+  token_id : nat;
+  owner : principal;
+  time : nat64;
+  arweave_id : text;
+  price : nat64;
+};
+type ListingsQuery = record {
+  sort_by : SortBy;
   page_size : nat64;
-  nfts : vec record { text; Nft };
+  page : nat64;
+  sort_order : SortOrder;
+  selected_user : opt principal;
+  search_term : opt text;
+};
+type ListingsResponse = record {
+  page_size : nat64;
+  nfts : vec ArweaveNft;
+  page : nat64;
   total_pages : nat64;
-  current_page : nat64;
+  total_count : nat64;
+  has_next : bool;
+  has_prev : bool;
 };
 type LogAction = variant {
   Listed : record { price : nat64 };
@@ -33,32 +52,19 @@ type Nft = record {
 };
 type NftStatus = variant { Listed; Reimbursed };
 type Result = variant { Ok : text; Err : text };
+type SortBy = variant { Time; Price };
+type SortOrder = variant { Asc; Desc };
 service : {
   arweave_id_to_nat : (text) -> (nat) query;
   buy_nft : (nat) -> (Result);
   get_caller_logs : (opt nat64, opt nat64, opt nat) -> (Logs) query;
-  get_listing : (opt nat64, opt nat64) -> (Listing) query;
-  get_listing_total_count : () -> (nat64) query;
-  get_listings : (opt nat64, opt nat64, opt bool, opt bool) -> (Listing) query;
+  get_listed_tokens : (vec nat) -> (vec opt Nft) query;
+  get_listing_users : () -> (vec principal) query;
+  get_listings : (ListingsQuery) -> (ListingsResponse) query;
   get_logs : (opt nat64, opt nat64, opt nat) -> (Logs) query;
-  get_search_listing : (
-      opt nat64,
-      opt nat64,
-      opt text,
-      opt nat,
-      opt text,
-      opt principal,
-      text,
-    ) -> (Listing) query;
   is_arweave_id : (text) -> (bool) query;
   list_nft : (nat, nat64) -> (Result);
   nat_to_arweave_id : (nat) -> (text) query;
   remove_nft_listing : (nat) -> (Result);
-  search_caller_listing_by_token_id : (nat, opt principal) -> (
-      opt record { text; Nft },
-    ) query;
-  search_listing : (text) -> (vec record { text; Nft }) query;
-  search_listing_by_principal : (principal) -> (vec record { text; Nft }) query;
-  search_listing_by_token : (nat) -> (vec record { text; Nft }) query;
   update_nft_price : (nat, nat64) -> (Result);
 }

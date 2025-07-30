@@ -14,5 +14,4 @@ export interface AlexandrianToken {
 	collection: TokenType;
 	canister?: string;
 	createdAt?: number;
-	owned?: boolean;
 }

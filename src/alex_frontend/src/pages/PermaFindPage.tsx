@@ -17,7 +17,7 @@ import {
     setSafeSearch,
     setContinuousScroll,
 } from "@/features/permasearch";
-import { TopupBalanceWarning } from "@/components/TopupBalanceWarning";
+import TopupBalanceWarning from "@/components/TopupBalanceWarning";
 import { UnauthenticatedWarning } from "@/components/UnauthenticatedWarning";
 import SafeSearchToggle from "@/components/SafeSearchToggle";
 import ContinuousScrollToggle from "@/components/ContinuousScrollToggle";

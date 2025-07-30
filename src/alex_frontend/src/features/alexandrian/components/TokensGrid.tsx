@@ -3,21 +3,20 @@ import { Skeleton } from "@/lib/components/skeleton";
 import { Masonry } from "react-plock";
 import Nft from "@/features/nft";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { AddToShelfButton, MintButton } from "./actions";
+import { AddToShelfButton, MintButton, SellButton } from "./../actions";
 import type { AlexandrianToken } from "../types";
+import { Button } from "@/lib/components/button";
+
+// zdcg2-dqaaa-aaaap-qpnha-cai
+const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 
 interface TokensGridProps {
 	// Only TanStack Query states
 	tokens: Record<string, AlexandrianToken>;
 	loading: boolean;
-	updateTokenOwnership: (tokenId: string) => void;
 }
 
-export function TokensGrid({
-	tokens,
-	loading,
-	updateTokenOwnership,
-}: TokensGridProps) {
+export function TokensGrid({ tokens, loading }: TokensGridProps) {
 	// Get Redux states directly
 	const { collectionType, safe, page, selectedUser } = useAppSelector(
 		(state) => state.alexandrian
@@ -64,10 +63,13 @@ export function TokensGrid({
 					action={
 						user && (
 							<div className="flex gap-2">
-								<MintButton
-									token={token}
-									updateTokenOwnership={updateTokenOwnership}
-								/>
+								{token.owner === user.principal && token.collection !== "SBT" ? (
+									<SellButton tokenId={token.id} />
+								) : token.owner === emporium_canister_id ? (
+									<Button variant="outline" scale="sm" disabled>Listed</Button>
+								) : (
+									<MintButton token={token}/>
+								)}
 								<AddToShelfButton token={token} />
 							</div>
 						)

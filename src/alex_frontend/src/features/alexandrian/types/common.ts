@@ -6,4 +6,4 @@ export interface MinimalToken {
 	synced?: boolean;
 }
 
-export const PAGE_SIZE_OPTIONS = [16, 32, 48, 64];
+export const PAGE_SIZE_OPTIONS = [6, 12, 18, 24];

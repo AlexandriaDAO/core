@@ -12,8 +12,7 @@ function EmporiumLayout() {
 			<div className="bg-card rounded-bordertb shadow">
 				<nav className="flex justify-center gap-2 p-2" aria-label="Tabs">
 					<Link
-						to="/app/imporium/marketplace"
-						search={{ search: undefined }}
+						to="/app/emporium"
 						className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
 						activeProps={{
 							className: "bg-primary text-primary-foreground shadow-md"
@@ -21,11 +20,14 @@ function EmporiumLayout() {
 						inactiveProps={{
 							className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
 						}}
+						activeOptions={{
+							exact: true
+						}}
 					>
 						Marketplace
 					</Link>
 
-					<Link
+					{/* <Link
 						to="/app/imporium/nfts"
 						className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
 						activeProps={{
@@ -36,10 +38,10 @@ function EmporiumLayout() {
 						}}
 					>
 						My NFTs
-					</Link>
+					</Link> */}
 
 					<Link
-						to="/app/imporium/my-logs"
+						to="/app/emporium/my-logs"
 						className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
 						activeProps={{
 							className: "bg-primary text-primary-foreground shadow-md"
@@ -52,7 +54,7 @@ function EmporiumLayout() {
 					</Link>
 
 					<Link
-						to="/app/imporium/market-logs"
+						to="/app/emporium/market-logs"
 						className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
 						activeProps={{
 							className: "bg-primary text-primary-foreground shadow-md"

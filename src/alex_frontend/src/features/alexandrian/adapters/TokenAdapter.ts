@@ -6,7 +6,6 @@ import { ALEX } from "../../../../../declarations/ALEX";
 import { LBRY } from "../../../../../declarations/LBRY";
 import { feed } from "../../../../../declarations/feed";
 import { natToArweaveId } from "@/utils/id_convert";
-import { wait } from "@/utils/lazyLoad";
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 

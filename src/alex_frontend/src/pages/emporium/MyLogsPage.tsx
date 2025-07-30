@@ -1,42 +1,38 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { Alert } from "@/components/Alert";
-import UserLogs from "@/features/imporium/components/UserLogs";
-import useEmporium from "@/hooks/actors/useEmporium";
-import getUserLogs from "@/features/imporium/thunks/getUserLog";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { reset } from "@/features/imporium/imporiumSlice";
 import { Skeleton } from "@/lib/components/skeleton";
 import { Button } from "@/lib/components/button";
 import { RefreshCcw } from "lucide-react";
+import { LogsTable, LogsPagination, useUserLogs } from "@/features/logs";
 
+const MyLogsPage: React.FC = () => {
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [pageSize] = useState<number>(10);
 
-const MyLogsPage = () => {
-    const dispatch = useAppDispatch();
-    const {actor} = useEmporium();
+    const { data, isPending, isFetching, error, refetch } = useUserLogs(currentPage, pageSize);
 
-    const { logs, loading, error } = useAppSelector((state) => state.imporium);
+    const logs = data?.logs ?? [];
+    const totalPages = data?.totalPages ?? 0;
 
-    const refresh = useCallback(() => {
-        if(!actor) return;
-        dispatch(getUserLogs({actor}));
-    }, [actor]);
+    const handleRefresh = useCallback(() => {
+        refetch();
+    }, [refetch]);
 
-    useEffect(() => {
-        if(actor) refresh();
+    const handlePageClick = useCallback((event: { selected: number }) => {
+        const newPage: number = event.selected + 1;
+        setCurrentPage(newPage);
+    }, []);
 
-        return ()=>{
-            dispatch(reset())
-        }
-    }, [actor, refresh]);
+    // Show skeleton only on initial load (no data yet)
+    if (isPending) return <Skeleton className="w-full flex-grow rounded" />
 
-    if(loading) return <Skeleton className="w-full flex-grow rounded" />
-
-    if(error) return (
+    if (error) return (
         <div className="max-w-2xl flex-grow container flex justify-center items-start mt-20">
-            <Alert variant="danger" title="Error" className="w-full">{error}</Alert>
+            <Alert variant="danger" title="Error" className="w-full">
+                {error instanceof Error ? error.message : 'An error occurred while fetching logs'}
+            </Alert>
         </div>
-    )
+    );
 
     return (
         <div className="flex flex-col gap-4">
@@ -45,21 +41,24 @@ const MyLogsPage = () => {
                 <Button
                     variant="muted"
                     className="font-roboto-condensed text-sm text-primary/70 hover:text-primary cursor-pointer flex items-center justify-start gap-1"
-                    onClick={refresh}
-                    disabled={loading}
+                    onClick={handleRefresh}
+                    disabled={isFetching}
                 >
                     <span>Refresh List</span>
-                    <RefreshCcw strokeWidth={2} size={16} className={`${loading ? 'animate-spin' : ''}`} />
+                    <RefreshCcw strokeWidth={2} size={16} className={`${isFetching ? 'animate-spin' : ''}`} />
                 </Button>
             </div>
             <div className="lg:mb-20 md:mb-16 sm:mb-10 xs:mb-6">
-                {logs && Array.isArray(logs) && logs.length <= 0 ? (
-                    <div className="text-center py-12">
-                        <p className="text-muted-foreground text-lg">You don't have any logs yet.</p>
-                    </div>
-                ) : <UserLogs />}
+                <LogsTable logs={logs} emptyMessage="You don't have any logs yet." />
+                <LogsPagination
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                    onPageChange={handlePageClick}
+                    disabled={isFetching}
+                />
             </div>
         </div>
     );
 };
+
 export default MyLogsPage;

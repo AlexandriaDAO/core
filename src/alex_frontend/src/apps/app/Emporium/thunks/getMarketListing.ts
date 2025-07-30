@@ -67,73 +67,75 @@ export const getMarketListing = createAsyncThunk<
           timeFilter = "desc"; // Default sorting by time
       }
 
-      // Fetch market listings
-      const result = await actorEmporium.get_search_listing(
-        [BigInt(page)],
-        [BigInt(pageSize)],
-        sortFilter,
-        tokenFilter,
-        [timeFilter],
-        ownerFilter,
-        type
-      );
+      throw new Error("This function is needs updated.");
 
-      if (!result?.nfts || !Array.isArray(result.nfts) || result.nfts.length === 0) {
-        console.warn("No market listings found.");
-        return { nfts: {}, totalPages: "0", totalCount: 0, pageSize: "0" };
-      }
+      // // Fetch market listings
+      // const result = await actorEmporium.get_search_listing(
+      //   [BigInt(page)],
+      //   [BigInt(pageSize)],
+      //   sortFilter,
+      //   tokenFilter,
+      //   [timeFilter],
+      //   ownerFilter,
+      //   type
+      // );
 
-      // Process retrieved NFTs
-      const nftIds: string[] = [];
-      const nftsObject: Record<string, { tokenId: string; arweaveId: string; price: string; owner: string }> = {};
+      // if (!result?.nfts || !Array.isArray(result.nfts) || result.nfts.length === 0) {
+      //   console.warn("No market listings found.");
+      //   return { nfts: {}, totalPages: "0", totalCount: 0, pageSize: "0" };
+      // }
 
-      result.nfts.forEach(([tokenId, nft]) => {
-        if (nft?.token_id !== undefined && nft?.price !== undefined && nft?.owner !== undefined) {
-          const arweaveId = natToArweaveId(BigInt(nft.token_id));
-          const price = ledgerService.e8sToIcp(nft.price).toString();
-          nftIds.push(arweaveId);
+      // // Process retrieved NFTs
+      // const nftIds: string[] = [];
+      // const nftsObject: Record<string, { tokenId: string; arweaveId: string; price: string; owner: string }> = {};
 
-          nftsObject[arweaveId] = {
-            tokenId: tokenId || "",
-            arweaveId,
-            price,
-            owner: nft.owner.toString(),
-          };
-        }
-      });
+      // result.nfts.forEach(([tokenId, nft]) => {
+      //   if (nft?.token_id !== undefined && nft?.price !== undefined && nft?.owner !== undefined) {
+      //     const arweaveId = natToArweaveId(BigInt(nft.token_id));
+      //     const price = ledgerService.e8sToIcp(nft.price).toString();
+      //     nftIds.push(arweaveId);
 
-      if (nftIds.length === 0) {
-        console.warn("No valid tokens found in market listings.");
-        return {
-          nfts: nftsObject,
-          totalPages: result.total_pages?.toString() || "0",
-          pageSize: result.page_size?.toString() || "0",
-          totalCount: 0,
-        };
-      }
-      // Fetch transactions for the retrieved NFTs
-      const transactions = await fetchTransactionsForAlexandrian(nftIds);
+      //     nftsObject[arweaveId] = {
+      //       tokenId: tokenId || "",
+      //       arweaveId,
+      //       price,
+      //       owner: nft.owner.toString(),
+      //     };
+      //   }
+      // });
 
-      if (!transactions || transactions.length === 0) {
-        console.warn("No transactions found for the listed NFTs.");
-        return {
-          nfts: nftsObject,
-          totalPages: result.total_pages?.toString() || "0",
-          pageSize: result.page_size?.toString() || "0",
-          totalCount: 0,
-        };
-      }
+      // if (nftIds.length === 0) {
+      //   console.warn("No valid tokens found in market listings.");
+      //   return {
+      //     nfts: nftsObject,
+      //     totalPages: result.total_pages?.toString() || "0",
+      //     pageSize: result.page_size?.toString() || "0",
+      //     totalCount: 0,
+      //   };
+      // }
+      // // Fetch transactions for the retrieved NFTs
+      // const transactions = await fetchTransactionsForAlexandrian(nftIds);
 
-      // Dispatch transactions to the state
-      dispatch(setTransactions(transactions));
-      await dispatch(loadContentForTransactions(transactions) as unknown as AnyAction);
+      // if (!transactions || transactions.length === 0) {
+      //   console.warn("No transactions found for the listed NFTs.");
+      //   return {
+      //     nfts: nftsObject,
+      //     totalPages: result.total_pages?.toString() || "0",
+      //     pageSize: result.page_size?.toString() || "0",
+      //     totalCount: 0,
+      //   };
+      // }
 
-      return {
-        nfts: nftsObject,
-        totalPages: result.total_pages.toString(),
-        pageSize: result.page_size.toString(),
-        totalCount: nftIds.length,
-      };
+      // // Dispatch transactions to the state
+      // dispatch(setTransactions(transactions));
+      // await dispatch(loadContentForTransactions(transactions) as unknown as AnyAction);
+
+      // return {
+      //   nfts: nftsObject,
+      //   totalPages: result.total_pages.toString(),
+      //   pageSize: result.page_size.toString(),
+      //   totalCount: nftIds.length,
+      // };
     } catch (error) {
       console.error("Error fetching market listings:", error);
       return rejectWithValue("An error occurred while fetching market listings.");
