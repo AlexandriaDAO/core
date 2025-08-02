@@ -101,39 +101,93 @@ type TagShelfCreationTimelineKey = record {
   reversed_created_at : nat64;
 };
 service : {
+  // Adds a single item to an existing shelf
+  // 
+  // Atomically updates parent shelf (content and metadata),
+  // nested shelf metadata (if adding a shelf), and NFT_SHELVES (if adding an NFT).
+  // Panics on failure during the commit phase to ensure atomicity.
   add_item_to_shelf : (text, AddItemInput) -> (Result);
+  // Adds a tag to a shelf and updates all relevant indices.
+  // This is the primary entry point for associating a tag with a shelf.
   add_tag_to_shelf : (TagOperationInput) -> (Result);
   follow_tag : (text) -> (Result);
   follow_user : (principal) -> (Result);
   get_followed_tags_feed : (CursorPaginationInput) -> (Result_1) query;
   get_followed_users_feed : (CursorPaginationInput) -> (Result_1) query;
+  // Query to get the list of tags followed by the caller.
   get_my_followed_tags : () -> (Result_2) query;
+  // Query to get the list of users (Principals) followed by the caller.
   get_my_followed_users : () -> (Result_3) query;
   get_nft_shelf_appearances : (text) -> (Result_4) query;
+  // Get popular tags (most associated shelves first - Paginated).
   get_popular_tags : (CursorPaginationInput_1) -> (Result_5) query;
+  // Get public shelf DTOs associated with a specific tag.
+  // Returns an empty list if the tag is not found or no public shelves are associated.
   get_public_shelves_by_tag : (text) -> (Result_6) query;
   get_recent_shelves : (CursorPaginationInput) -> (Result_1) query;
   get_shelf : (text) -> (Result_7) query;
   get_shelf_items : (text, CursorPaginationInput_2) -> (Result_8) query;
+  // Get optimization metrics for a shelf's positions
+  // This helps frontend clients identify when a shelf needs rebalancing
   get_shelf_position_metrics : (text) -> (Result_9) query;
+  // Get shelf IDs associated with a specific tag (Paginated).
+  // Returns an empty list if the tag is not found.
   get_shelves_by_tag : (text, CursorPaginationInput_3) -> (Result_10) query;
+  // Returns a list of shelves shuffled deterministically based on the current hour.
+  // This samples from a recent window of public shelves.
   get_shuffled_by_hour_feed : (nat64) -> (Result_6) query;
   get_storyline_feed : (CursorPaginationInput) -> (Result_1) query;
+  // Get the number of shelves associated with a specific tag.
   get_tag_shelf_count : (text) -> (nat64) query;
+  // Get tags starting with a given prefix (case-insensitive - Paginated).
   get_tags_with_prefix : (text, CursorPaginationInput_4) -> (Result_11) query;
   get_user_publicly_editable_shelves : (principal, OffsetPaginationInput) -> (
       Result_12,
     ) query;
   get_user_shelves : (principal, OffsetPaginationInput) -> (Result_12) query;
+  // Checks if a shelf is publicly editable
+  // 
+  // Returns true if the shelf is set to public access mode.
   is_shelf_public : (text) -> (Result_13) query;
+  // Removes a item from an existing shelf
+  // 
+  // Only users with edit permissions can remove items.
+  // This also handles cleanup of any references if the item contained an NFT or nested Shelf.
   remove_item_from_shelf : (text, nat32) -> (Result);
+  // Removes a tag from a shelf and updates all relevant indices.
   remove_tag_from_shelf : (TagOperationInput) -> (Result);
+  // Reorders a shelf in a user's profile relative to another shelf
+  // 
+  // This repositions a shelf relative to other shelves on the user's profile.
+  // The position can be specified as before or after another shelf.
   reorder_profile_shelf : (text, opt text, bool) -> (Result);
+  // Resets the profile order to default (chronological ordering)
+  // 
+  // This clears all customizations and returns the profile to its original state.
   reset_profile_order : () -> (Result);
+  // Sets the absolute order of items within a shelf.
+  // 
+  // This replaces the existing item order with the one provided.
+  // All item IDs in the input list must exist within the shelf.
+  // This function is refactored for atomicity. It reads, validates, prepares the change,
+  // then commits. Panics on commit failure.
   set_item_order : (text, vec nat32) -> (Result);
+  // Creates a new shelf with the provided metadata and items
+  // 
+  // Stores the newly created shelf in the global registry and
+  // establishes the appropriate ownership and reference tracking.
+  // Note: Initial tag association must now happen via explicit calls to add_tag_to_shelf.
   store_shelf : (text, opt text, vec Item, opt vec text) -> (Result_14);
+  // Toggles public access for a shelf
+  // 
+  // When enabled, anyone can edit the shelf.
+  // Only the shelf owner can toggle this setting.
+  // This function ensures that updates to SHELF_METADATA and GLOBAL_TIMELINE are atomic.
   toggle_shelf_public_access : (text, bool) -> (Result);
   unfollow_tag : (text) -> (Result);
   unfollow_user : (principal) -> (Result);
+  // Updates the metadata (title and/or description) of an existing shelf
+  // 
+  // Only users with edit permissions can modify shelf metadata.
   update_shelf_metadata : (text, opt text, opt text) -> (Result);
 }
