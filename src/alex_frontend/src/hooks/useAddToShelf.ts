@@ -5,7 +5,8 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useNftManager } from "@/hooks/actors";
 import { usePerpetua } from "@/hooks/actors";
 import mint from "@/features/nft/thunks/mint";
-import type { AlexandrianToken } from "../types";
+import { arweaveIdToNat } from "@/utils/id_convert";
+import { AddToShelfItem } from "@/components/AddToShelfButton";
 
 export const useAddToShelf = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +15,7 @@ export const useAddToShelf = () => {
 	const { actor: perpetuaActor } = usePerpetua();
 	const { user } = useAppSelector((state) => state.auth);
 
-	const addToShelf = async (token: AlexandrianToken, shelfIds: string[]) => {
+	const addToShelf = async (item: AddToShelfItem, shelfIds: string[], onSuccess?: () => void) => {
 		if (!user) {
 			toast.error("Please log in to add items to shelves");
 			return;
@@ -33,29 +34,47 @@ export const useAddToShelf = () => {
 		setIsLoading(true);
 
 		try {
-			let tokenToAdd = token;
+			let tokenId = item.id;
+			let needsMinting = false;
 
-			// If token is not owned by current user, mint it first
-			if (token.owner !== user.principal) {
+			// Check if we need to mint first
+			if (!tokenId || (item.owner && item.owner !== user.principal)) {
+				needsMinting = true;
+			}
+
+			// If we need to mint, do it first
+			if (needsMinting) {
 				try {
 					await dispatch(mint({
 						actor: nftManagerActor,
-						transaction: token.arweaveId,
+						transaction: item.arweaveId,
 					})).unwrap();
 
-					// Update token ownership status
-					tokenToAdd = { ...token, owner: user.principal };
+					// Convert arweave ID to token ID for adding to shelf
+					tokenId = arweaveIdToNat(item.arweaveId).toString();
 				} catch (error) {
-					// Error messages are already handled in the mint thunk
-					return;
+					// Check if the error is "You already own this NFT"
+					const errorMessage = error instanceof Error ? error.message : String(error);
+					if (errorMessage.includes("You already own this NFT")) {
+						// User already owns the NFT, continue with adding to shelf
+						tokenId = arweaveIdToNat(item.arweaveId).toString();
+					} else {
+						// Other errors should stop the process
+						return;
+					}
 				}
+			}
+
+			// If we still don't have a token ID, generate it from arweave ID
+			if (!tokenId) {
+				tokenId = arweaveIdToNat(item.arweaveId).toString();
 			}
 
 			// Add to each selected shelf
 			const addPromises = shelfIds.map(async (shelfId) => {
 				try {
 					const result = await perpetuaActor.add_item_to_shelf(shelfId, {
-						content: { Nft: tokenToAdd.id },
+						content: { Nft: tokenId },
 						reference_item_id: [],
 						before: true,
 					});
@@ -84,6 +103,8 @@ export const useAddToShelf = () => {
 				toast.success(
 					`Added to ${successful.length} shelf${successful.length > 1 ? "s" : ""}`
 				);
+				// Call success callback if provided
+				onSuccess?.();
 			}
 
 			if (failed.length > 0) {
@@ -103,6 +124,5 @@ export const useAddToShelf = () => {
 	return {
 		addToShelf,
 		isLoading,
-		isLoggedIn: !!user,
 	};
 };

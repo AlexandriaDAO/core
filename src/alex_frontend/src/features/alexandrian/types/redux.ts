@@ -1,10 +1,6 @@
 import type { TokenType } from './common';
-import type { AlexandrianUser } from './models';
 
 export interface AlexandrianState {
-	// Data - unified tokens for current collection
-	users: AlexandrianUser[];
-
 	// Filters
 	selectedUser: string | null; // null means "Most Recent"
 	collectionType: TokenType;
@@ -22,10 +18,8 @@ export interface AlexandrianState {
 
 	// Loading states
 	loading: boolean;
-	loadingUsers: boolean;
 	refreshing: boolean;
 
 	// Error states
 	error: string | null;
-	userError: string | null;
 }

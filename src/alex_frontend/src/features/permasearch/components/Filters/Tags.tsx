@@ -17,9 +17,7 @@ const APP_NAME_OPTIONS = [
 
 export const FilterTags: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const { filters } = useAppSelector(
-		(state: { permasearch: import("../../types").SearchState }) => state.permasearch
-	);
+	const { filters } = useAppSelector(state => state.permasearch);
 
 	const handleCustomTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter") {

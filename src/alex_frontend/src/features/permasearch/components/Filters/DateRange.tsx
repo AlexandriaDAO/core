@@ -9,9 +9,7 @@ import { datePresets, getDateRangeFromPreset } from "../../utils";
 
 export const FilterDateRange: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const { filters } = useAppSelector(
-		(state: { permasearch: import("../../types").SearchState }) => state.permasearch
-	);
+	const { filters } = useAppSelector(state => state.permasearch);
 
 	return (
 		<div className="space-y-4">

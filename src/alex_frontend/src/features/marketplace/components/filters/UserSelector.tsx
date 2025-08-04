@@ -31,11 +31,16 @@ export function UserSelector({ disabled }: UserSelectorProps) {
 	const [open, setOpen] = useState(false);
 	const { users, isLoading } = useListingUsers();
 
-	const getUserDisplayName = (user?: Principal) => {
-		if (!user) return "All Users";
-		const userString = user.toString();
-		// Show first 8 and last 4 characters for readability
-		return `${userString.slice(0, 8)}...${userString.slice(-4)}`;
+	const getUserDisplayName = (userPrincipal?: Principal) => {
+		if (!userPrincipal) return "All Users";
+		
+		// Find the user info for this principal
+		const userInfo = users.find(u => u.principal.toString() === userPrincipal.toString());
+		if (userInfo) {
+			return `${userInfo.username} (${userInfo.listing_count})`;
+		}
+		
+		return "Unknown User";
 	};
 
 	const handleUserSelect = (user?: Principal) => {
@@ -84,22 +89,25 @@ export function UserSelector({ disabled }: UserSelectorProps) {
 							</CommandItem>
 
 							{/* Individual users */}
-							{users.map((user) => (
+							{users.map((userInfo) => (
 								<CommandItem
-									key={user.toString()}
-									onSelect={() => handleUserSelect(user)}
+									key={userInfo.principal.toString()}
+									onSelect={() => handleUserSelect(userInfo.principal)}
 								>
 									<CheckIcon
 										className={cn(
 											"mr-2 h-4 w-4",
-											selectedUser?.toString() === user.toString()
+											selectedUser?.toString() === userInfo.principal.toString()
 												? "opacity-100"
 												: "opacity-0"
 										)}
 									/>
 									<div className="flex flex-col">
-										<span className="font-mono text-sm">
-											{getUserDisplayName(user)}
+										<span className="font-medium text-sm">
+											{userInfo.username}
+										</span>
+										<span className="text-xs text-muted-foreground">
+											{userInfo.listing_count.toString()} listing{userInfo.listing_count !== 1n ? 's' : ''}
 										</span>
 									</div>
 								</CommandItem>

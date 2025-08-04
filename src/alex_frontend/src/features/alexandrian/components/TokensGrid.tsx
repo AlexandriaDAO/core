@@ -3,9 +3,10 @@ import { Skeleton } from "@/lib/components/skeleton";
 import { Masonry } from "react-plock";
 import Nft from "@/features/nft";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { AddToShelfButton, MintButton, SellButton } from "./../actions";
+import { MintButton, SellButton } from "./../actions";
 import type { AlexandrianToken } from "../types";
 import { Button } from "@/lib/components/button";
+import { AddToShelfButton } from "@/components/AddToShelfButton";
 
 // zdcg2-dqaaa-aaaap-qpnha-cai
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
@@ -70,7 +71,8 @@ export function TokensGrid({ tokens, loading }: TokensGridProps) {
 								) : (
 									<MintButton token={token}/>
 								)}
-								<AddToShelfButton token={token} />
+								{/* <AddToShelfButton token={token} /> */}
+								<AddToShelfButton item={{ id: token.id, arweaveId: token.arweaveId, owner: token.owner }} />
 							</div>
 						)
 					}

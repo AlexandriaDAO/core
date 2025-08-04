@@ -17,9 +17,8 @@ export const useSell = () => {
     const { actor: actorEmporium } = useEmporium();
     const { actor: actorIcrc7 } = useIcrc7();
     const { collectionType, selectedUser, page, pageSize, sortOrder, sortBy } = useAppSelector((state) => state.alexandrian);
-    const { user } = useAppSelector((state) => state.auth);
 
-    const queryKey = ["alexandrian-tokens", collectionType, selectedUser || "all", page, pageSize, sortOrder, sortBy, user?.principal];
+    const queryKey = ["alexandrian-tokens", collectionType, selectedUser || "all", page, pageSize, sortOrder, sortBy];
 
     const sellMutation = useMutation({
         mutationFn: async ({ tokenId, price }: SellNftParams) => {

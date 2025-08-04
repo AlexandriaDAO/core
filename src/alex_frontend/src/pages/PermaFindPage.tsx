@@ -24,16 +24,15 @@ import ContinuousScrollToggle from "@/components/ContinuousScrollToggle";
 import SortToggle from "@/features/permasearch/components/SortToggle";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { AddToShelfButton } from "@/components/AddToShelfButton";
 
 function PermaFindPage() {
     const dispatch = useAppDispatch();
 
     const { user } = useAppSelector(state => state.auth);
-    const { query, appliedFilters, showFilters, sortOrder, safeSearch, continuousScroll } = useAppSelector(state => state.permasearch);
+    const { query, showFilters, safeSearch, continuousScroll } = useAppSelector(state => state.permasearch);
 
-    const { transactions, isLoading, isLoadingMore, isLoadingMintStatus, isRefreshing, error, hasNextPage, isEmpty, loadMore, refresh, updateTransactionMinted } = useSearch({
-        query, filters: appliedFilters, sortOrder,
-    });
+    const { transactions, isLoading, isLoadingMore, isLoadingMintStatus, isRefreshing, error, hasNextPage, isEmpty, loadMore, refresh, updateTransactionMinted } = useSearch();
 
     const { mintTransaction, isMinting } = useMinting();
 
@@ -150,7 +149,7 @@ function PermaFindPage() {
                             id={tx.id}
                             checkNsfw={safeSearch}
                             action={
-                                user && (
+                                user && <>
                                     <Button
                                         variant="outline"
                                         scale="sm"
@@ -176,7 +175,9 @@ function PermaFindPage() {
                                             </>
                                         )}
                                     </Button>
-                                )
+
+                                    <AddToShelfButton item={{ arweaveId: tx.id }} variant="outline" scale="sm" onSuccess={()=>updateTransactionMinted(tx.id)}/>
+                                </>
                             }
                         />
                     )}

@@ -1,6 +1,6 @@
 import React from 'react'
 import { createLazyFileRoute } from '@tanstack/react-router'
-import { LbryActor, NftManagerActor, PerpetuaActor } from '@/actors'
+import { EmporiumActor, Icrc7Actor, LbryActor, NftManagerActor, PerpetuaActor } from '@/actors'
 import Alexis from '@/pages/AlexisPage'
 
 export const Route = createLazyFileRoute('/app/alexis')({
@@ -8,7 +8,11 @@ export const Route = createLazyFileRoute('/app/alexis')({
     <PerpetuaActor>
       <LbryActor>
         <NftManagerActor>
-          <Alexis />
+          <EmporiumActor>
+            <Icrc7Actor>
+              <Alexis />
+            </Icrc7Actor>
+          </EmporiumActor>
         </NftManagerActor>
       </LbryActor>
     </PerpetuaActor>

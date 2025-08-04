@@ -13,30 +13,30 @@ export function useMinting() {
 	const { actor } = useNftManager();
 
 	const { collectionType, selectedUser, page, pageSize, sortOrder, sortBy } = useAppSelector((state) => state.alexandrian);
-	const { user } = useAppSelector((state) => state.auth);
+	// const { user } = useAppSelector((state) => state.auth);
 
 	const [mintingTokenId, setMintingTokenId] = useState<string | null>(null);
 
 	const queryKey = [ "alexandrian-tokens", collectionType, selectedUser || "all", page, pageSize, sortOrder, sortBy ];
 
-	// Optimistic update mutation for token ownership
-	const updateOwnership = (tokenId: string) => {
-		// Update the cache for this specific query
-		queryClient.setQueryData(queryKey, (oldData: any) => {
-			if (!oldData || !user) return oldData;
+	// // Optimistic update mutation for token ownership
+	// const updateOwnership = (tokenId: string) => {
+	// 	// Update the cache for this specific query
+	// 	queryClient.setQueryData(queryKey, (oldData: any) => {
+	// 		if (!oldData || !user) return oldData;
 
-			return {
-				...oldData,
-				tokens: {
-					...oldData.tokens,
-					[tokenId]: {
-						...oldData.tokens[tokenId],
-						owner: user.principal,
-					},
-				},
-			};
-		});
-	}
+	// 		return {
+	// 			...oldData,
+	// 			tokens: {
+	// 				...oldData.tokens,
+	// 				[tokenId]: {
+	// 					...oldData.tokens[tokenId],
+	// 					owner: user.principal,
+	// 				},
+	// 			},
+	// 		};
+	// 	});
+	// }
 
 	const mintToken = useCallback(async (tokenId: string, arweaveId: string ) => {
 		if (!actor) {
@@ -54,7 +54,8 @@ export function useMinting() {
 		try {
 			await dispatch(mint({ actor, transaction: arweaveId })).unwrap();
 
-			updateOwnership(tokenId);
+			// updateOwnership(tokenId);
+			queryClient.invalidateQueries({ queryKey });
 		} catch (error) {
 			// Error is handled by the mint thunk
 		} finally {

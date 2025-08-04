@@ -6,6 +6,11 @@ type ArweaveNft = record {
   arweave_id : text;
   price : nat64;
 };
+type ListingUserInfo = record {
+  "principal" : principal;
+  username : text;
+  listing_count : nat64;
+};
 type ListingsQuery = record {
   sort_by : SortBy;
   page_size : nat64;
@@ -58,8 +63,29 @@ service : {
   arweave_id_to_nat : (text) -> (nat) query;
   buy_nft : (nat) -> (Result);
   get_caller_logs : (opt nat64, opt nat64, opt nat) -> (Logs) query;
+  // 
+  // * Get listed NFTs for multiple token IDs
+  // * Returns Option<Nft> for each token_id - None if token is not found
+  // * Used for: Frontend price display and listing status in token grids
+  // 
   get_listed_tokens : (vec nat) -> (vec opt Nft) query;
-  get_listing_users : () -> (vec principal) query;
+  get_listing_users : () -> (vec ListingUserInfo);
+  // 
+  // * Core query function with filtering funnel approach:
+  // *
+  // * Filtering Logic:
+  // * 1. Start with all listings in storage
+  // * 2. Apply user filter (if specified) -> narrows down to specific user's listings
+  // * 3. Apply search filter (if specified) -> searches within the user-filtered results
+  // * 4. Sort the final filtered results
+  // * 5. Apply pagination
+  // *
+  // * Scenarios:
+  // * - No user + No search = All listings
+  // * - No user + Search = Search through ALL listings
+  // * - User selected + No search = Only that user's listings
+  // * - User selected + Search = Search only within that user's listings
+  // 
   get_listings : (ListingsQuery) -> (ListingsResponse) query;
   get_logs : (opt nat64, opt nat64, opt nat) -> (Logs) query;
   is_arweave_id : (text) -> (bool) query;
