@@ -1,12 +1,5 @@
 import type { TokenType } from './common';
 
-export interface AlexandrianUser {
-	principal: string;
-	username: string;
-	hasNfts: boolean;
-	hasSbts: boolean;
-}
-
 export interface AlexandrianToken {
 	id: string;
 	arweaveId: string;

@@ -5,10 +5,11 @@ import {
 	useInvalidateSearchQuery,
 	SEARCH_QUERY_KEY,
 } from "../api/queries";
-import { SearchParams, Transaction } from "../types/index";
+import { Transaction } from "../types/index";
 import { useNftManager } from "@/hooks/actors";
 import { checkMintedStatus } from "../api/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 interface UseSearchReturn {
 	transactions: Transaction[];
@@ -24,13 +25,14 @@ interface UseSearchReturn {
 	updateTransactionMinted: (transactionId: string) => void;
 }
 
-export function useSearch(params: SearchParams): UseSearchReturn {
+export function useSearch(): UseSearchReturn {
 	const {actor} = useNftManager();
+	const { query, appliedFilters, sortOrder } = useAppSelector(state => state.permasearch);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [isLoadingMintStatus, setIsLoadingMintStatus] = useState(false);
 	const queryClient = useQueryClient();
 
-	const {data, isLoading, isFetchingNextPage, error, hasNextPage, fetchNextPage, refetch } = useSearchQuery({...params, actor: actor});
+	const {data, isLoading, isFetchingNextPage, error, hasNextPage, fetchNextPage, refetch } = useSearchQuery({ query, filters: appliedFilters, sortOrder, actor });
 
 	const updateMutation = useUpdateTransactionMutation();
 	const invalidateQueries = useInvalidateSearchQuery();

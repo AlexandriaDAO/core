@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/lib/components/button";
 import {
 	Command,
@@ -19,13 +19,22 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { setSelectedUser } from "../../alexandrianSlice";
 
+import fetchUsers from "@/features/nft/thunks/fetchUsers";
+
 // Emporium canister ID for "Listed" option
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 
 export function UserSelector() {
 	const dispatch = useAppDispatch();
-	const { selectedUser, users, collectionType } = useAppSelector((state) => state.alexandrian);
+	const { selectedUser,  collectionType } = useAppSelector((state) => state.alexandrian);
+	const { users } = useAppSelector((state) => state.nft);
 	const [open, setOpen] = useState(false);
+
+	// Load users on mount (keeping Redux for now)
+	useEffect(() => {
+		if(users.length > 0) return; // Avoid refetching if already loaded
+		dispatch(fetchUsers());
+	}, [users]);
 
 	const getUserDisplayName = (userId: string | null) => {
 		if (!userId) return "Most Recent";

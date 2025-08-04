@@ -2,7 +2,6 @@ import React, { useCallback } from "react";
 import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { toast } from "sonner";
 import { X, RotateCcw, Check } from "lucide-react";
 import {
 	applyFilters,
@@ -10,14 +9,10 @@ import {
 	setShowFilters,
 } from "../../store/slice";
 import { useInvalidateSearchQuery } from "../../api/queries";
-import useNftManager from "@/hooks/actors/useNftManager";
 
 export const FilterActions: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const { actor } = useNftManager();
-	const { filters, appliedFilters } = useAppSelector(
-		(state: { permasearch: import("../../types").SearchState }) => state.permasearch
-	);
+	const { filters, appliedFilters } = useAppSelector(state => state.permasearch);
 	const invalidateQueries = useInvalidateSearchQuery();
 
 	// Check if selected filters differ from applied filters

@@ -1,7 +1,8 @@
 use crate::{id_converter, Nft, NftStatus, LISTING};
 use candid::{CandidType, Nat, Principal};
-use ic_cdk::query;
+use ic_cdk::{query, update, api::call::CallResult};
 use serde::Deserialize;
+use std::collections::HashMap;
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
 pub struct ArweaveNft {
@@ -201,24 +202,132 @@ fn sort_listings(items: &mut [Nft], sort_by: &SortBy, sort_order: &SortOrder) {
     }
 }
 
-// ===== UTILITY FUNCTIONS FOR UI =====
+// // ===== UTILITY FUNCTIONS FOR UI =====
 
-/**
- * Get all unique users who have listings
- * Used for: User selector dropdown in marketplace
- */
-#[query]
-pub fn get_listing_users() -> Vec<Principal> {
-    LISTING.with(|storage| {
-        let listings = storage.borrow();
-        let mut users: Vec<Principal> = listings.iter().map(|(_, nft)| nft.owner).collect();
+// /**
+//  * Get all unique users who have listings
+//  * Used for: User selector dropdown in marketplace
+//  */
+// #[query]
+// pub fn get_listing_users() -> Vec<Principal> {
+//     LISTING.with(|storage| {
+//         let listings = storage.borrow();
+//         let mut users: Vec<Principal> = listings.iter().map(|(_, nft)| nft.owner).collect();
 
-        // Remove duplicates and sort for consistent dropdown order
-        users.sort_unstable();
-        users.dedup();
-        users
-    })
+//         // Remove duplicates and sort for consistent dropdown order
+//         users.sort_unstable();
+//         users.dedup();
+//         users
+//     })
+// }
+
+
+
+
+// User canister constant
+pub const USER_CANISTER_ID: &str = "yo4hu-nqaaa-aaaap-qkmoq-cai";
+
+// Helper function to convert string to Principal
+pub fn get_principal(canister_id: &str) -> Principal {
+    Principal::from_text(canister_id).expect("Invalid canister ID")
 }
+
+// User canister principal getter
+pub fn user_principal() -> Principal {
+    get_principal(USER_CANISTER_ID)
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct ListingUserInfo {
+    pub principal: Principal,
+    pub username: String,
+    pub listing_count: u64,
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+struct UserPrincipalInfo {
+    principal: Principal,
+    username: String,
+}
+
+/// Fetch user info from user canister
+async fn get_all_users() -> Result<Vec<UserPrincipalInfo>, String> {
+    let result: CallResult<(Vec<UserPrincipalInfo>,)> = ic_cdk::api::call::call(
+        user_principal(),
+        "get_all_users",
+        (),
+    ).await;
+
+    match result {
+        Ok((users,)) => Ok(users),
+        Err((code, msg)) => Err(format!("Error getting users: {} (rejection code: {:?})", msg, code))
+    }
+}
+
+#[update]
+pub async fn get_listing_users() -> Vec<ListingUserInfo> {
+    // Get user listing counts from storage
+    let user_listing_counts = LISTING.with(|storage| {
+        let listings = storage.borrow();
+        let mut counts: HashMap<Principal, u64> = HashMap::new();
+
+        for (_, nft) in listings.iter() {
+            *counts.entry(nft.owner).or_insert(0) += 1;
+        }
+
+        counts
+    });
+
+    // Fetch usernames from user canister
+    match get_all_users().await {
+        Ok(all_users) => {
+            let mut result: Vec<ListingUserInfo> = Vec::new();
+
+            // Create username lookup map
+            let username_map: HashMap<Principal, String> = all_users
+                .into_iter()
+                .map(|user| (user.principal, user.username))
+                .collect();
+
+            // Build result with usernames and listing counts
+            for (principal, count) in user_listing_counts {
+                let username = username_map
+                    .get(&principal)
+                    .cloned()
+                    .unwrap_or_else(|| {
+                        let principal_str = principal.to_string();
+                        format!("{}...{}", &principal_str[0..8], &principal_str[principal_str.len()-4..])
+                    });
+
+                result.push(ListingUserInfo {
+                    principal,
+                    username,
+                    listing_count: count,
+                });
+            }
+
+            // Sort by username
+            result.sort_by(|a, b| a.username.cmp(&b.username));
+            result
+        }
+        Err(_) => {
+            // Fallback if user canister call fails
+            user_listing_counts
+                .into_iter()
+                .map(|(principal, count)| {
+                    let principal_str = principal.to_string();
+                    ListingUserInfo {
+                        principal,
+                        username: format!("{}...{}", &principal_str[0..8], &principal_str[principal_str.len()-4..]),
+                        listing_count: count,
+                    }
+                })
+                .collect()
+        }
+    }
+}
+
+
 
 /**
  * Get listed NFTs for multiple token IDs

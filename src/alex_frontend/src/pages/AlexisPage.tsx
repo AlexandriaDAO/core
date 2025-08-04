@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { Alert } from "@/components/Alert";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import TopupBalanceWarning from "@/components/TopupBalanceWarning";
@@ -6,9 +6,6 @@ import { UnauthenticatedWarning } from "@/components/UnauthenticatedWarning";
 
 // Redux actions for UI state
 import { setPage } from "@/features/alexandrian/alexandrianSlice";
-
-// Legacy imports for users (still using Redux thunk for now)
-import fetchUsers from "@/features/alexandrian/thunks/fetchUsers";
 
 // TanStack Query hook for token data
 import useTokens from "@/features/alexandrian/hooks/useTokens";
@@ -19,11 +16,6 @@ import { FilterBar, TokensGrid, PaginationControls } from "@/features/alexandria
 function AlexisPage() {
 	const dispatch = useAppDispatch();
 	const {tokens, totalPages, loading, updating, error, refresh } = useTokens();
-
-	// Load users on mount (keeping Redux for now)
-	useEffect(() => {
-		dispatch(fetchUsers());
-	}, []);
 
 	// Handlers for TanStack Query actions
 	const handleRefresh = useCallback(() => {

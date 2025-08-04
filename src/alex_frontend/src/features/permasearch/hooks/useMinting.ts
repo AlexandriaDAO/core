@@ -26,7 +26,7 @@ export function useMinting() {
 			await dispatch(mint({ actor, transaction: transactionId })).unwrap();
 			onSuccess?.();
 		} catch (error) {
-			toast.error("Failed to mint NFT");
+			console.error("Minting error:", error);
 		} finally {
 			setMintingTx(null);
 		}

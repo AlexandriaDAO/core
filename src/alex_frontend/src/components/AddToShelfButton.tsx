@@ -36,7 +36,9 @@ import {
 	DialogFooter,
 } from "@/lib/components/dialog";
 import { cn } from "@/lib/utils";
-import { useAddToShelf } from "../hooks/useAddToShelf";
+import { useAddToShelf } from "@/hooks/useAddToShelf";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import fetchUsers from "@/features/nft/thunks/fetchUsers";
 import { usePerpetua } from "@/hooks/actors";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import {
@@ -48,15 +50,24 @@ import { useTagData } from "@/apps/app/Perpetua/features/tags/hooks/useTagData";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { Principal } from "@dfinity/principal";
 import { toast } from "sonner";
-import type { AlexandrianToken } from "../types";
 
 type SearchMode = "mySignedIn" | "publicByTag" | "publicByUser";
 
-interface AddToShelfButtonProps {
-	token: AlexandrianToken;
+export interface AddToShelfItem {
+	id?: string;
+	arweaveId: string;
+	owner?: string;
 }
 
-export function AddToShelfButton({ token }: AddToShelfButtonProps) {
+interface AddToShelfButtonProps {
+	item: AddToShelfItem;
+	variant?: "outline" | "primary" | "ghost";
+	scale?: "sm" | "default" | "lg";
+	className?: string;
+	onSuccess?: () => void;
+}
+
+export function AddToShelfButton({ item, variant = "outline", scale = "sm", className = "", onSuccess }: AddToShelfButtonProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedShelfIds, setSelectedShelfIds] = useState<string[]>([]);
 
@@ -89,7 +100,8 @@ export function AddToShelfButton({ token }: AddToShelfButtonProps) {
 	const { addToShelf, isLoading } = useAddToShelf();
 	const { actor: perpetuaActor } = usePerpetua();
 	const { user } = useAppSelector((state) => state.auth);
-	const { users } = useAppSelector((state) => state.alexandrian);
+	const { users } = useAppSelector((state) => state.nft);
+	const dispatch = useAppDispatch();
 	const { fetchTagsWithPrefix } = useTagActions();
 	const { tagSearchResults, isTagSearchLoading, popularTags } = useTagData();
 
@@ -99,6 +111,14 @@ export function AddToShelfButton({ token }: AddToShelfButtonProps) {
 			loadMyShelves();
 		}
 	}, [isOpen, perpetuaActor, user, searchMode]);
+
+	// Fetch users when users tab is selected and we have no users
+	useEffect(() => {
+		if (searchMode !== "publicByUser") return;
+		if (users.length > 0) return;
+
+		dispatch(fetchUsers());
+	}, [searchMode, users]);
 
 	const loadMyShelves = async () => {
 		if (!perpetuaActor || !user) return;
@@ -131,7 +151,6 @@ export function AddToShelfButton({ token }: AddToShelfButtonProps) {
 			setPublicShelvesByTag([]);
 
 			try {
-				// Implementation based on existing ShelfSelectionDialog pattern
 				const result =
 					await perpetuaActor.get_public_shelves_by_tag(tag);
 
@@ -171,7 +190,6 @@ export function AddToShelfButton({ token }: AddToShelfButtonProps) {
 
 				if ("Ok" in result) {
 					setPublicShelvesByUser(result.Ok.items);
-					// Remove toast notifications as empty state is shown in dialog
 				} else {
 					console.error("Failed to load user's public shelves");
 				}
@@ -259,24 +277,22 @@ export function AddToShelfButton({ token }: AddToShelfButtonProps) {
 		}
 
 		try {
-			await addToShelf(token, selectedShelfIds);
+			await addToShelf(item, selectedShelfIds, onSuccess);
 			setIsOpen(false);
 			setSelectedShelfIds([]);
-			toast.success("Added to shelf successfully!");
 		} catch (error) {
 			console.error("Failed to add to shelf:", error);
-			toast.error("Failed to add to shelf");
 		}
 	};
 
 	return (
 		<>
 			<Button
-				variant="outline"
-				scale="sm"
+				variant={variant}
+				scale={scale}
 				onClick={handleClick}
 				disabled={isLoading}
-				className="flex items-center gap-2"
+				className={cn("flex items-center gap-2", className)}
 			>
 				{isLoading ? (
 					<>
@@ -313,9 +329,7 @@ export function AddToShelfButton({ token }: AddToShelfButtonProps) {
 					<DialogHeader>
 						<DialogTitle>Add to Shelf</DialogTitle>
 						<DialogDescription>
-							Add this {token.collection.toLowerCase()} to your
-							own shelves or discover publicly editable shelves by
-							tag or user.
+							Add this item to your own shelves or discover publicly editable shelves by tag or user.
 						</DialogDescription>
 					</DialogHeader>
 
@@ -402,7 +416,6 @@ export function AddToShelfButton({ token }: AddToShelfButtonProps) {
 													newValue
 												);
 
-												// Clear search results when input becomes empty
 												if (newValue === "") {
 													setSelectedTag(null);
 													setPublicShelvesByTag([]);

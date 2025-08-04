@@ -1,16 +1,10 @@
 import {
 	createSlice,
 	PayloadAction,
-	ActionReducerMapBuilder,
 } from "@reduxjs/toolkit";
-import { toast } from "sonner";
 import { AlexandrianState, PAGE_SIZE_OPTIONS, TokenType } from "./types";
-import fetchUsers from "./thunks/fetchUsers";
 
 const initialState: AlexandrianState = {
-	// Data
-	users: [],
-
 	// Filters
 	selectedUser: null, // null means "Most Recent"
 	collectionType: "NFT",
@@ -28,12 +22,10 @@ const initialState: AlexandrianState = {
 
 	// Loading states
 	loading: false,
-	loadingUsers: false,
 	refreshing: false,
 
 	// Error states
 	error: null,
-	userError: null,
 };
 
 const alexandrianSlice = createSlice({
@@ -78,27 +70,8 @@ const alexandrianSlice = createSlice({
 		// Utility actions
 		clearError: (state) => {
 			state.error = null;
-			state.userError = null;
 		},
 		reset: () => initialState,
-	},
-	extraReducers: (builder: ActionReducerMapBuilder<AlexandrianState>) => {
-		builder
-			// Fetch Users
-			.addCase(fetchUsers.pending, (state) => {
-				state.loadingUsers = true;
-				state.userError = null;
-			})
-			.addCase(fetchUsers.fulfilled, (state, action) => {
-				state.users = action.payload;
-				state.loadingUsers = false;
-				state.userError = null;
-			})
-			.addCase(fetchUsers.rejected, (state, action) => {
-				state.loadingUsers = false;
-				state.userError = action.payload as string;
-				toast.error("Failed to fetch users");
-			});
 	},
 });
 

@@ -139,13 +139,15 @@ export const useContentCardState = ({
                      safeForMinting = true; // Non-media is always considered safe for minting
                  } else {
                      // Media requires prediction check
-                     if (predictions && predictions.isPorn === false) {
-                         determinedLikability = true; // Likable/mintable if explicitly safe
-                         safeForMinting = true;
-                     } else {
-                         // Not explicitly safe (or no prediction), so not likable/mintable
+                     if (predictions && predictions.isPorn === true) {
+                         // Explicitly marked as NSFW - not safe for minting
                          determinedLikability = false;
-                         safeForMinting = false; // Mark as unsafe for minting
+                         safeForMinting = false;
+                     } else {
+                         // Safe if predictions are not loaded yet, loading, or explicitly safe
+                         // This allows action buttons to show while predictions are loading
+                         determinedLikability = true;
+                         safeForMinting = true;
                      }
                  }
             } else {
