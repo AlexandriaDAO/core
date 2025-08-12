@@ -71,7 +71,7 @@ const convertSingleToken = async (
 			arweaveId: tokenData.arweaveId,
 			owner: ownerPrincipal,
 			collection: collectionType,
-			canister: tokenData.canister,
+			// canister: tokenData.canister,
 			createdAt: Date.now(),
 		};
 	} catch (error) {

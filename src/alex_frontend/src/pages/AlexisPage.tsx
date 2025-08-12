@@ -17,11 +17,6 @@ function AlexisPage() {
 	const dispatch = useAppDispatch();
 	const {tokens, totalPages, totalItems, loading, updating, error, refresh } = useTokens();
 
-	// Handlers for TanStack Query actions
-	const handleRefresh = useCallback(() => {
-		refresh();
-	}, [refresh]);
-
 	const handlePageClick = useCallback(
 		(event: { selected: number }) => {
 			dispatch(setPage(event.selected));
@@ -52,7 +47,7 @@ function AlexisPage() {
 				<TopupBalanceWarning />
 
                 <div className="space-y-3 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-lg shadow-lg border">
-					<FilterBar disabled={disabled} onRefresh={handleRefresh} />
+					<FilterBar disabled={disabled} onRefresh={refresh} />
 					<PaginationControls totalPages={totalPages} totalItems={totalItems} disabled={disabled} onPageClick={handlePageClick} />
 				</div>
 

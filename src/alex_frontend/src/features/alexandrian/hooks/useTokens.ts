@@ -1,10 +1,11 @@
 import { createTokenFetcher } from "../api/createTokenFetcher";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UseAlexandrianTokensReturn } from "../types";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 const useTokens = (): UseAlexandrianTokensReturn => {
 	const { collectionType, selectedUser, page, pageSize, sortOrder, sortBy } = useAppSelector((state) => state.alexandrian);
+	const queryClient = useQueryClient();
 
 	// Create the query key - this is what TanStack Query uses to identify unique requests
 	// When this key changes, TanStack Query will trigger a new request
@@ -22,7 +23,7 @@ const useTokens = (): UseAlexandrianTokensReturn => {
 	const fetcher = createTokenFetcher();
 
 	// Use TanStack Query with automatic cancellation support
-	const { data, error, isPending, isLoading, isFetching, refetch } = useQuery(
+	const { data, error, isPending, isLoading, isFetching, isRefetching, refetch } = useQuery(
 		{
 			queryKey,
 			queryFn: async ({ signal }) => {
@@ -52,6 +53,26 @@ const useTokens = (): UseAlexandrianTokensReturn => {
 		}
 	);
 
+
+	const refresh = async () => {
+		try {
+			// If currently fetching or refetching, cancel the requests
+			if (isRefetching || isFetching) {
+				// Cancel alexandrian token queries
+				await queryClient.cancelQueries({
+					queryKey: ["alexandrian-tokens", collectionType, selectedUser || "all", page, pageSize, sortOrder, sortBy]
+				});
+
+				return; // Don't start a new request
+			}
+
+			// If not currently fetching, start a new refetch
+			await refetch();
+		}catch(error){
+			console.log('refetch error', error)
+		}
+	};
+
 	return {
 		// Data
 		tokens: data?.tokens || {},
@@ -66,7 +87,7 @@ const useTokens = (): UseAlexandrianTokensReturn => {
 		error: error?.message || null,
 
 		// Actions
-		refresh: () => refetch(), // Force refresh the data
+		refresh,
 	};
 };
 
