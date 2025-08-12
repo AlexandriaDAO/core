@@ -5,13 +5,9 @@ import { AssetProps } from "../../../types/assetTypes";
 
 const BookModal: React.FC<AssetProps> = ({ url }) => {
     return (
-        <div className="w-full pb-5 text-black scale-y-100 transition-all duration-500 flex flex-col justify-between">
+        <div className="p-8 w-full h-full bg-background rounded-lg border border-border/30 overflow-hidden place-content-center place-items-center">
             <ReaderProvider>
-                <div className="relative w-full p-2">
-                    <div className="max-w-7xl m-auto grid grid-cols-1 gap-4">
-                        <Reader bookUrl={url} />
-                    </div>
-                </div>
+                <Reader bookUrl={url} />
             </ReaderProvider>
         </div>
     )

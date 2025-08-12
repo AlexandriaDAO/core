@@ -35,7 +35,7 @@ const MarketLogsPage: React.FC = () => {
     );
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="sm:w-10/12 flex flex-col gap-4">
             <div className="flex gap-1 items-center">
                 <p className="text-sm text-muted-foreground">Here you will see Market Logs</p>
                 <Button

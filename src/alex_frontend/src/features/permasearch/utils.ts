@@ -122,3 +122,66 @@ export const estimateBlockHeight = (timestamp: number, currentBlockHeight: numbe
     return Math.min(estimatedBlocks, currentBlockHeight);
 };
 
+// Function to get the block height closest to a given timestamp using binary search
+export async function getBlockHeightForTimestamp(timestamp: number): Promise<number> {
+    const ARWEAVE_GATEWAY_URL = 'https://arweave.net';
+
+    // Get the current network info to determine the max block height
+    const response = await fetch(`${ARWEAVE_GATEWAY_URL}/info`);
+    if (!response.ok) throw new Error('Failed to fetch Arweave info');
+
+    const networkInfo = await response.json();
+    let minHeight = 0;
+    let maxHeight = parseInt(networkInfo.height, 10);
+
+    let closestBlockHeight = -1;
+
+    while (minHeight <= maxHeight) {
+        const midHeight = Math.floor((minHeight + maxHeight) / 2);
+
+        // Fetch the block at midHeight
+        try {
+            const blockResponse = await fetch(`${ARWEAVE_GATEWAY_URL}/block/height/${midHeight}`);
+            if (!blockResponse.ok) throw new Error(`Failed to fetch block at height ${midHeight}`);
+
+            const block = await blockResponse.json();
+
+            if (block.timestamp < timestamp) {
+                minHeight = midHeight + 1;
+            } else if (block.timestamp > timestamp) {
+                maxHeight = midHeight - 1;
+            } else {
+                // Exact match found
+                closestBlockHeight = midHeight;
+                break;
+            }
+        } catch (error) {
+            console.error(`Error fetching block at height ${midHeight}:`, error);
+            break; // Exit if there's an error fetching the block
+        }
+    }
+
+    // If exact timestamp not found, use the closest block height
+    if (closestBlockHeight === -1) {
+        closestBlockHeight = maxHeight;
+    }
+
+    return closestBlockHeight;
+}
+
+// Helper function to convert date or datetime string to timestamp
+export function dateStringToTimestamp(dateString: string): number {
+    let date: Date;
+    
+    // Check if it's already a datetime string (contains 'T')
+    if (dateString.includes('T')) {
+        // It's already a datetime string like "2023-12-25T14:30"
+        date = new Date(dateString + ':00Z'); // Add seconds and Z for UTC
+    } else {
+        // It's a date string like "2023-12-25", convert to start of day UTC
+        date = new Date(dateString + 'T00:00:00Z');
+    }
+    
+    return Math.floor(date.getTime() / 1000); // Convert to seconds (Arweave format)
+}
+

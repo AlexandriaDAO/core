@@ -1,65 +1,8 @@
 import type { ActorSubclass } from "@dfinity/agent";
 import { ARWEAVE_GRAPHQL_ENDPOINT, checkMintedStatus } from "./utils";
 import type { _SERVICE } from "../../../../../declarations/nft_manager/nft_manager.did";
-import { SearchResponse, GraphQLQueryResponse, Transaction, TagFilter, Filters } from "../types";
-import { estimateBlockHeight, getCurrentBlockHeight } from "../utils";
-
-function buildTagFilters(filters: Filters): TagFilter[] {
-	const tags: TagFilter[] = [];
-	const allContentTypes = [...filters.types];
-
-	if (filters.customType.trim()) allContentTypes.push(filters.customType.trim());
-
-	if (allContentTypes.length > 0) {
-		tags.push({
-			name: "Content-Type",
-			values: allContentTypes,
-		});
-	}
-
-	filters.tags.forEach((tag) => {
-		const existingTag = tags.find((t) => t.name === tag.name);
-		if (existingTag) {
-			if (!existingTag.values.includes(tag.value)) {
-				existingTag.values.push(tag.value);
-			}
-		} else {
-			tags.push({ name: tag.name, values: [tag.value] });
-		}
-	});
-
-	return tags;
-}
-
-async function buildBlockRange(dateRange: { from?: string; to?: string }): Promise<{ min?: number; max?: number }> {
-	if (!dateRange.from && !dateRange.to) {
-		return {};
-	}
-
-	try {
-		const currentBlockHeight = await getCurrentBlockHeight();
-		let minBlock: number | undefined;
-		let maxBlock: number | undefined;
-
-		if (dateRange.from) {
-			const fromDate = new Date(dateRange.from);
-			const fromTimestamp = Math.floor(fromDate.getTime() / 1000);
-			minBlock = estimateBlockHeight(fromTimestamp, currentBlockHeight);
-		}
-
-		if (dateRange.to) {
-			const toDate = new Date(dateRange.to);
-			toDate.setHours(23, 59, 59, 999); // End of day
-			const toTimestamp = Math.floor(toDate.getTime() / 1000);
-			maxBlock = estimateBlockHeight(toTimestamp, currentBlockHeight);
-		}
-
-		return { min: minBlock, max: maxBlock };
-	} catch (error) {
-		console.warn('Failed to build block range from date range:', error);
-		return {};
-	}
-}
+import { SearchResponse, GraphQLQueryResponse, Transaction, Filters } from "../types";
+import { buildBlockRange, buildTagFilters } from "./utils";
 
 export async function fetchByFilters({
 	filters,
@@ -88,7 +31,12 @@ export async function fetchByFilters({
 
 	const queryStr = `
 		query GetTransactions($after: String, $tags: [TagFilter!]) {
-			transactions(first: 12, sort: ${sortOrder}, after: $after, tags: $tags${blockFilter ? `, ${blockFilter}` : ""}) {
+			transactions(
+				first: 12,
+				sort: ${sortOrder},
+				after: $after,
+				tags: $tags${blockFilter ? `, ${blockFilter}` : ""}
+			) {
 				edges {
 					cursor
 					node {

@@ -37,8 +37,8 @@ export function UserSelector() {
 	}, [users]);
 
 	const getUserDisplayName = (userId: string | null) => {
-		if (!userId) return "Most Recent";
-		if (userId === emporium_canister_id) return "Listed Items";
+		if (!userId) return "All Items";
+		if (userId === emporium_canister_id) return "Tradeable Items";
 		const foundUser = users.find((u) => u.principal === userId);
 		return foundUser ? foundUser.username : userId;
 	};
@@ -80,7 +80,7 @@ export function UserSelector() {
 										selectedUser === null ? "opacity-100" : "opacity-0"
 									)}
 								/>
-								Most Recent
+								<span className="text-info">All Items</span>
 							</CommandItem>
 							<CommandItem onSelect={() => handleUserSelect(emporium_canister_id)}>
 								<CheckIcon
@@ -89,7 +89,7 @@ export function UserSelector() {
 										selectedUser === emporium_canister_id ? "opacity-100" : "opacity-0"
 									)}
 								/>
-								Listed
+								<span className="text-info">Tradeable Items</span>
 							</CommandItem>
 							{getApplicableUsers().map((user) => (
 								<CommandItem

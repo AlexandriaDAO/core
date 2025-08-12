@@ -24,20 +24,17 @@ export function SortBySelector({ disabled }: SortBySelectorProps) {
 		}
 	};
 	return (
-		<div className="flex items-center gap-2">
-			<span className="text-sm text-muted-foreground">Sort by:</span>
-			<Select
-				value={sortBy}
-				disabled={disabled}
-				onValueChange={handleSortByChange}
-			>
-				<SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-				<SelectContent>
-					<SelectItem value="default">Default</SelectItem>
-					<SelectItem value="alex">ALEX</SelectItem>
-					<SelectItem value="lbry">LBRY</SelectItem>
-				</SelectContent>
-			</Select>
-		</div>
+		<Select
+			value={sortBy}
+			disabled={disabled}
+			onValueChange={handleSortByChange}
+		>
+			<SelectTrigger className="w-20 h-7 text-xs font-roboto-condensed"><SelectValue /></SelectTrigger>
+			<SelectContent>
+				<SelectItem value="default">Sort By</SelectItem>
+				<SelectItem value="alex">ALEX</SelectItem>
+				<SelectItem value="lbry">LBRY</SelectItem>
+			</SelectContent>
+		</Select>
 	);
 }

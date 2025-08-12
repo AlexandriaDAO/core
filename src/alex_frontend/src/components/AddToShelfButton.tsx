@@ -8,6 +8,7 @@ import {
 	Check as CheckIcon,
 	ChevronsUpDown,
 	X,
+	LoaderPinwheel,
 } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
@@ -27,6 +28,11 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/lib/components/popover";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/lib/components/tooltip";
 import {
 	Dialog,
 	DialogContent,
@@ -287,25 +293,20 @@ export function AddToShelfButton({ item, variant = "outline", scale = "sm", clas
 
 	return (
 		<>
-			<Button
-				variant={variant}
-				scale={scale}
-				onClick={handleClick}
-				disabled={isLoading}
-				className={cn("flex items-center gap-2", className)}
-			>
-				{isLoading ? (
-					<>
-						<Loader2 className="h-4 w-4 animate-spin" />
-						<span className="text-sm">Adding...</span>
-					</>
-				) : (
-					<>
-						<Bookmark className="h-4 w-4" />
-						<span className="text-sm">Add to Shelf</span>
-					</>
-				)}
-			</Button>
+			<Tooltip delayDuration={0}>
+				<TooltipTrigger asChild>
+					<Button
+						variant={variant}
+						scale={scale}
+						onClick={handleClick}
+						disabled={isLoading}
+						className={cn("px-1 py-4 group/bookmark rounded-t-none rounded-b", className)}
+					>
+						{isLoading ? <LoaderPinwheel className="animate-spin" /> : <Bookmark className="group-hover/bookmark:fill-primary" />}
+					</Button>
+				</TooltipTrigger>
+				<TooltipContent side="right" sideOffset={8} portal>Add to shelf</TooltipContent>
+			</Tooltip>
 
 			<Dialog
 				open={isOpen}

@@ -3,12 +3,14 @@ import {
 	SortOrderToggle,
 	CollectionTypeToggle,
 	UserSelector,
-	RefreshButton,
 } from "./Filters";
 import SafeSearchToggle from "@/components/SafeSearchToggle";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { setSafe } from "../alexandrianSlice";
+import { Button } from "@/lib/components/button";
+import { RotateCw } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
 
 interface FilterBarProps {
 	disabled?: boolean;
@@ -23,7 +25,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ disabled, onRefresh }) => {
 		dispatch(setSafe(!safe));
 	}, [safe]);
 	return (
-		<div className="flex items-center justify-between gap-3 flex-wrap sticky top-2 z-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4">
+        <div className="flex flex-wrap items-stretch justify-between gap-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
 			<div className="flex items-center justify-between gap-3 flex-wrap">
 				<SortOrderToggle disabled={disabled} />
 				<CollectionTypeToggle disabled={disabled} />
@@ -36,10 +38,20 @@ const FilterBar: React.FC<FilterBarProps> = ({ disabled, onRefresh }) => {
 					enabled={safe}
 					setEnabled={handleToggle}
 				/>
-				<RefreshButton
-					onRefresh={onRefresh}
-					disabled={disabled}
-				/>
+				<Tooltip delayDuration={0}>
+					<TooltipTrigger asChild>
+						<Button
+							onClick={onRefresh}
+							variant="outline"
+							scale="icon"
+							rounded="full"
+							className="self-stretch place-content-center place-items-center w-10"
+						>
+							<RotateCw className={`${disabled ? "animate-spin" : ""}`}/>
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent side="right" sideOffset={16}>Refresh results</TooltipContent>
+				</Tooltip>
 			</div>
 		</div>
 	)

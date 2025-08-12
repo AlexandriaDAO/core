@@ -3,13 +3,16 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useNftManager } from "@/hooks/actors";
 import mint from "@/features/nft/thunks/mint";
 import { toast } from "sonner";
+import { useUpdate } from "./useUpdate";
 
 export function useMinting() {
+	const update = useUpdate();
 	const dispatch = useAppDispatch();
 	const { actor } = useNftManager();
+
 	const [mintingTx, setMintingTx] = useState<string | null>(null);
 
-	const mintTransaction = useCallback(async ( transactionId: string, onSuccess?: () => void ) => {
+	const mintTransaction = useCallback(async ( transactionId: string ) => {
 		if (!actor) {
 			toast.error("Please authenticate to mint NFTs");
 			return;
@@ -24,7 +27,8 @@ export function useMinting() {
 
 		try {
 			await dispatch(mint({ actor, transaction: transactionId })).unwrap();
-			onSuccess?.();
+
+			update(transactionId);
 		} catch (error) {
 			console.error("Minting error:", error);
 		} finally {

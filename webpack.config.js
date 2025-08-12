@@ -6,6 +6,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const { TanStackRouterWebpack } = require('@tanstack/router-plugin/webpack')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -130,7 +131,19 @@ module.exports = {
       {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
-        use: 'ts-loader',
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env', 
+              '@babel/preset-react',
+              '@babel/preset-typescript'
+            ],
+            plugins: [
+              isDevelopment && require.resolve('react-refresh/babel')
+            ].filter(Boolean),
+          },
+        },
       },
       {
         test: /\.(js|jsx)$/,
@@ -139,6 +152,9 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env', '@babel/preset-react'],
+            plugins: [
+              isDevelopment && require.resolve('react-refresh/babel')
+            ].filter(Boolean),
           },
         },
       },
@@ -254,6 +270,7 @@ module.exports = {
       'require("./model_imports/mobilenet_v2")': '{}',
       'require("./model_imports/mobilenet_v2_mid")': '{}'
     }),
+    ...(isDevelopment ? [new ReactRefreshWebpackPlugin({ overlay: false })] : []),
     TanStackRouterWebpack({
       target: 'react',
       autoCodeSplitting: true,
@@ -305,8 +322,11 @@ module.exports = {
       }
     ],
     hot: true,
+    client: {
+      overlay: false,
+    },
     watchFiles: [path.resolve(__dirname, "src", frontendDirectory, "src")],
-    liveReload: true,
+    liveReload: false,
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",

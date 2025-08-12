@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
+import { PAGE_SIZE_OPTIONS } from "./types";
 
 export interface MarketplaceState {
 	editing: string; // arweave_id, empty string for no selection
@@ -31,7 +32,7 @@ const initialState: MarketplaceState = {
 	sortBy: "Time",
 	sortOrder: "Desc", // Newest first by default
 	page: 1,
-	pageSize: 8,
+	pageSize: PAGE_SIZE_OPTIONS[0],
 };
 
 const marketplaceSlice = createSlice({

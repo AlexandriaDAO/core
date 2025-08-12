@@ -67,7 +67,9 @@ function EmporiumLayout() {
 					</Link>
 				</nav>
 			</div>
-			<Outlet />
+			<div className="place-content-center place-items-center">
+				<Outlet />
+			</div>
 		</div>
 	);
 }

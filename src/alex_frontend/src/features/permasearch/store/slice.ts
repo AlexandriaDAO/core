@@ -27,6 +27,7 @@ const initialState: SearchState = {
   sortOrder: "HEIGHT_DESC",
   safeSearch: true,
   continuousScroll: true,
+  randomDate: undefined,
 };
 
 const permasearchSlice = createSlice({
@@ -82,6 +83,9 @@ const permasearchSlice = createSlice({
       state.filters = { ...initialFilters };
       state.appliedFilters = { ...initialFilters };
     },
+    setFilters: (state, action: PayloadAction<Filters>) => {
+      state.filters = action.payload;
+    },
 
     // UI state actions
     setSortOrder: (state, action: PayloadAction<string>) => {
@@ -107,6 +111,14 @@ const permasearchSlice = createSlice({
       state.expanded[key] = !state.expanded[key];
     },
 
+    // Random date actions
+    setRandomDate: (state, action: PayloadAction<string | undefined>) => {
+      state.randomDate = action.payload;
+    },
+    clearRandomDate: (state) => {
+      state.randomDate = undefined;
+    },
+
     // Reset all state
     reset: () => initialState,
   },
@@ -125,6 +137,7 @@ export const {
   removeFilterTag,
   applyFilters,
   resetFilters,
+  setFilters,
   setSortOrder,
   toggleSortOrder,
   setShowFilters,
@@ -132,6 +145,8 @@ export const {
   setSafeSearch,
   setContinuousScroll,
   toggleExpanded,
+  setRandomDate,
+  clearRandomDate,
   reset,
 } = permasearchSlice.actions;
 

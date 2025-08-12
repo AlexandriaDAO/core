@@ -2,6 +2,7 @@ import { Principal } from "@dfinity/principal";
 import { ArweaveNft } from "../../../../declarations/emporium/emporium.did";
 
 export const MARKETPLACE_LBRY_FEE = 20; // MarketPlace fee frontend
+export const PAGE_SIZE_OPTIONS = [8, 16, 24, 32];
 
 export interface MarketplaceFilters {
 	page: number;

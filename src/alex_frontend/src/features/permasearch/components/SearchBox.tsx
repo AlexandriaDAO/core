@@ -4,7 +4,7 @@ import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { clearQuery, setQuery } from "../../store/slice";
+import { clearQuery, setQuery } from "../store/slice";
 
 interface SearchBoxProps {
 	disabled?: boolean;

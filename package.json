@@ -204,7 +204,7 @@
 
     "lru-cache": "^11.0.2",
 
-    "lucide-react": "^0.452.0",
+    "lucide-react": "^0.539.0",
 
     "meilisearch": "^0.42.0",
 
@@ -314,6 +314,8 @@
 
     "@babel/preset-typescript": "^7.26.0",
 
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.6.1",
+
     "@svgr/webpack": "^8.1.0",
 
     "@tanstack/router-plugin": "^1.120.16",
@@ -397,6 +399,8 @@
     "postcss-nested": "^6.2.0",
 
     "process": "^0.11.10",
+
+    "react-refresh": "^0.17.0",
 
     "stream-browserify": "^3.0.0",
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/lib/components/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
 import {
 	Dialog,
 	DialogContent,
@@ -55,67 +56,76 @@ const Update: React.FC<UpdateProps> = ({ nft }) => {
 
 	return (
 		<>
-			<Button onClick={handleOpen} variant="primary" scale="sm">
-				Edit Price <Pencil size={16} />
-			</Button>
-			<Dialog open={isOpen}>
-				<DialogContent
-					className="sm:max-w-[425px]"
-					closeIcon={
-						<Button
-							disabled={isPending}
-							onClick={handleClose}
-							variant="outline"
-							scale="icon"
-							rounded="full"
-							className="border-ring"
-						>
-							<X size={18} />
-						</Button>
-					}
-				>
-					<DialogHeader>
-						<DialogTitle>Edit NFT Price</DialogTitle>
-						<DialogDescription>
-							Set a new price for your NFT.
-						</DialogDescription>
-					</DialogHeader>
-					{error && (
-						<Alert variant="danger" title="Error">
-							{error.message}
-						</Alert>
-					)}
-					{isPending ? (
-						<div className="p-6 flex justify-center items-center h-full">
-							<LoaderPinwheel className="animate-spin" />
-						</div>
-					) : (
-						<div className="grid gap-4 py-4">
-							<div className="flex flex-col">
-								<Label htmlFor="price" className="text-right">
-									Price (ICP)
-								</Label>
-								<Input
-									id="price"
-									type="number"
-									step="0.01"
-									min="0"
-									placeholder="0.00"
-									value={price}
-									onChange={(e) => setPrice(e.target.value)}
-									className="col-span-3"
-									required
-								/>
+			<Tooltip delayDuration={0}>
+				<TooltipTrigger asChild>
+					<Button onClick={handleOpen} variant="outline" className="px-1 py-4 group/update">
+						<Pencil className="group-hover/update:text-primary"/>
+					</Button>
+				</TooltipTrigger>
+				<TooltipContent side="right" sideOffset={8} portal>
+					<p>Update</p>
+				</TooltipContent>
+			</Tooltip>
+			{isOpen && (
+				<Dialog open={true}>
+					<DialogContent
+						className="sm:max-w-[425px]"
+						closeIcon={
+							<Button
+								disabled={isPending}
+								onClick={handleClose}
+								variant="outline"
+								scale="icon"
+								rounded="full"
+								className="border-ring"
+							>
+								<X size={18} />
+							</Button>
+						}
+					>
+						<DialogHeader>
+							<DialogTitle>Edit NFT Price</DialogTitle>
+							<DialogDescription>
+								Set a new price for your NFT.
+							</DialogDescription>
+						</DialogHeader>
+						{error && (
+							<Alert variant="danger" title="Error">
+								{error.message}
+							</Alert>
+						)}
+						{isPending ? (
+							<div className="p-6 flex justify-center items-center h-full">
+								<LoaderPinwheel className="animate-spin" />
 							</div>
-						</div>
-					)}
-					<DialogFooter>
-						<Button disabled={isPending} onClick={handleSubmit}>
-							{isPending ? "Updating..." : "Update Price"}
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+						) : (
+							<div className="grid gap-4 py-4">
+								<div className="flex flex-col">
+									<Label htmlFor="price" className="text-right">
+										Price (ICP)
+									</Label>
+									<Input
+										id="price"
+										type="number"
+										step="0.01"
+										min="0"
+										placeholder="0.00"
+										value={price}
+										onChange={(e) => setPrice(e.target.value)}
+										className="col-span-3"
+										required
+									/>
+								</div>
+							</div>
+						)}
+						<DialogFooter>
+							<Button disabled={isPending} onClick={handleSubmit}>
+								{isPending ? "Updating..." : "Update Price"}
+							</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
+			)}
 		</>
 	);
 };

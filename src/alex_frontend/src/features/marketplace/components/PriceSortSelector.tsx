@@ -23,18 +23,21 @@ export function PriceSortSelector({ disabled }: PriceSortSelectorProps) {
 	};
 
 	return (
-		<Select
-			value={sortBy}
-			onValueChange={handleValueChange}
-			disabled={disabled}
-		>
-			<SelectTrigger className="w-[140px] h-10">
-				<SelectValue placeholder="Sort by" />
-			</SelectTrigger>
-			<SelectContent>
-				<SelectItem value="Time">By Time</SelectItem>
-				<SelectItem value="Price">By Price</SelectItem>
-			</SelectContent>
-		</Select>
+		<div className="flex gap-1 items-center text-xs font-roboto-condensed">
+			<span>Sort By</span>
+			<Select
+				value={sortBy}
+				onValueChange={handleValueChange}
+				disabled={disabled}
+			>
+				<SelectTrigger className="w-20 h-7 text-xs">
+					<SelectValue />
+				</SelectTrigger>
+				<SelectContent>
+					<SelectItem value="Time">Time</SelectItem>
+					<SelectItem value="Price">Price</SelectItem>
+				</SelectContent>
+			</Select>
+		</div>
 	);
 }

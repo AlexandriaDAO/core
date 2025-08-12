@@ -1,54 +1,30 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Button } from "@/lib/components/button";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toggleShowFilters } from "../../store/slice";
-import { Filter } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
+import { useFilterCount } from "../../hooks/useFilterCount";
 
 interface FilterToggleProps {
 	isLoading: boolean;
 }
 
-const FilterToggle: React.FC<FilterToggleProps> = ({ isLoading }) => {
+export const FilterToggle: React.FC<FilterToggleProps> = ({ isLoading }) => {
 	const dispatch = useAppDispatch();
-	const { query, appliedFilters } = useAppSelector(state => state.permasearch);
-
-	const count = useMemo(() => {
-		let count = 0;
-
-		// Count active content types
-		if (
-			appliedFilters.types.length > 0 ||
-			appliedFilters.customType.trim()
-		) {
-			count++;
-		}
-
-
-		// Count date range
-		if (appliedFilters.dateRange.from || appliedFilters.dateRange.to) {
-			count++;
-		}
-
-		// Count tags
-		if (appliedFilters.tags.length > 0) {
-			count++;
-		}
-
-		return count;
-	}, [appliedFilters]);
+	const { applied } = useFilterCount();
 
 	return (
 		<Button
 			onClick={() => dispatch(toggleShowFilters())}
-			disabled={isLoading || !!query}
+			disabled={isLoading}
 			variant="outline"
-			className="flex items-center gap-2 h-10"
+			scale="icon"
+			rounded="full"
+			className="relative"
+			title={applied > 0 ? `Filters (${applied} active)` : 'Filters'}
 		>
-			<Filter className="h-4 w-4" /> Filters
-			{count > 0 && <span className="bg-emerald-500 text-white rounded-full px-2 py-0.5 text-xs ml-1">{count}</span>}
+			<SlidersHorizontal size={28} className="p-1" />
+			{applied > 0 && <span className="absolute -top-2 -right-2 bg-emerald-500 text-white rounded-full h-5 w-5 flex justify-center items-center">{applied}</span>}
 		</Button>
 	)
 };
-
-export default FilterToggle;

@@ -1,6 +1,7 @@
 import {
+	GraphQLEdge,
+	GraphQLPageInfo,
 	SearchResponse,
-	GraphQLQueryResponse,
 	Transaction,
 } from "../types";
 import {
@@ -9,6 +10,22 @@ import {
 } from "./utils";
 import type { ActorSubclass } from "@dfinity/agent";
 import type { _SERVICE } from "../../../../../declarations/nft_manager/nft_manager.did";
+
+
+interface GraphQLQueryResponse {
+	data: {
+		byOwner?: {
+			edges: GraphQLEdge[];
+			pageInfo: GraphQLPageInfo;
+		};
+		byId?: Transaction;
+		transactions?: {
+			edges: GraphQLEdge[];
+			pageInfo: GraphQLPageInfo;
+		};
+	};
+	errors?: Array<{ message: string }>;
+}
 
 export async function fetchByQuery({
 	query,

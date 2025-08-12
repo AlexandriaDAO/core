@@ -29,11 +29,11 @@ const SortToggle: React.FC<SortToggleProps> = ({
 			onClick={() => dispatch(toggleSortOrder())}
 			disabled={isLoading || count <= 1}
 			variant="outline"
-			className="flex items-center gap-2 h-10"
+			rounded="full"
+			scale="icon"
 			title={title}
 		>
-            <SortAsc className={`h-4 w-4${sortOrder === "HEIGHT_DESC" ? "" : " rotate-180"}`} />
-            {sortOrder === "HEIGHT_DESC" ? "Newest" : "Oldest"}
+			<SortAsc size={28} className={`p-1 ${sortOrder === "HEIGHT_DESC" ? "" : " rotate-180"}`} />
 		</Button>
 	);
 };

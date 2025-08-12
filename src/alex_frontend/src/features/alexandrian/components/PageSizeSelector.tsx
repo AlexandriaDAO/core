@@ -23,24 +23,21 @@ export function PageSizeSelector({ disabled }: PageSizeSelectorProps) {
 		dispatch(setPageSize(parseInt(newSize, 10)));
 	};
 	return (
-		<div className="flex items-center gap-2">
-			<span className="text-sm text-muted-foreground">Items per page:</span>
-			<Select
-				disabled={disabled}
-				value={pageSize.toString()}
-				onValueChange={handlePageSizeChange}
-			>
-				<SelectTrigger className="w-20">
-					<SelectValue />
-				</SelectTrigger>
-				<SelectContent>
-					{PAGE_SIZE_OPTIONS.map((size) => (
-						<SelectItem key={size} value={size.toString()}>
-							{size}
-						</SelectItem>
-					))}
-				</SelectContent>
-			</Select>
-		</div>
+		<Select
+			disabled={disabled}
+			value={pageSize.toString()}
+			onValueChange={handlePageSizeChange}
+		>
+			<SelectTrigger className="w-24 h-7 text-xs font-roboto-condensed">
+				<SelectValue />
+			</SelectTrigger>
+			<SelectContent>
+				{PAGE_SIZE_OPTIONS.map((size) => (
+					<SelectItem key={size} value={size.toString()}>
+						{size} Items
+					</SelectItem>
+				))}
+			</SelectContent>
+		</Select>
 	);
 }
