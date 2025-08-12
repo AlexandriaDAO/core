@@ -22,6 +22,7 @@ export interface SearchState {
 	sortOrder: string;
 	safeSearch: boolean;
 	continuousScroll: boolean;
+	randomDate?: string;
 }
 
 // Filter processing types for API

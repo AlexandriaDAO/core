@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/lib/components/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
 import {
 	Dialog,
 	DialogContent,
@@ -42,66 +43,75 @@ const Remove: React.FC<RemoveProps> = ({ nft }) => {
 
 	return (
 		<>
-			<Button onClick={handleOpen} variant="primary" scale="sm">
-				Remove <Trash2 size={16} />
-			</Button>
-			<Dialog open={isOpen}>
-				<DialogContent
-					className="sm:max-w-[425px]"
-					closeIcon={
-						<Button
-							disabled={isPending}
-							onClick={handleClose}
-							variant="outline"
-							scale="icon"
-							rounded="full"
-							className="border-ring"
-						>
-							<X size={18} />
-						</Button>
-					}
-				>
-					<DialogHeader>
-						<DialogTitle>Unlist NFT</DialogTitle>
-						<DialogDescription>
-							Are you sure you want to remove this NFT from the
-							marketplace?
-						</DialogDescription>
-					</DialogHeader>
-					{error && (
-						<Alert variant="danger" title="Error">
-							{error.message}
-						</Alert>
-					)}
-					{isPending ? (
-						<div className="p-6 flex justify-center items-center h-full">
-							<LoaderPinwheel className="animate-spin" />
-						</div>
-					) : (
-						<div className="grid gap-4 py-4">
-							<div className="flex flex-col">
-								<p className="text-sm text-muted-foreground">
-									This action will remove your NFT from the
-									marketplace. You can list it again later if
-									needed.
-								</p>
+			<Tooltip delayDuration={0}>
+				<TooltipTrigger asChild>
+					<Button onClick={handleOpen} variant="outline" className="px-1 py-4 group/unlist rounded-t-none rounded-b">
+						<Trash2 className="group-hover/unlist:text-primary"/>
+					</Button>
+				</TooltipTrigger>
+				<TooltipContent side="right" sideOffset={8} portal>
+					<p>Remove</p>
+				</TooltipContent>
+			</Tooltip>
+			{isOpen && (
+				<Dialog open={true}>
+					<DialogContent
+						className="sm:max-w-[425px]"
+						closeIcon={
+							<Button
+								disabled={isPending}
+								onClick={handleClose}
+								variant="outline"
+								scale="icon"
+								rounded="full"
+								className="border-ring"
+							>
+								<X size={18} />
+							</Button>
+						}
+					>
+						<DialogHeader>
+							<DialogTitle>Unlist NFT</DialogTitle>
+							<DialogDescription>
+								Are you sure you want to remove this NFT from the
+								marketplace?
+							</DialogDescription>
+						</DialogHeader>
+						{error && (
+							<Alert variant="danger" title="Error">
+								{error.message}
+							</Alert>
+						)}
+						{isPending ? (
+							<div className="p-6 flex justify-center items-center h-full">
+								<LoaderPinwheel className="animate-spin" />
 							</div>
-						</div>
-					)}
-					<DialogFooter>
-						<Button disabled={isPending} onClick={handleClose}>
-							Cancel
-						</Button>
-						<Button
-							disabled={isPending}
-							onClick={handleSubmit}
-							variant="destructive"
-						>
-							{isPending ? "Removing..." : "Remove from Sale"}
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
+						) : (
+							<div className="grid gap-4 py-4">
+								<div className="flex flex-col">
+									<p className="text-sm text-muted-foreground">
+										This action will remove your NFT from the
+										marketplace. You can list it again later if
+										needed.
+									</p>
+								</div>
+							</div>
+						)}
+						<DialogFooter>
+							<Button disabled={isPending} onClick={handleClose}>
+								Cancel
+							</Button>
+							<Button
+								disabled={isPending}
+								onClick={handleSubmit}
+								variant="destructive"
+							>
+								{isPending ? "Removing..." : "Remove from Sale"}
+							</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
+			)}
 		</>
 	);
 };

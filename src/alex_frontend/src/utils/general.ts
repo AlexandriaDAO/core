@@ -23,9 +23,14 @@ export const shorten = (
 // Returns null if principal string is empty/invalid
 export const getIcPrincipal = (principal: string) => principal ? Principal.fromText(principal) : null;
 
-// Helper function to convert IC timestamp (nanoseconds) to Date
-export const convertTimestamp = (timestamp: bigint, format: 'iso' | 'readable' | 'relative' | 'combined' = 'iso'): string => {
-    const date = new Date(Number(timestamp) / 1_000_000); // Convert nanoseconds to milliseconds
+// Helper function to convert timestamps to Date
+// bigint = ICP timestamps (nanoseconds), number = Arweave timestamps (seconds)
+export const convertTimestamp = (timestamp: bigint | number, format: 'iso' | 'readable' | 'relative' | 'combined' = 'iso'): string => {
+    const date = new Date(
+        typeof timestamp === 'bigint' 
+            ? Number(timestamp) / 1_000_000  // ICP: nanoseconds to milliseconds
+            : timestamp * 1_000              // Arweave: seconds to milliseconds
+    );
     
     switch (format) {
         case 'readable':
@@ -147,4 +152,16 @@ export const downloadQRCode = (content: string, filename: string = "qrcode") => 
 	};
 
 	img.src = "data:image/svg+xml;base64," + btoa(svgData);
+};
+
+
+
+export const copyToClipboard = async (text: string) => {
+    try {
+        await navigator.clipboard.writeText(text);
+        toast.success("Copied to clipboard");
+    } catch (err) {
+        console.error("Failed to copy text: ", err);
+        toast.error("Failed to copy text");
+    }
 };

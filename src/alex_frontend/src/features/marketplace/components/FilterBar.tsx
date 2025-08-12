@@ -3,7 +3,8 @@ import { UserSelector } from "./filters/UserSelector";
 import SearchBox from "./filters/SearchBox";
 import { SortOrderToggle } from "./filters/SortOrderToggle";
 import { Button } from "@/lib/components/button";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, RotateCw } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
 
 interface FilterBarProps {
 	onRefresh: () => void;
@@ -23,14 +24,21 @@ const FilterBar: React.FC<FilterBarProps> = ({
 
 			<SearchBox disabled={disabled} />
 
-			<Button
-				onClick={onRefresh}
-				disabled={disabled}
-				variant="outline"
-				className="flex items-center gap-2 h-10"
-			>
-				<RefreshCw className={`h-4 w-4 ${disabled ? "animate-spin" : ""}`} /> Refresh
-			</Button>
+			<Tooltip delayDuration={0}>
+				<TooltipTrigger asChild>
+					<Button
+						onClick={onRefresh}
+						disabled={disabled}
+						variant="outline"
+						scale="icon"
+						rounded="full"
+						className="self-stretch place-content-center place-items-center w-10"
+					>
+						<RotateCw className={`${disabled ? "animate-spin" : ""}`}/>
+					</Button>
+				</TooltipTrigger>
+				<TooltipContent side="right" sideOffset={16}>Refresh results</TooltipContent>
+			</Tooltip>
 		</div>
 	);
 };

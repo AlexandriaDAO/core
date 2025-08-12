@@ -94,6 +94,11 @@ const alexSlice = createSlice({
 		setLastRefresh: (state) => {
 			state.lastRefresh = Date.now();
 		},
+		setUnlocked: (state, action) => {
+			const newBalance = state.unlocked + action.payload;
+			if(newBalance <= 0) state.unlocked = 0;
+			else state.unlocked = newBalance;
+		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<AlexBalanceState>) => {
 		builder
@@ -197,5 +202,5 @@ const alexSlice = createSlice({
 	},
 });
 
-export const { clearUnlockedError, clearLockedError, clearPriceError, clearRateError, clearFeeError, clearWithdrawError, clearAllErrors, setLastRefresh } = alexSlice.actions;
+export const { clearUnlockedError, clearLockedError, clearPriceError, clearRateError, clearFeeError, clearWithdrawError, clearAllErrors, setLastRefresh, setUnlocked } = alexSlice.actions;
 export default alexSlice.reducer;

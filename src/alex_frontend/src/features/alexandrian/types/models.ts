@@ -5,6 +5,5 @@ export interface AlexandrianToken {
 	arweaveId: string;
 	owner: string;
 	collection: TokenType;
-	canister?: string;
 	createdAt?: number;
 }

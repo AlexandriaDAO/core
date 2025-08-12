@@ -115,6 +115,11 @@ const lbrySlice = createSlice({
 		setLastRefresh: (state) => {
 			state.lastRefresh = Date.now();
 		},
+		setUnlocked: (state, action) => {
+			const newBalance = state.unlocked + action.payload;
+			if(newBalance <= 0) state.unlocked = 0;
+			else state.unlocked = newBalance;
+		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<LbryBalanceState>) => {
 		builder
@@ -263,5 +268,5 @@ const lbrySlice = createSlice({
 	},
 });
 
-export const { clearUnlockedError, clearLockedError, clearBurnError, clearRatioError, clearFeeError, clearSwapError, clearWithdrawError, clearTransferError, clearAllErrors, setLastRefresh } = lbrySlice.actions;
+export const { clearUnlockedError, clearLockedError, clearBurnError, clearRatioError, clearFeeError, clearSwapError, clearWithdrawError, clearTransferError, clearAllErrors, setLastRefresh, setUnlocked } = lbrySlice.actions;
 export default lbrySlice.reducer;

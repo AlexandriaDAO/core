@@ -1,45 +1,34 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { Video as VideoIcon, Play } from "lucide-react";
 import Preview from "./../Preview";
 import AssetSkeleton from "@/layouts/skeletons/emporium/components/AssetSkeleton";
 
-// NEW: Import our optimized hooks
 import useAssetLoading from "../../../hooks/useAssetLoading";
-import useNsfwAnalysis from "../../../hooks/useNsfwAnalysis";
 import { VideoAssetProps } from "../../../types/assetTypes";
+import useVideoAnalysis from "@/features/nft/hooks/useVideoAnalysis";
 
 const VideoCard: React.FC<VideoAssetProps> = ({ url, contentType, checkNsfw, setIsNsfw }) => {
-	// NEW: Use unified loading hook with abort signal support
-	const { loading, error, ready, setLoading, setError, setReady } = useAssetLoading(url);
+	
+	const { loading, setLoading, error, setError } = useAssetLoading(url);
 
-	// OPTIMIZATION: Use SWR-cached NSFW analysis with 24-hour cache
-	// Start NSFW analysis immediately when Safe Search is ON - no need to wait for video load
-	const { isNsfw, analyzing } = useNsfwAnalysis(url, contentType, checkNsfw);
-	// const { isNsfw, analyzing } = useNsfwAnalysis("/video/1.mp4", contentType, checkNsfw);
-
-	const videoRef = useRef<HTMLVideoElement>(null);
+	const { nsfw, analyzing } = useVideoAnalysis(url, checkNsfw);
 
 	// Update parent component when NSFW analysis completes
 	useEffect(() => {
-		if (!analyzing && isNsfw !== undefined) {
-			setIsNsfw(isNsfw);
+		if (!analyzing && nsfw) {
+			setIsNsfw(nsfw);
 		}
-	}, [isNsfw, analyzing, setIsNsfw]);
+	}, [nsfw, analyzing, setIsNsfw]);
 
-	// Show error state with consistent UI
-	if (error) {
-		return <Preview icon={VideoIcon} message={error} />;
-	}
+	if (error) return <Preview icon={VideoIcon} message={error} />;
 
 	return (
 		<>
 			{loading && <AssetSkeleton />}
 			<div className={`relative w-full h-full bg-black/5 rounded-md overflow-hidden group ${loading ? 'hidden' : ''}`}>
-				{/* Video - OPTIMIZED: preload="metadata" for thumbnail but no auto download */}
 				<video
-					ref={videoRef}
 					className="w-full h-full object-cover max-w-full max-h-[19rem]"
-					preload="metadata"  // CHANGED: Back to "metadata" so loading events fire
+					preload="metadata"
 					muted
 					playsInline
 					crossOrigin="anonymous"
@@ -50,7 +39,6 @@ const VideoCard: React.FC<VideoAssetProps> = ({ url, contentType, checkNsfw, set
 					onLoadedMetadata={(e) => {
 						// Video metadata loaded - stop loading skeleton
 						setLoading(false);
-						setReady(true);
 
 						const video = e.target as HTMLVideoElement;
 						// Set to 1 second for thumbnail, but don't download full video

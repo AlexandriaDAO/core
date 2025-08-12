@@ -1,13 +1,24 @@
 import React from "react";
 import { AssetProps } from "../../../types/assetTypes";
+import useAssetLoading from "@/features/nft/hooks/useAssetLoading";
+import AssetSkeleton from "@/layouts/skeletons/emporium/components/AssetSkeleton";
+import Preview from "../Preview";
+import { FileText } from "lucide-react";
 
 const PdfModal: React.FC<AssetProps> = ({ url }) => {
+	const {loading, setLoading, error, setError} = useAssetLoading(url);
+
+    if (error) return <Preview icon={FileText} message="Failed to load pdf" />;
+
 	return (
-		<div className="w-full h-full min-h-96 flex flex-col">
+		<div className="relative w-full h-full bg-background rounded-lg border border-border/30 overflow-hidden">
+			{loading && <AssetSkeleton />}
 			<embed
 				src={url}
 				type="application/pdf"
-				className="w-full h-full flex-1 border-0"
+				className='p-10 w-full h-full rounded-lg'
+				onLoad={()=>setLoading(false)}
+				onError={() => setError("Unable to load pdf")}
 			/>
 		</div>
 	);

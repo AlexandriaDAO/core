@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "@/lib/components/button";
-import { Coins, LoaderPinwheel, Check } from "lucide-react";
+import { ThumbsUp, LoaderPinwheel, Check } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
 import { useMinting } from "../hooks/useMinting";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import type { AlexandrianToken } from "../types";
@@ -24,29 +25,27 @@ export function MintButton({ token }: MintButtonProps) {
 	const isOwned = user?.principal === token.owner;
 
 	return (
-		<Button
-			variant="outline"
-			scale="sm"
-			onClick={handleMint}
-			disabled={isCurrentlyMinting || isOwned}
-			className="flex items-center gap-2"
-		>
-			{isCurrentlyMinting ? (
-				<>
-					<LoaderPinwheel className="h-4 w-4 animate-spin" />
-					<span className="text-sm">Minting...</span>
-				</>
-			) : isOwned ? (
-				<>
-					<Check className="h-4 w-4" />
-					<span className="text-sm">Minted</span>
-				</>
-			) : (
-				<>
-					<Coins className="h-4 w-4" />
-					<span className="text-sm">Mint</span>
-				</>
-			)}
-		</Button>
+		<Tooltip delayDuration={0}>
+			<TooltipTrigger asChild>
+				<Button
+					variant="outline"
+					scale="sm"
+					onClick={handleMint}
+					disabled={isCurrentlyMinting || isOwned}
+					className="px-1 py-4 group/like"
+				>
+					{isCurrentlyMinting ? (
+						<LoaderPinwheel className="animate-spin" />
+					) : isOwned ? (
+						<Check />
+					) : (
+						<ThumbsUp className="group-hover/like:text-primary" />
+					)}
+				</Button>
+			</TooltipTrigger>
+			<TooltipContent side="right" sideOffset={8} portal>
+				{isCurrentlyMinting ? 'Liking...' : isOwned ? 'Liked' : 'Like'}
+			</TooltipContent>
+		</Tooltip>
 	);
 }

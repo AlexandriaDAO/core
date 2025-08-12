@@ -1,127 +1,85 @@
-import { useMemo, useState, useEffect } from "react";
-import {
-	useSearchQuery,
-	useUpdateTransactionMutation,
-	useInvalidateSearchQuery,
-	SEARCH_QUERY_KEY,
-} from "../api/queries";
-import { Transaction } from "../types/index";
+import { useMemo } from "react";
+import { SEARCH_QUERY_KEY, SearchResponse, Transaction } from "../types/index";
 import { useNftManager } from "@/hooks/actors";
-import { checkMintedStatus } from "../api/utils";
-import { useQueryClient } from "@tanstack/react-query";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchSearchResults } from "../api/fetchers";
 
 interface UseSearchReturn {
 	transactions: Transaction[];
 	isLoading: boolean;
 	isLoadingMore: boolean;
 	isRefreshing: boolean;
-	isLoadingMintStatus: boolean;
 	error: Error | null;
 	hasNextPage: boolean;
 	isEmpty: boolean;
 	loadMore: () => void;
 	refresh: () => Promise<void>;
-	updateTransactionMinted: (transactionId: string) => void;
 }
 
 export function useSearch(): UseSearchReturn {
 	const {actor} = useNftManager();
-	const { query, appliedFilters, sortOrder } = useAppSelector(state => state.permasearch);
-	const [isRefreshing, setIsRefreshing] = useState(false);
-	const [isLoadingMintStatus, setIsLoadingMintStatus] = useState(false);
+	const { query, appliedFilters, sortOrder, randomDate } = useAppSelector(state => state.permasearch);
 	const queryClient = useQueryClient();
 
-	const {data, isLoading, isFetchingNextPage, error, hasNextPage, fetchNextPage, refetch } = useSearchQuery({ query, filters: appliedFilters, sortOrder, actor });
-
-	const updateMutation = useUpdateTransactionMutation();
-	const invalidateQueries = useInvalidateSearchQuery();
+	const {data, isLoading, isRefetching, isFetchingNextPage, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery<SearchResponse, Error>({
+		queryKey: [SEARCH_QUERY_KEY, { query, appliedFilters, sortOrder, randomDate }],
+		queryFn: ({ pageParam = null, signal }) =>
+			fetchSearchResults({
+				query,
+				filters: appliedFilters,
+				sortOrder,
+				randomDate,
+				cursor: pageParam as string | undefined,
+				actor,
+				signal,
+			}),
+        placeholderData: (previousData) => previousData,
+		getNextPageParam: (lastPage) => lastPage.hasNext ? lastPage.cursor : undefined,
+		initialPageParam: null,
+		gcTime: 10 * 60 * 1000, // 10 minutes garbage collection time, when user navigates away and query becomes inactive
+		staleTime: 30 * 60 * 1000, // 30 minutes - increased to reduce auto-refetches
+		refetchOnWindowFocus: false, // Prevent refetch on window focus
+		refetchOnReconnect: false, // Prevent refetch on reconnect
+	});
 
 	const transactions = useMemo(() => {
 		if (!data?.pages) return [];
 		return data.pages.flatMap((page) => page.transactions);
 	}, [data?.pages]);
 
-	// Check mint status when actor becomes available for existing transactions
-	useEffect(() => {
-		if (!actor || transactions.length === 0 || isLoadingMintStatus) return;
-
-		// Find transactions with undefined minted status
-		const transactionsNeedingCheck = transactions.filter(tx => tx.minted === undefined);
-		if (transactionsNeedingCheck.length === 0) return;
-
-		const updateMintStatus = async () => {
-			setIsLoadingMintStatus(true);
-			try {
-				const updatedTransactions = await checkMintedStatus(transactionsNeedingCheck, actor);
-
-				// Only update cache if we still have the same actor (user didn't log out)
-				if (!actor) return;
-
-				// Update the search query cache - only update transactions that don't already have minted: true
-				queryClient.setQueriesData(
-					{ queryKey: [SEARCH_QUERY_KEY] },
-					(oldData: any) => {
-						if (!oldData) return oldData;
-
-						return {
-							...oldData,
-							pages: oldData.pages.map((page: any) => ({
-								...page,
-								transactions: page.transactions.map((tx: Transaction) => {
-									// Don't overwrite transactions that are already minted: true
-									if (tx.minted === true) return tx;
-
-									const updatedTx = updatedTransactions.find(updated => updated.id === tx.id);
-									return updatedTx || tx;
-								})
-							}))
-						};
-					}
-				);
-			} catch (error) {
-				console.warn("Failed to check mint status:", error);
-			} finally {
-				setIsLoadingMintStatus(false);
-			}
-		};
-
-		updateMintStatus();
-	}, [actor, transactions, queryClient, isLoadingMintStatus]);
-
-	const isEmpty = !isLoading && transactions.length === 0;
-
 	const loadMore = () => {
-		if (hasNextPage && !isFetchingNextPage) {
-			fetchNextPage();
-		}
+		if(!hasNextPage) return;
+		if(isFetchingNextPage) return;
+
+		fetchNextPage();
 	};
 
 	const refresh = async () => {
-		setIsRefreshing(true);
 		try {
-			invalidateQueries();
+			// If currently fetching or refetching, cancel the requests
+			if (isRefetching || isFetchingNextPage) {
+				// Cancel search queries
+				await queryClient.cancelQueries({
+					queryKey: [SEARCH_QUERY_KEY, { query, appliedFilters, sortOrder }]
+				});
+
+				return; // Don't start a new request
+			}
+
+			// If not currently fetching, start a new refetch
 			await refetch();
-		} finally {
-			setIsRefreshing(false);
+		}catch(error){
+			console.log('refetch error', error)
 		}
 	};
 
-	const updateTransactionMinted = (transactionId: string) => {
-		updateMutation.mutate({ transactionId });
-	};
-
 	return {
-		transactions,
-		isLoading,
+		transactions, isLoading, error,
 		isLoadingMore: isFetchingNextPage,
-		isRefreshing,
-		isLoadingMintStatus,
-		error,
+		isRefreshing: isRefetching,
 		hasNextPage: !!hasNextPage,
-		isEmpty,
-		loadMore,
-		refresh,
-		updateTransactionMinted,
+		isEmpty: !isLoading && transactions.length === 0,
+		loadMore, refresh,
 	};
 }

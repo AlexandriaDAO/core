@@ -7,11 +7,10 @@ import {
 	setFilterDateRange,
 	setFilterDatePreset,
 	removeFilterTag,
-	resetFilters,
 	applyFilters,
 	toggleSortOrder,
 } from "../../store/slice";
-import { useInvalidateSearchQuery } from "../../api/queries";
+import { useInvalidate } from "../../hooks/useInvalidate";
 import { useNftManager } from "@/hooks/actors";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
@@ -19,27 +18,19 @@ const AppliedFilters: React.FC = () => {
 	const {actor} = useNftManager();
 	const dispatch = useAppDispatch();
 	const { appliedFilters, sortOrder } = useAppSelector(state=>state.permasearch);
-	const invalidateQueries = useInvalidateSearchQuery();
+	const invalidate = useInvalidate();
 
 	const activeFilters = [];
 
 	const handleApplyChanges = () => {
 		if (actor) {
 			dispatch(applyFilters());
-			invalidateQueries();
+			invalidate();
 		} else {
 			toast.warning("Actor is not ready yet, try again");
 		}
 	};
 
-	const handleResetAll = () => {
-		if (actor) {
-			dispatch(resetFilters());
-			invalidateQueries();
-		} else {
-			toast.warning("Actor is not ready yet, try again");
-		}
-	};
 
 	if (sortOrder !== "HEIGHT_DESC") {
 		activeFilters.push({
@@ -108,10 +99,6 @@ const AppliedFilters: React.FC = () => {
 		}
 	);
 
-	if (activeFilters.length === 0) {
-		return null;
-	}
-
 	return (
 		<div className="flex-grow flex flex-wrap gap-2">
 			{activeFilters.map((filter) => (
@@ -128,12 +115,6 @@ const AppliedFilters: React.FC = () => {
 					</button>
 				</div>
 			))}
-			<button
-				onClick={handleResetAll}
-				className="px-3 py-1 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-full text-sm hover:bg-gray-400 dark:hover:bg-gray-500 border border-gray-400 dark:border-gray-500"
-			>
-				Reset All
-			</button>
 		</div>
 	);
 }

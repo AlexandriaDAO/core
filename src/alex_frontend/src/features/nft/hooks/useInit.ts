@@ -29,13 +29,17 @@ const fetchAssetMetadata = async (id: string, canister?: string, signal?: AbortS
 		}
 	} catch (error) {
 		// Try Arweave
-		const arweaveAssetUrl = 'https://arweave.net/' + id;
-		const headResponse = await fetch(arweaveAssetUrl, { method: 'HEAD', signal });
-		if(headResponse.ok){
-			contentType = headResponse.headers.get('Content-Type') ?? undefined;
-			finalAssetUrl = arweaveAssetUrl;
-		} else {
-			throw new Error("Asset not found on Arweave");
+		try {
+			const arweaveAssetUrl = 'https://arweave.net/' + id;
+			const headResponse = await fetch(arweaveAssetUrl, { method: 'HEAD', signal });
+			if(headResponse.ok){
+				contentType = headResponse.headers.get('Content-Type') ?? undefined;
+				finalAssetUrl = arweaveAssetUrl;
+			} else {
+				throw new Error("Asset not found on Arweave");
+			}
+		} catch (arweaveError) {
+			throw new Error("Asset not found on canister or Arweave");
 		}
 	}
 

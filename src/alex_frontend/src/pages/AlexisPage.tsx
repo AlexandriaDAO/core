@@ -15,12 +15,7 @@ import { FilterBar, TokensGrid, PaginationControls } from "@/features/alexandria
 
 function AlexisPage() {
 	const dispatch = useAppDispatch();
-	const {tokens, totalPages, loading, updating, error, refresh } = useTokens();
-
-	// Handlers for TanStack Query actions
-	const handleRefresh = useCallback(() => {
-		refresh();
-	}, [refresh]);
+	const {tokens, totalPages, totalItems, loading, updating, error, refresh } = useTokens();
 
 	const handlePageClick = useCallback(
 		(event: { selected: number }) => {
@@ -51,13 +46,14 @@ function AlexisPage() {
 
 				<TopupBalanceWarning />
 
-				<FilterBar disabled={disabled} onRefresh={handleRefresh} />
+                <div className="space-y-3 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-lg shadow-lg border">
+					<FilterBar disabled={disabled} onRefresh={refresh} />
+					<PaginationControls totalPages={totalPages} totalItems={totalItems} disabled={disabled} onPageClick={handlePageClick} />
+				</div>
 
 				{error && <Alert variant="danger" title="Error">{error}</Alert>}
 
 				<TokensGrid tokens={tokens} loading={loading} />
-
-				<PaginationControls totalPages={totalPages} disabled={disabled} onPageClick={handlePageClick} />
 			</div>
 		</div>
 	);

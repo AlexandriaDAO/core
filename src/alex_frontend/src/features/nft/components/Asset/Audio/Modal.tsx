@@ -18,17 +18,17 @@ const AudioModal: React.FC<AudioAssetProps> = ({ url, contentType }) => {
     }
 
     return (
-        <div className="w-full h-full">
+        <div className="w-full h-full bg-background rounded-lg border boder-border/30 overflow-hidden">
             {/* Loading State */}
             {loading && <AssetSkeleton />}
-            
+
             {/* Audio Content - Hidden when loading */}
             <div className={`w-full h-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 gap-6 ${loading ? 'hidden' : ''}`}>
                 {/* Audio Icon */}
                 <div className="bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full p-8">
                     <Music className="h-16 w-16 text-purple-500 dark:text-purple-400" strokeWidth={1.5} />
                 </div>
-                
+
                 {/* Audio Player - Always rendered so onCanPlay can fire */}
                 <div className="w-full max-w-md">
                     <audio
@@ -49,7 +49,7 @@ const AudioModal: React.FC<AudioAssetProps> = ({ url, contentType }) => {
                         Your browser does not support the audio element.
                     </audio>
                 </div>
-                
+
                 {/* Content Type Info */}
                 <div className="text-sm text-muted-foreground">
                     {contentType}

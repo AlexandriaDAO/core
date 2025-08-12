@@ -12,11 +12,14 @@ export interface GraphQLPageInfo {
 
 export interface GraphQLQueryResponse {
 	data: {
-		byOwner?: {
+		byOwners?: {
 			edges: GraphQLEdge[];
 			pageInfo: GraphQLPageInfo;
 		};
-		byId?: Transaction;
+		byIds?: {
+			edges: GraphQLEdge[];
+			pageInfo: GraphQLPageInfo;
+		};
 		transactions?: {
 			edges: GraphQLEdge[];
 			pageInfo: GraphQLPageInfo;

@@ -51,92 +51,94 @@ export const FilterTags: React.FC = () => {
 
 	return (
 		<div className="space-y-4">
-			<h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wide">
-				Tags
-			</h4>
+			<div className="space-y-1">
+				<h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wide">
+					Tags
+				</h4>
 
-			{/* App-Name Tags */}
-			<div className="h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md">
-				<div className="p-3 space-y-3">
-					<div className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-						App-Name
-					</div>
-					<div className="flex flex-wrap gap-1">
-						{APP_NAME_OPTIONS.map((value) => {
-							const isSelected = filters.tags.some(
-								(tag: { name: string; value: string }) =>
-									tag.name === "App-Name" && tag.value === value
-							);
-							return (
-								<button
-									key={value}
-									onClick={() => {
-										if (isSelected) {
-											dispatch(
-												removeFilterTag({
-													name: "App-Name",
-													value,
-												})
-											);
-										} else {
-											dispatch(
-												addFilterTag({
-													name: "App-Name",
-													value,
-												})
-											);
-										}
-									}}
-									className={`px-2 py-1 text-xs rounded transition-colors border ${
-										isSelected
-											? "bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-700"
-											: "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 border-gray-200 dark:border-gray-600"
-									}`}
-									title={
-										isSelected
-											? `Remove App-Name: ${value}`
-											: `Add App-Name: ${value}`
-									}
-								>
-									{value}
-								</button>
-							);
-						})}
-					</div>
-
-					{/* Custom Tags Display */}
-					{filters.tags.filter(
-						(tag: { name: string; value: string }) => tag.name !== "App-Name"
-					).length > 0 && (
-						<div className="space-y-2">
-							<div className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-								Custom Tags
-							</div>
-							<div className="flex flex-wrap gap-1">
-								{filters.tags
-									.filter(
-										(tag: { name: string; value: string }) =>
-											tag.name !== "App-Name"
-									)
-									.map((tag: { name: string; value: string }, index: number) => (
-										<div
-											key={index}
-											className="flex items-center gap-1 px-2 py-1 text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 rounded"
-											title={`${tag.name}: ${tag.value}`}
-										>
-											<span className="font-medium">{tag.name}:</span>
-											<span>{tag.value}</span>
-											<button
-												onClick={() => dispatch(removeFilterTag(tag))}
-												className="ml-1 text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200"
-											>
-												<X className="h-3 w-3" />
-											</button>
-										</div>
-									))}
-							</div>
+				{/* App-Name Tags */}
+				<div className="h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md">
+					<div className="p-3 space-y-3">
+						<div className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+							App-Name
 						</div>
-					)}
+						<div className="flex flex-wrap gap-1">
+							{APP_NAME_OPTIONS.map((value) => {
+								const isSelected = filters.tags.some(
+									(tag: { name: string; value: string }) =>
+										tag.name === "App-Name" && tag.value === value
+								);
+								return (
+									<button
+										key={value}
+										onClick={() => {
+											if (isSelected) {
+												dispatch(
+													removeFilterTag({
+														name: "App-Name",
+														value,
+													})
+												);
+											} else {
+												dispatch(
+													addFilterTag({
+														name: "App-Name",
+														value,
+													})
+												);
+											}
+										}}
+										className={`px-2 py-1 text-xs rounded transition-colors border ${
+											isSelected
+												? "bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-700"
+												: "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 border-gray-200 dark:border-gray-600"
+										}`}
+										title={
+											isSelected
+												? `Remove App-Name: ${value}`
+												: `Add App-Name: ${value}`
+										}
+									>
+										{value}
+									</button>
+								);
+							})}
+						</div>
+
+						{/* Custom Tags Display */}
+						{filters.tags.filter(
+							(tag: { name: string; value: string }) => tag.name !== "App-Name"
+						).length > 0 && (
+							<div className="space-y-2">
+								<div className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+									Custom Tags
+								</div>
+								<div className="flex flex-wrap gap-1">
+									{filters.tags
+										.filter(
+											(tag: { name: string; value: string }) =>
+												tag.name !== "App-Name"
+										)
+										.map((tag: { name: string; value: string }, index: number) => (
+											<div
+												key={index}
+												className="flex items-center gap-1 px-2 py-1 text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 rounded"
+												title={`${tag.name}: ${tag.value}`}
+											>
+												<span className="font-medium">{tag.name}:</span>
+												<span>{tag.value}</span>
+												<button
+													onClick={() => dispatch(removeFilterTag(tag))}
+													className="ml-1 text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-200"
+												>
+													<X className="h-3 w-3" />
+												</button>
+											</div>
+										))}
+								</div>
+							</div>
+						)}
+					</div>
 				</div>
 			</div>
 

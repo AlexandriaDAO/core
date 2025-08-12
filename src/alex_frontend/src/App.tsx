@@ -27,6 +27,7 @@ import { routeTree } from "@/routeTree.gen";
 import { SWRConfig } from 'swr';
 import ContentLoadingSpinner from "./components/ContentLoadingSpinner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { TooltipProvider } from "./lib/components/tooltip";
 
 
 
@@ -99,7 +100,9 @@ export default function App() {
                                     <UserProvider>
                                             <NsfwProvider>
                                                 {/* <AppRoutes /> */}
-                                                <RouterProvider router={router} />
+                                                <TooltipProvider delayDuration={0} skipDelayDuration={0}>
+                                                    <RouterProvider router={router} />
+                                                </TooltipProvider>
                                             </NsfwProvider>
                                         </UserProvider>
                                     </ActorProvider>

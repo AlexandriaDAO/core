@@ -4,12 +4,9 @@ import { File, MoreHorizontal } from "lucide-react";
 import usePartialData from "../../../hooks/usePartialData";
 import AssetSkeleton from "@/layouts/skeletons/emporium/components/AssetSkeleton";
 
-// NEW: Import our shared types
 import { AssetProps } from "../../../types/assetTypes";
 
 const TextCard: React.FC<AssetProps> = ({ url }) => {
-    // NOTE: usePartialData already uses SWR internally, so it has built-in caching
-    // We pass the signal indirectly by checking if cancelled in our render logic
     const { data, fetching, fetchError, partial } = usePartialData(url, 500);
 
     const { displayText, isTruncated, isEmpty } = useMemo(() => {
@@ -28,8 +25,6 @@ const TextCard: React.FC<AssetProps> = ({ url }) => {
             return { displayText: truncated, isTruncated: true, isEmpty: false };
         }
 
-        // Since we already fetched partial data, no need to truncate by length again
-        // The usePartialData hook already handles the byte limit
         return { displayText: trimmedData, isTruncated: partial, isEmpty: false };
     }, [fetching, fetchError, data, partial]);
 
@@ -41,8 +36,8 @@ const TextCard: React.FC<AssetProps> = ({ url }) => {
     if (!data || isEmpty) return <Preview icon={File} message="Text is empty" />
 
     return (
-        <div className="relative w-full">
-            <pre className="truncate font-mono text-xs w-full max-h-[19rem] bg-gray-50 dark:bg-gray-800 p-3 rounded-md border border-input whitespace-break-spaces overflow-hidden">
+        <>
+            <pre className="truncate font-mono text-xs max-h-80 h-full w-full bg-gray-50 dark:bg-gray-800 p-3 rounded-md border border-input whitespace-break-spaces overflow-hidden">
                 {displayText}
             </pre>
             {isTruncated && (
@@ -50,7 +45,7 @@ const TextCard: React.FC<AssetProps> = ({ url }) => {
                     <MoreHorizontal size={16} className="text-gray-600 dark:text-gray-300" />
                 </div>
             )}
-        </div>
+        </>
     )
 };
 

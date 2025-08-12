@@ -37,7 +37,7 @@ export const useListing = () => {
 		[filters]
 	);
 
-	const { data, isLoading, error, refetch, isFetching } = useQuery({
+	const { data, isLoading, error, refetch, isFetching, isRefetching } = useQuery({
 		queryKey,
 		queryFn: (): Promise<ListingsResponse> => {
 			const query: ListingsQuery = {
@@ -80,12 +80,27 @@ export const useListing = () => {
 	});
 
 	const refresh = useCallback(async () => {
-		await queryClient.invalidateQueries({
-			queryKey: ["marketplace-listings"],
-			exact: false,
-		});
-		return refetch();
-	}, [queryClient, refetch]);
+		try {
+			// // If currently fetching or refetching, cancel the requests
+			// if (isRefetching || isFetching) {
+			// 	// Cancel marketplace listing queries
+			// 	await queryClient.cancelQueries({
+			// 		queryKey: queryKey
+			// 	});
+
+			// 	return; // Don't start a new request
+			// }
+
+			// If not currently fetching, start a new refetch
+			await queryClient.invalidateQueries({
+				queryKey: ["marketplace-listings"],
+				exact: false,
+			});
+			return refetch();
+		} catch (error) {
+			console.log('marketplace refetch error', error);
+		}
+	}, [queryClient, refetch, isRefetching, isFetching, queryKey]);
 
 	return {
 		data,
