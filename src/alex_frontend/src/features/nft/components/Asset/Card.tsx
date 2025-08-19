@@ -10,19 +10,16 @@ import { PdfCard } from "./Pdf";
 import Preview from "./Preview";
 
 interface AssetCardProps {
-	url: string;
+	id: string;
 	type?: string;
 	checkNsfw: boolean;
 	setIsNsfw: (isNsfw: boolean) => void;
 }
 
-const AssetCard: React.FC<AssetCardProps> = ({
-	url,
-	type,
-	checkNsfw = false,
-	setIsNsfw,
-}) => {
-	if(!type) return <Preview message="Preview not available"/>
+const AssetCard: React.FC<AssetCardProps> = ({ id, type, checkNsfw, setIsNsfw }) => {
+	const url = `https://arweave.net/${id}`;
+
+	if(!type) return <Preview title="No Preview" description={'File type is not supported'}/>
 
 	// Binary files - use direct URL
 	if(type.startsWith("image/")) return <ImageCard url={url} checkNsfw={checkNsfw} setIsNsfw={setIsNsfw} />
@@ -38,7 +35,7 @@ const AssetCard: React.FC<AssetCardProps> = ({
 	// Text files - let TextCard handle partial data fetching
 	if(type.startsWith("text/") || type.startsWith("application/json")) return <TextCard url={url} />
 
-	return <Preview message="Preview not available" contentType={type} />
+	return <Preview title="Preview not available" description={type} />
 };
 
 export default AssetCard;

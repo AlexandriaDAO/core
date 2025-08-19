@@ -1,5 +1,6 @@
 import { AlexandrianToken } from "../types";
 import { TokenAdapter } from "../adapters/TokenAdapter";
+import { natToArweaveId } from "@/utils/id_convert";
 
 // Convert raw token IDs to full AlexandrianToken objects
 export const convertTokenData = async (
@@ -64,15 +65,14 @@ const convertSingleToken = async (
 		}
 
 		// Get the full token data from the adapter
-		const tokenData = await tokenAdapter.tokenToNFTData(tokenId, ownerPrincipal);
+		const icpInfo = await tokenAdapter.tokenToIcpInfo(tokenId);
 
 		return {
 			id: tokenId.toString(),
-			arweaveId: tokenData.arweaveId,
+			arweaveId: natToArweaveId(tokenId),
 			owner: ownerPrincipal,
 			collection: collectionType,
-			// canister: tokenData.canister,
-			createdAt: Date.now(),
+			...icpInfo
 		};
 	} catch (error) {
 		console.warn(`Failed to convert token ${tokenId}:`, error);

@@ -3,19 +3,15 @@ import { Music } from "lucide-react";
 import Preview from "../Preview";
 import AssetSkeleton from "@/layouts/skeletons/emporium/components/AssetSkeleton";
 
-// NEW: Import our optimized hooks and types
 import useAssetLoading from "../../../hooks/useAssetLoading";
 import { AudioAssetProps } from "../../../types/assetTypes";
 
 const AudioModal: React.FC<AudioAssetProps> = ({ url, contentType }) => {
-    // NEW: Use unified loading hook with abort signal support
-    const { loading, error, setLoading, setError } = useAssetLoading(url);
+    const { loading, error, setLoading } = useAssetLoading(url);
     const [localError, setLocalError] = useState('');
 
     // Show error state with consistent UI
-    if (error || localError) {
-        return <Preview icon={Music} message={error || localError || "Audio cannot be played"} />;
-    }
+    if (error || localError) return <Preview icon={<Music size={48} />} title="Loading Error" description={error || localError || "Audio cannot be played"} />
 
     return (
         <div className="w-full h-full bg-background rounded-lg border boder-border/30 overflow-hidden">

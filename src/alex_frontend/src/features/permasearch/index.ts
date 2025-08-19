@@ -7,7 +7,6 @@ export { default as AdvanceFilters } from "./components/AdvanceFilters";
 export { default as AppliedFilters } from "./components/Filters/Applied";
 export { default as SearchBox } from "./components/SearchBox";
 export { default as RandomDateSelector } from "./components/RandomDateSelector";
-export { default as ResultsGrid } from "./components/ResultsGrid";
 export { default as LoadMoreButton } from "./components/LoadMore";
 
 
@@ -24,8 +23,7 @@ export {
 	clearQuery,
 	setFilterTypes,
 	setFilterCategories,
-	setFilterDateRange,
-	setFilterDatePreset,
+	setFilterRange,
 	setFilterCustomType,
 	setFilterTags,
 	addFilterTag,

@@ -20,7 +20,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ isLoading, isRefreshing, isLoadin
 
             <SortToggle isLoading={isLoading} count={transactionsCount}/>
 
-            <SearchBox disabled={isLoading} />
+            <SearchBox disabled={isLoading} isRefreshing={isRefreshing} />
 
             <Button
                 onClick={onRefresh}

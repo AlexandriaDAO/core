@@ -1,18 +1,20 @@
 import React from 'react';
-import { LucideIcon, File as FileIcon } from 'lucide-react';
+import { cn } from "@/lib/utils";
+import { File } from 'lucide-react';
 
 interface PreviewProps {
-	icon?: LucideIcon;
-	message?: string;
-	contentType?: string;
+	icon?: React.ReactNode;
+	title?: string;
+	description?: string;
+	className?: string;
 }
 
-const Preview: React.FC<PreviewProps> = ({ icon: Icon = FileIcon, message, contentType }) => {
+const Preview: React.FC<PreviewProps> = ({ icon = <File size={48} strokeWidth={1.25}/>, title, description, className }) => {
 	return (
-		<div className="h-44 p-2 flex flex-col items-center justify-center text-muted-foreground gap-2">
-			<Icon size={48} strokeWidth={1.25}/>
-			{message && <p className="text-sm">{message}</p>}
-			{contentType && <p className="text-xs text-muted-foreground/70">{contentType}</p>}
+		<div className={cn("min-h-40 h-full w-full place-items-center place-content-center text-muted-foreground space-y-2 p-2", className)}>
+			{icon}
+			{title && <p className="text-sm break-all">{title}</p>}
+			{description && <p className="break-all text-xs text-muted-foreground/70">{description}</p>}
 		</div>
 	)
 };

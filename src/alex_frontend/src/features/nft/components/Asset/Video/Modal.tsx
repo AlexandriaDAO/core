@@ -1,7 +1,6 @@
 import React from "react";
-import { Video as VideoIcon } from "lucide-react";
+import { Loader, Video } from "lucide-react";
 import Preview from "./../Preview";
-import AssetSkeleton from "@/layouts/skeletons/emporium/components/AssetSkeleton";
 
 import useAssetLoading from "../../../hooks/useAssetLoading";
 
@@ -13,11 +12,16 @@ interface VideoModalProps {
 const VideoModal: React.FC<VideoModalProps> = ({ url, contentType }) => {
 	const { loading, error, setLoading, setError } = useAssetLoading(url);
 
-	if (error) return <Preview icon={VideoIcon} message={error} />;
+	if (error) return <Preview icon={<Video size={48} />} title="Loading Error" description={error || 'Unable to load Video'} />;
 
 	return (
         <div className="w-full h-full place-items-center place-content-center bg-background rounded-lg border boder-border/30 overflow-hidden">
-			{loading && <AssetSkeleton />}
+			{loading &&
+				<div className="relative min-h-40 h-full w-full place-items-center place-content-center">
+					<Loader className="animate-spin" />
+				</div>
+			}
+
 			<video
 				controls
 				autoPlay
@@ -30,10 +34,9 @@ const VideoModal: React.FC<VideoModalProps> = ({ url, contentType }) => {
 					height: 'auto'
 				}}
 				onCanPlay={(e) => {
+					setLoading(false);
 					const video = e.target as HTMLVideoElement;
-					video.play().finally(() => {
-						setLoading(false);
-					});
+					video.play();
 				}}
 				onError={() => {
 					setError("Unable to load video");

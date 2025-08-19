@@ -60,9 +60,9 @@ export function Alert({
 	const Icon = CustomIcon || DefaultIcon;
 
 	return (
-		<div className={cn("rounded-md p-3 border mb-3", container, className)}>
-			<div className={cn("flex items-center gap-2", heading)}>
-				<Icon className="h-4 w-4" />
+		<div className={cn("rounded-md p-3 border mb-3 break-all max-w-full max-h-full", container, className)}>
+			<div className={cn("flex gap-2", heading)}>
+				<Icon size={18} className="p-0.5 flex-shrink-0" />
 				{title && <h4 className="font-medium text-sm">{title}</h4>}
 			</div>
 			<div className={cn("mt-1 text-sm", text)}>{children}</div>

@@ -6,24 +6,18 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import {
     FilterBar,
     AdvanceFilters,
-    ResultsGrid,
     MintButton,
     LoadMoreButton,
     useSearch,
     useUpdate,
-    RandomDateSelector,
-    setSafeSearch,
 } from "@/features/permasearch";
 import TopupBalanceWarning from "@/components/TopupBalanceWarning";
 import { UnauthenticatedWarning } from "@/components/UnauthenticatedWarning";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { AddToShelfButton } from "@/components/AddToShelfButton";
-import SafeSearchToggle from "@/components/SafeSearchToggle";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import NftProvider from "@/components/NftProvider";
 
 function PermaFindPage() {
-    const dispatch = useAppDispatch();
-
     const { user } = useAppSelector(state => state.auth);
 
     const { showFilters, safeSearch, continuousScroll } = useAppSelector(state => state.permasearch);
@@ -50,6 +44,7 @@ function PermaFindPage() {
                         </h1>
                         <div className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-4xl mx-auto">
 							<p> Discover and mint NFTs from Arweave's permanent storage network. </p>
+							<p> By default, we fetch transactions that are at least 1 hour old to ensure they are confirmed. </p>
 							<p> Each mint costs 5 LBRY tokens. </p>
 						</div>
                     </div>
@@ -59,24 +54,16 @@ function PermaFindPage() {
 
                 <TopupBalanceWarning />
 
-                <div className="space-y-3 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-lg shadow-lg border">
-                    <FilterBar isLoading={isLoading} isRefreshing={isRefreshing} isLoadingMore={isLoadingMore} transactionsCount={transactions.length} onRefresh={refresh}/>
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <RandomDateSelector isRefreshing={isRefreshing} />
-                        <SafeSearchToggle enabled={safeSearch} setEnabled={() => dispatch(setSafeSearch(!safeSearch))}/>
-                    </div>
-                </div>
+                <FilterBar isLoading={isLoading} isRefreshing={isRefreshing} isLoadingMore={isLoadingMore} transactionsCount={transactions.length} onRefresh={refresh}/>
 
                 {showFilters && <AdvanceFilters />}
 
                 {error && <Alert variant="danger" title="Error">{error.message}</Alert>}
 
-                <ResultsGrid transactions={transactions} loading={isLoading}>
-                    {(tx) => (
+                <NftProvider loading={isLoading} items={transactions} safe={safeSearch}>
+                    {tx => (
                         <Nft
-                            key={tx.id}
                             id={tx.id}
-                            checkNsfw={safeSearch}
                             action={
                                 user && <>
                                     <AddToShelfButton item={{ arweaveId: tx.id }} variant="outline" scale="sm" onSuccess={()=>update(tx.id)}/>
@@ -85,7 +72,7 @@ function PermaFindPage() {
                             }
                         />
                     )}
-                </ResultsGrid>
+                </NftProvider>
 
                 {/* Conditional rendering based on continuousScroll setting */}
                 {continuousScroll ? (
@@ -131,6 +118,7 @@ function PermaFindPage() {
                         resultCount={transactions.length}
                     />
                 )}
+
             </div>
         </div>
     );

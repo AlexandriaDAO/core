@@ -9,52 +9,6 @@ export const categoryOptions = Object.entries(FILE_TYPES).map(([key, category]) 
 	types: category.types,
 }));
 
-// Date presets for quick filtering
-export const datePresets = [
-	{ value: "last7days", label: "Last 7 days" },
-	{ value: "last30days", label: "Last 30 days" },
-	{ value: "last6months", label: "Last 6 months" },
-	{ value: "lastyear", label: "Last year" },
-	{ value: "custom", label: "Custom range" },
-];
-
-
-// Helper function to get date range from preset
-export const getDateRangeFromPreset = (preset: string) => {
-	const now = new Date();
-	const from = new Date();
-
-	switch (preset) {
-		case "last7days":
-			from.setDate(now.getDate() - 7);
-			return {
-				from: from.toISOString().split("T")[0],
-				to: now.toISOString().split("T")[0],
-			};
-		case "last30days":
-			from.setDate(now.getDate() - 30);
-			return {
-				from: from.toISOString().split("T")[0],
-				to: now.toISOString().split("T")[0],
-			};
-		case "last6months":
-			from.setMonth(now.getMonth() - 6);
-			return {
-				from: from.toISOString().split("T")[0],
-				to: now.toISOString().split("T")[0],
-			};
-		case "lastyear":
-			from.setFullYear(now.getFullYear() - 1);
-			return {
-				from: from.toISOString().split("T")[0],
-				to: now.toISOString().split("T")[0],
-			};
-		default:
-			return {};
-	}
-};
-
-
 
 // Helper function to fetch current block height from Arweave
 export const getCurrentBlockHeight = async (): Promise<number> => {
@@ -123,33 +77,33 @@ export const estimateBlockHeight = (timestamp: number, currentBlockHeight: numbe
 };
 
 // Function to get the block height closest to a given timestamp using binary search
-export async function getBlockHeightForTimestamp(timestamp: number): Promise<number> {
-    const ARWEAVE_GATEWAY_URL = 'https://arweave.net';
+export async function getBlockHeightForTimestamp(timestamp: number, minimum: number, maximum: number): Promise<number> {
+    // const ARWEAVE_GATEWAY_URL = 'https://arweave.net';
 
-    // Get the current network info to determine the max block height
-    const response = await fetch(`${ARWEAVE_GATEWAY_URL}/info`);
-    if (!response.ok) throw new Error('Failed to fetch Arweave info');
+    // // Get the current network info to determine the max block height
+    // const response = await fetch(`${ARWEAVE_GATEWAY_URL}/info`);
+    // if (!response.ok) throw new Error('Failed to fetch Arweave info');
 
-    const networkInfo = await response.json();
-    let minHeight = 0;
-    let maxHeight = parseInt(networkInfo.height, 10);
+    // const networkInfo = await response.json();
+    // let minHeight = 0;
+    // let maxHeight = parseInt(networkInfo.height, 10);
 
     let closestBlockHeight = -1;
 
-    while (minHeight <= maxHeight) {
-        const midHeight = Math.floor((minHeight + maxHeight) / 2);
+    while (minimum <= maximum) {
+        const midHeight = Math.floor((minimum + maximum) / 2);
 
         // Fetch the block at midHeight
         try {
-            const blockResponse = await fetch(`${ARWEAVE_GATEWAY_URL}/block/height/${midHeight}`);
+            const blockResponse = await fetch(`https://arweave.net/block/height/${midHeight}`);
             if (!blockResponse.ok) throw new Error(`Failed to fetch block at height ${midHeight}`);
 
             const block = await blockResponse.json();
 
             if (block.timestamp < timestamp) {
-                minHeight = midHeight + 1;
+                minimum = midHeight + 1;
             } else if (block.timestamp > timestamp) {
-                maxHeight = midHeight - 1;
+                maximum = midHeight - 1;
             } else {
                 // Exact match found
                 closestBlockHeight = midHeight;
@@ -163,7 +117,7 @@ export async function getBlockHeightForTimestamp(timestamp: number): Promise<num
 
     // If exact timestamp not found, use the closest block height
     if (closestBlockHeight === -1) {
-        closestBlockHeight = maxHeight;
+        closestBlockHeight = maximum;
     }
 
     return closestBlockHeight;

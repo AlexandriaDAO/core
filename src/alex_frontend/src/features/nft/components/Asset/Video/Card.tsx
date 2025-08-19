@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Video as VideoIcon, Play } from "lucide-react";
+import { Video, Play } from "lucide-react";
 import Preview from "./../Preview";
 import AssetSkeleton from "@/layouts/skeletons/emporium/components/AssetSkeleton";
 
@@ -8,9 +8,7 @@ import { VideoAssetProps } from "../../../types/assetTypes";
 import useVideoAnalysis from "@/features/nft/hooks/useVideoAnalysis";
 
 const VideoCard: React.FC<VideoAssetProps> = ({ url, contentType, checkNsfw, setIsNsfw }) => {
-	
 	const { loading, setLoading, error, setError } = useAssetLoading(url);
-
 	const { nsfw, analyzing } = useVideoAnalysis(url, checkNsfw);
 
 	// Update parent component when NSFW analysis completes
@@ -20,7 +18,7 @@ const VideoCard: React.FC<VideoAssetProps> = ({ url, contentType, checkNsfw, set
 		}
 	}, [nsfw, analyzing, setIsNsfw]);
 
-	if (error) return <Preview icon={VideoIcon} message={error} />;
+	if (error) return <Preview icon={<Video size={48} />} title="Loading Error" description={error || 'Unable to load Video'} />;
 
 	return (
 		<>

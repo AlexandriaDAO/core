@@ -10,7 +10,7 @@ export interface SearchParams {
 	actor?: ActorSubclass<_SERVICE>;
 	query?: string;
 	cursor?: string;
-	randomDate?: string;
+	timestamp?: number;
 }
 
 // Canister response types

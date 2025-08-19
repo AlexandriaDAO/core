@@ -11,19 +11,30 @@ import { setPage } from "@/features/alexandrian/alexandrianSlice";
 import useTokens from "@/features/alexandrian/hooks/useTokens";
 
 // Components
-import { FilterBar, TokensGrid, PaginationControls } from "@/features/alexandrian/components";
+import Nft from "@/features/nft";
+import { FilterBar, PaginationControls } from "@/features/alexandrian/components";
+import { MintButton, SellButton } from "@/features/alexandrian/actions";
+import NftProvider from "@/components/NftProvider";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { AddToShelfButton } from "@/components/AddToShelfButton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
+import { Button } from "@/lib/components/button";
+import { Check } from "lucide-react";
+
+// zdcg2-dqaaa-aaaap-qpnha-cai
+const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 
 function AlexisPage() {
 	const dispatch = useAppDispatch();
 	const {tokens, totalPages, totalItems, loading, updating, error, refresh } = useTokens();
 
-	const handlePageClick = useCallback(
-		(event: { selected: number }) => {
-			dispatch(setPage(event.selected));
-		},
-		[dispatch]
-	);
+	const { safe } = useAppSelector(state => state.alexandrian);
+	const { user } = useAppSelector((state) => state.auth);
 
+
+	const handlePageClick = useCallback((event: { selected: number }) => {
+		dispatch(setPage(event.selected));
+	},[dispatch]);
 
 	const disabled = loading || updating;
 
@@ -53,7 +64,35 @@ function AlexisPage() {
 
 				{error && <Alert variant="danger" title="Error">{error}</Alert>}
 
-				<TokensGrid tokens={tokens} loading={loading} />
+				{/* <TokensGrid tokens={tokens} loading={loading} /> */}
+				<NftProvider loading={loading} items={Object.values(tokens)} safe={safe}>
+					{token => (
+						<Nft
+							id={token.arweaveId}
+							action={
+								user && <>
+									<AddToShelfButton item={{ id: token.id, arweaveId: token.arweaveId, owner: token.owner }} />
+									{token.owner === user.principal && token.collection !== "SBT" ? (
+										<SellButton tokenId={token.id} />
+									) : token.owner === emporium_canister_id ? (
+										<Tooltip delayDuration={0}>
+											<TooltipTrigger asChild>
+												<Button variant="outline" scale="sm" className="px-1 py-4 opacity-60 cursor-auto hover:text-foreground">
+													<Check />
+												</Button>
+											</TooltipTrigger>
+											<TooltipContent side="right" sideOffset={8} portal>Listed</TooltipContent>
+										</Tooltip>
+									) : (
+										<MintButton token={token}/>
+									)}
+								</>
+							}
+							// canister={token.owner!== emporium_canister_id ? canisters[token.owner] : undefined}
+							token={token}
+						/>
+					)}
+				</NftProvider>
 			</div>
 		</div>
 	);

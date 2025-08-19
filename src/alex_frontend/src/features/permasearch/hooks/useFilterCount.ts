@@ -13,8 +13,8 @@ function calculateFilterCount(filters: Filters): number {
 		count++;
 	}
 
-	// Count date range as 1 if present
-	if (filters.dateRange.from || filters.dateRange.to) {
+	// Count block range as 1 if different from default (500)
+	if (filters.range !== 500) {
 		count++;
 	}
 
@@ -37,13 +37,8 @@ function calculateDirtyCount(filters: Filters, appliedFilters: Filters): number 
 		dirtyCount++;
 	}
 
-	// Check date range
-	const currentFromStr = filters.dateRange.from || "";
-	const appliedFromStr = appliedFilters.dateRange.from || "";
-	const currentToStr = filters.dateRange.to || "";
-	const appliedToStr = appliedFilters.dateRange.to || "";
-
-	if (currentFromStr !== appliedFromStr || currentToStr !== appliedToStr) {
+	// Check block range
+	if (filters.range !== appliedFilters.range) {
 		dirtyCount++;
 	}
 

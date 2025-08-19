@@ -4,8 +4,7 @@ import { toast } from "sonner";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import {
 	setFilterTypes,
-	setFilterDateRange,
-	setFilterDatePreset,
+	setFilterRange,
 	removeFilterTag,
 	applyFilters,
 	toggleSortOrder,
@@ -58,29 +57,12 @@ const AppliedFilters: React.FC = () => {
 	}
 
 
-	if (appliedFilters.dateRange.from || appliedFilters.dateRange.to) {
-		// Get the date range label based on preset
-		let dateLabel = "Date Range";
-		if (appliedFilters.datePreset) {
-			const presetLabels = {
-				last7days: "Last 7 days",
-				last30days: "Last 30 days",
-				last6months: "Last 6 months",
-				lastyear: "Last year",
-				custom: "Custom range",
-			};
-			dateLabel =
-				presetLabels[
-					appliedFilters.datePreset as keyof typeof presetLabels
-				] || "Date Range";
-		}
-
+	if (appliedFilters.range !== 500) {
 		activeFilters.push({
-			label: dateLabel,
-			key: "date",
+			label: `Block Range: ±${appliedFilters.range}`,
+			key: "range",
 			clear: () => {
-				dispatch(setFilterDateRange({ from: "", to: "" }));
-				dispatch(setFilterDatePreset(""));
+				dispatch(setFilterRange(500)); // Reset to default
 				handleApplyChanges();
 			},
 		});

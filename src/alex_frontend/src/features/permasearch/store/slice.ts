@@ -1,25 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SearchState, Filters, DateRange } from '../types/index';
+import { SearchState, Filters } from '../types/index';
 
 const initialFilters: Filters = {
   types: ["image/jpeg"],
   categories: ["images"],
-  dateRange: (() => {
-    const now = new Date();
-    const from = new Date();
-    from.setDate(now.getDate() - 7);
-    return {
-      from: from.toISOString().split("T")[0],
-      to: now.toISOString().split("T")[0],
-    };
-  })(),
-  datePreset: "last7days",
+  range: 500, // Default ±500 blocks (~17 hours)
   customType: "",
   tags: [],
+  query: "",
+  timestamp: undefined, // No timestamp filtering by default
 };
 
 const initialState: SearchState = {
-  query: "",
   filters: { ...initialFilters },
   appliedFilters: { ...initialFilters },
   showFilters: false,
@@ -27,33 +19,30 @@ const initialState: SearchState = {
   sortOrder: "HEIGHT_DESC",
   safeSearch: true,
   continuousScroll: true,
-  randomDate: undefined,
 };
 
 const permasearchSlice = createSlice({
   name: "permasearch",
   initialState,
   reducers: {
-    // Query actions
+    // Filter actions
     setQuery: (state, action: PayloadAction<string>) => {
-      state.query = action.payload;
+      state.filters.query = action.payload;
     },
     clearQuery: (state) => {
-      state.query = "";
+      state.filters.query = "";
     },
-
-    // Filter actions
+    setTimestamp: (state, action: PayloadAction<number|undefined>) => {
+      state.filters.timestamp = action.payload;
+    },
     setFilterTypes: (state, action: PayloadAction<string[]>) => {
       state.filters.types = action.payload;
     },
     setFilterCategories: (state, action: PayloadAction<string[]>) => {
       state.filters.categories = action.payload;
     },
-    setFilterDateRange: (state, action: PayloadAction<DateRange>) => {
-      state.filters.dateRange = action.payload;
-    },
-    setFilterDatePreset: (state, action: PayloadAction<string>) => {
-      state.filters.datePreset = action.payload;
+    setFilterRange: (state, action: PayloadAction<number>) => {
+      state.filters.range = action.payload;
     },
     setFilterCustomType: (state, action: PayloadAction<string>) => {
       state.filters.customType = action.payload;
@@ -111,14 +100,6 @@ const permasearchSlice = createSlice({
       state.expanded[key] = !state.expanded[key];
     },
 
-    // Random date actions
-    setRandomDate: (state, action: PayloadAction<string | undefined>) => {
-      state.randomDate = action.payload;
-    },
-    clearRandomDate: (state) => {
-      state.randomDate = undefined;
-    },
-
     // Reset all state
     reset: () => initialState,
   },
@@ -127,10 +108,10 @@ const permasearchSlice = createSlice({
 export const {
   setQuery,
   clearQuery,
+  setTimestamp,
   setFilterTypes,
   setFilterCategories,
-  setFilterDateRange,
-  setFilterDatePreset,
+  setFilterRange,
   setFilterCustomType,
   setFilterTags,
   addFilterTag,
@@ -145,8 +126,6 @@ export const {
   setSafeSearch,
   setContinuousScroll,
   toggleExpanded,
-  setRandomDate,
-  clearRandomDate,
   reset,
 } = permasearchSlice.actions;
 
