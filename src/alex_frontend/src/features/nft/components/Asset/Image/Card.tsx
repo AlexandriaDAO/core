@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
-import { Image as ImageIcon } from "lucide-react";
+import { Image } from "lucide-react";
 import Preview from "../Preview";
 
-// NEW: Import our optimized hooks
 import useAssetLoading from "../../../hooks/useAssetLoading";
 import useImageAnalysis from "../../../hooks/useImageAnalysis";
 import { NsfwAssetProps } from "../../../types/assetTypes";
@@ -18,8 +17,7 @@ const ImageCard: React.FC<NsfwAssetProps> = ({ url, checkNsfw, setIsNsfw }) => {
 		}
 	}, [nsfw, analyzing, setIsNsfw]);
 
-	// Show error state with consistent UI
-	if (error) return <Preview icon={ImageIcon} message={error || "Unable to load image"} />
+	if (error) return <Preview icon={<Image size={48} />} title="Loading Error" description={error || "Unable to load image"} />
 
 	return (
 		<img

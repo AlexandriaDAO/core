@@ -3,18 +3,17 @@ export interface DateRange {
 	to?: string;
 }
 
-
 export interface Filters {
 	types: string[];
 	categories: string[];
-	dateRange: DateRange;
-	datePreset: string;
+	range: number; // Block range ± from target block (default 500)
 	customType: string;
 	tags: Array<{ name: string; value: string }>;
+	query: string;
+	timestamp: number | undefined; // Unix timestamp in seconds, undefined for no timestamp filtering
 }
 
 export interface SearchState {
-	query: string;
 	filters: Filters;
 	appliedFilters: Filters;
 	showFilters: boolean;
@@ -22,7 +21,6 @@ export interface SearchState {
 	sortOrder: string;
 	safeSearch: boolean;
 	continuousScroll: boolean;
-	randomDate?: string;
 }
 
 // Filter processing types for API

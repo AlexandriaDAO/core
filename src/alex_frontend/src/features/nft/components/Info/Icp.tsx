@@ -160,7 +160,7 @@ const IcpInfo: React.FC<IcpInfoProps> = ({ token }) => {
 				<Button
 					onClick={handleWithdraw}
 					variant="info"
-					className="flex-1"
+					className="flex-grow flex-shrink basis-9 w-10/12"
 					disabled={withdrawing || !nftManagerActor || !user}
 				>
 					{withdrawing ? (

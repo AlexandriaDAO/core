@@ -1,22 +1,20 @@
-import React, { useState } from "react";
-import { Image as ImageIcon, ZoomIn, ZoomOut, RotateCcw, Crosshair, Maximize, Minimize } from "lucide-react";
+import React from "react";
+import { Image, ZoomIn, ZoomOut, RotateCcw, Crosshair, Maximize, Minimize, Loader } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import Preview from "../Preview";
 
-// NEW: Import our optimized hooks and types
 import useAssetLoading from "../../../hooks/useAssetLoading";
 import { AssetProps } from "../../../types/assetTypes";
 
 const ImageModal: React.FC<AssetProps> = ({ url }) => {
-	const { error, setError } = useAssetLoading(url);
+	const { error, setError, loading, setLoading } = useAssetLoading(url);
 
-	if (error) return <Preview icon={ImageIcon} message={error || "Image cannot be displayed"} />;
+	if (error) return <Preview icon={<Image size={48} />} title="Loading Error" description={error || "Image cannot be displayed"} />;
 
 	return (
-		<div className="relative p-4 w-full h-full bg-background rounded-lg border border-border/30 overflow-hidden">
-			{/* Image Display with Zoom Library */}
+		<>
 			<TransformWrapper
 				initialScale={1}
 				minScale={0.25}
@@ -29,7 +27,7 @@ const ImageModal: React.FC<AssetProps> = ({ url }) => {
 				panning={{ disabled: false }}
 				alignmentAnimation={{ sizeX: 0, sizeY: 0 }}
 				velocityAnimation={{ sensitivity: 1, animationTime: 400 }}
-			>
+				>
 				{({ zoomIn, zoomOut, resetTransform, centerView }) => (
 					<>
 						<TransformComponent
@@ -38,11 +36,16 @@ const ImageModal: React.FC<AssetProps> = ({ url }) => {
 							wrapperStyle={{ width: '100%', height: '100%' }}
 							contentStyle={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
 						>
+							{loading &&
+								<div className="relative min-h-40 h-full w-full place-items-center place-content-center">
+									<Loader className="animate-spin" />
+								</div>
+							}
 							<img
 								src={url}
 								alt="Asset Full View"
 								crossOrigin="anonymous"
-								className="rounded-lg shadow-lg object-contain select-none"
+								className={`rounded-lg shadow-lg object-contain select-none border ${loading ? 'hidden':''}`}
 								style={{
 									maxWidth: '100%',
 									maxHeight: '100%',
@@ -50,8 +53,10 @@ const ImageModal: React.FC<AssetProps> = ({ url }) => {
 									height: 'auto'
 								}}
 								onError={() => {
+									setLoading(false);
 									setError("Unable to load image");
 								}}
+								onLoad={()=>setLoading(false)}
 								draggable={false}
 							/>
 						</TransformComponent>
@@ -101,7 +106,7 @@ const ImageModal: React.FC<AssetProps> = ({ url }) => {
 					</>
 				)}
 			</TransformWrapper>
-		</div>
+		</>
 	);
 };
 

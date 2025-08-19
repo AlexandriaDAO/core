@@ -25,9 +25,9 @@
 
 import { SearchResponse, SearchParams, GraphQLQueryResponse, Transaction } from "../types";
 import { ARWEAVE_GRAPHQL_ENDPOINT, buildBlockRange, buildTagFilters, checkMintedStatus, filterAvailableAssets } from "./utils";
-import { getBlockHeightForTimestamp, dateStringToTimestamp } from "../utils";
+import { getBlockHeightForTimestamp, dateStringToTimestamp, getCurrentBlockHeight } from "../utils";
 
-export async function fetchSearchResults({ query, filters, sortOrder, cursor, actor, signal, randomDate }: SearchParams & { signal?: AbortSignal; }): Promise<SearchResponse> {
+export async function fetchSearchResults({ query, filters, sortOrder, cursor, actor, signal, timestamp }: SearchParams & { signal?: AbortSignal; }): Promise<SearchResponse> {
 	const tags = buildTagFilters(filters);
 
 
@@ -60,49 +60,37 @@ export async function fetchSearchResults({ query, filters, sortOrder, cursor, ac
 	// }
 
 
+	const current = await getCurrentBlockHeight();
+
+	// Use filters.range for block range (default 500)
+	let blockRange = {min: 0, max: current - 500}
 
 	// Determine which block range to use
-	let blockRange;
-	if (randomDate) {
-		// reference implementation /src/apps/Modules/LibModules/arweaveSearch/api/arweaveApi.ts
-		// Use randomDate to get block range (overrides dateRange)
-		const timestamp = dateStringToTimestamp(randomDate);
-
+	if (timestamp) {
 		try {
-			// Get block height for the random datetime (single API call)
-			const targetBlock = await getBlockHeightForTimestamp(timestamp);
-			
-			// Create a much smaller, more precise range around the target block
-			// ±500 blocks ≈ ±1000 minutes ≈ ±16 hours around target time
-			const rangeSize = 500;
+			const targetBlock = await getBlockHeightForTimestamp(timestamp, 0, current);
+
+			// Use the range from filters
+			const rangeSize = filters.range;
 			const minBlock = Math.max(0, targetBlock - rangeSize);
-			const maxBlock = targetBlock + rangeSize;
+			const maxBlock = Math.min(current, targetBlock + rangeSize); // Cap max at current block height
 
-			blockRange = {
-				min: minBlock,
-				max: maxBlock
-			};
-
-			console.log(`Random datetime ${randomDate}: block range ${minBlock}-${maxBlock} (${maxBlock - minBlock + 1} blocks, ~±16 hours)`);
+			blockRange = { min: minBlock, max: maxBlock };
+			console.log(`Timestamp ${timestamp}: block range ${minBlock}-${maxBlock} (${maxBlock - minBlock + 1} blocks, ±${rangeSize} blocks)`);
 		} catch (error) {
-			console.error("Error getting block height for random date:", error);
-			// Fallback to regular dateRange behavior
-			blockRange = await buildBlockRange(filters.dateRange);
+			console.error("Error getting block height for timestamp:", error);
 		}
-	} else {
-		// Use dateRange as before
-		blockRange = await buildBlockRange(filters.dateRange);
 	}
 
-	// Build the block filter object
-	let blockFilter = "";
-	if (blockRange.min !== undefined || blockRange.max !== undefined) {
-		const conditions = [];
-		if (blockRange.min !== undefined) conditions.push(`min: ${blockRange.min}`);
-		// Exclude recent blocks (~30 blocks = 1 hour) when browsing to avoid unconfirmed transactions
-		if (blockRange.max !== undefined) conditions.push(`max: ${query ? blockRange.max : blockRange.max - 30}`);
-		blockFilter = `block: { ${conditions.join(", ")} }`;
-	}
+	// // Build the block filter object
+	// let blockFilter = "";
+	// if (blockRange.min !== undefined || blockRange.max !== undefined) {
+	// 	const conditions = [];
+	// 	if (blockRange.min !== undefined) conditions.push(`min: ${blockRange.min}`);
+	// 	// Exclude recent blocks (~30 blocks = 1 hour) when browsing to avoid unconfirmed transactions
+	// 	if (blockRange.max !== undefined) conditions.push(`max: ${query ? blockRange.max : blockRange.max - 30}`);
+	// 	blockFilter = `block: { ${conditions.join(", ")} }`;
+	// }
 
 	let queryStr = "";
 
@@ -110,11 +98,12 @@ export async function fetchSearchResults({ query, filters, sortOrder, cursor, ac
 		queryStr = `
 			query GetTransactions($after: String, $tags: [TagFilter!], $owners: [String!], $ids: [ID!]) {
 				byOwners: transactions(
-					first: 12,
+					first: 24,
 					sort: ${sortOrder},
 					after: $after,
 					tags: $tags,
-					owners: $owners${blockFilter ? `, ${blockFilter}` : ""}
+					owners: $owners,
+					block: { min: ${blockRange.min}, max: ${blockRange.max} }
 				) {
 					edges {
 						cursor
@@ -128,11 +117,12 @@ export async function fetchSearchResults({ query, filters, sortOrder, cursor, ac
 					pageInfo { hasNextPage }
 				}
 				byIds: transactions(
-					first: 12,
+					first: 24,
 					sort: ${sortOrder},
 					after: $after,
 					tags: $tags,
-					ids: $ids${blockFilter ? `, ${blockFilter}` : ""}
+					ids: $ids,
+					block: { min: ${blockRange.min}, max: ${blockRange.max} }
 				) {
 					edges {
 						cursor
@@ -151,10 +141,11 @@ export async function fetchSearchResults({ query, filters, sortOrder, cursor, ac
 		queryStr = `
 			query GetTransactions($after: String, $tags: [TagFilter!]) {
 				transactions(
-					first: 12,
+					first: 24,
 					sort: ${sortOrder},
 					after: $after,
-					tags: $tags${blockFilter ? `, ${blockFilter}` : ""}
+					tags: $tags,
+					block: { min: ${blockRange.min}, max: ${blockRange.max} }
 				) {
 					edges {
 						cursor

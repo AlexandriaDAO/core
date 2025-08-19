@@ -3,7 +3,6 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { Alert } from "@/components/Alert";
 import FilterBar from "@/features/marketplace/components/FilterBar";
-import { Skeleton } from "@/lib/components/skeleton";
 import { setPage, setPageSize, setSafe } from "@/features/marketplace/marketplaceSlice";
 import Nft from "@/features/nft";
 import Purchase from "@/features/marketplace/actions/Purchase";
@@ -14,6 +13,7 @@ import { useListing } from "@/features/marketplace/hooks";
 import Remove from "@/features/marketplace/actions/Remove";
 import Update from "@/features/marketplace/actions/Update";
 import SafeSearchToggle from "@/components/SafeSearchToggle";
+import NftProvider from "@/components/NftProvider";
 
 const EmporiumPage = () => {
 	const dispatch = useAppDispatch();
@@ -72,33 +72,26 @@ const EmporiumPage = () => {
 				)}
 			</div>
 
-			{isLoading ? (
-				<Skeleton className="w-full flex-grow rounded h-96" />
-			) : isEmpty ? (
-				<div className="text-center py-12">
-					<p className="text-muted-foreground text-lg">
-						No NFTs found matching your criteria.
-					</p>
-				</div>
-			) : (
-				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 items-center justify-items-center">
-					{data?.nfts?.map((nft) => (
-						<Nft
-							key={nft.arweave_id}
-							id={nft.arweave_id}
-							checkNsfw={safe}
-							action={
-								nft.owner !== user?.principal ? <Purchase nft={nft} /> : <>
-									<Remove nft={nft} />
-									<Update nft={nft}/>
-								</>
-							}
-							price={nft.price}
-							canister={canisters[nft.owner]}
-						/>
-					))}
-				</div>
-			)}
+			<NftProvider
+				loading={isLoading}
+				items={data?.nfts || []}
+				safe={safe}
+			>
+				{(nft) => (
+					<Nft
+						key={nft.arweave_id}
+						id={nft.arweave_id}
+						action={
+							nft.owner !== user?.principal ? <Purchase nft={nft} /> : <>
+								<Remove nft={nft} />
+								<Update nft={nft}/>
+							</>
+						}
+						price={nft.price}
+						// canister={canisters[nft.owner]}
+					/>
+				)}
+			</NftProvider>
 
 		</div>
 	);

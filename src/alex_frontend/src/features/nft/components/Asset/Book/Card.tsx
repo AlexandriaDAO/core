@@ -24,12 +24,12 @@ const BookCard: React.FC<NsfwAssetProps> = ({ url, checkNsfw, setIsNsfw }) => {
 
     // Error state - something went wrong (can't open book, network issues, etc.)
     if (error) {
-        return <Preview icon={BookIcon} message="Unable to load book cover" />;
+        return <Preview icon={<BookIcon size={48} />} title="Loading Error" description="Unable to Preview book cover" />;
     }
 
     // No cover available - book opened successfully but has no cover
     if (!cover) {
-        return <Preview icon={BookIcon} message="Book Cover not available." />;
+        return <Preview icon={<BookIcon size={48} />} title="Loading Error" description="Book Cover not available." />;
     }
 
     // Cover is available - show it (cover is guaranteed to be string here)

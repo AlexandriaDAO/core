@@ -1,9 +1,11 @@
-import type { TokenType } from './common';
+import type { IcpInfo, TokenType } from './common';
 
-export interface AlexandrianToken {
+export interface Token {
 	id: string;
 	arweaveId: string;
 	owner: string;
 	collection: TokenType;
-	createdAt?: number;
+	// canister?: string;
 }
+
+export type AlexandrianToken = Token & IcpInfo;

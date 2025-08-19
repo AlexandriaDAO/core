@@ -19,17 +19,17 @@ interface UseSearchReturn {
 
 export function useSearch(): UseSearchReturn {
 	const {actor} = useNftManager();
-	const { query, appliedFilters, sortOrder, randomDate } = useAppSelector(state => state.permasearch);
+	const { appliedFilters, sortOrder } = useAppSelector(state => state.permasearch);
 	const queryClient = useQueryClient();
 
 	const {data, isLoading, isRefetching, isFetchingNextPage, error, hasNextPage, fetchNextPage, refetch } = useInfiniteQuery<SearchResponse, Error>({
-		queryKey: [SEARCH_QUERY_KEY, { query, appliedFilters, sortOrder, randomDate }],
+		queryKey: [SEARCH_QUERY_KEY, { appliedFilters, sortOrder }],
 		queryFn: ({ pageParam = null, signal }) =>
 			fetchSearchResults({
-				query,
+				query: appliedFilters.query,
 				filters: appliedFilters,
 				sortOrder,
-				randomDate,
+				timestamp: appliedFilters.timestamp,
 				cursor: pageParam as string | undefined,
 				actor,
 				signal,
@@ -61,7 +61,7 @@ export function useSearch(): UseSearchReturn {
 			if (isRefetching || isFetchingNextPage) {
 				// Cancel search queries
 				await queryClient.cancelQueries({
-					queryKey: [SEARCH_QUERY_KEY, { query, appliedFilters, sortOrder }]
+					queryKey: [SEARCH_QUERY_KEY, { appliedFilters, sortOrder }]
 				});
 
 				return; // Don't start a new request

@@ -8,7 +8,7 @@ import { FileText } from "lucide-react";
 const PdfModal: React.FC<AssetProps> = ({ url }) => {
 	const {loading, setLoading, error, setError} = useAssetLoading(url);
 
-    if (error) return <Preview icon={FileText} message="Failed to load pdf" />;
+    if (error) return <Preview icon={<FileText size={48}/>} title="Loading Error" description="Failed to load pdf" />;
 
 	return (
 		<div className="relative w-full h-full bg-background rounded-lg border border-border/30 overflow-hidden">

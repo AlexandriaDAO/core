@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import Preview from "./../Preview";
-import { File, MoreHorizontal } from "lucide-react";
+import { File, Loader, MoreHorizontal } from "lucide-react";
 import usePartialData from "../../../hooks/usePartialData";
 import AssetSkeleton from "@/layouts/skeletons/emporium/components/AssetSkeleton";
 
@@ -29,11 +29,13 @@ const TextCard: React.FC<AssetProps> = ({ url }) => {
     }, [fetching, fetchError, data, partial]);
 
 
-    if (fetching) return <AssetSkeleton />
+    if (fetching) return <div className="relative min-h-40 h-full w-full place-items-center place-content-center">
+        <Loader className="animate-spin" />
+    </div>
 
-    if (fetchError) return <Preview icon={File} message="Failed to load text content" />
+    if (fetchError) return <Preview title="Loading Error" description={fetchError || 'Failed to load text content'} />
 
-    if (!data || isEmpty) return <Preview icon={File} message="Text is empty" />
+    if (!data || isEmpty) return <Preview title="Text is empty" />
 
     return (
         <>
