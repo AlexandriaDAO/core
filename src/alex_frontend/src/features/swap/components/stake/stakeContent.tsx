@@ -223,14 +223,21 @@ const StakeContent = () => {
                                 </div>
                             </div>
                         </div>
+                        {parseFloat(amount) > 0 && parseFloat(amount) < 1 && (
+                            <div className="text-center mb-3">
+                                <p className="text-sm text-red-500 dark:text-red-400 font-medium">
+                                    Minimum stake amount is 1 ALEX token
+                                </p>
+                            </div>
+                        )}
                         <div>
                             {user ? <button
                                 type="button"
-                                className={`bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 mb-6 ${parseFloat(amount) === 0 || swap.loading ? 'text-[#808080] cursor-not-allowed' : 'bg-balancebox text-white cursor-pointer'}`}
+                                className={`bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 mb-6 ${parseFloat(amount) < 1 || swap.loading ? 'text-[#808080] cursor-not-allowed' : 'bg-balancebox text-white cursor-pointer'}`}
                                 style={{
-                                    backgroundColor: parseFloat(amount) === 0 || swap.loading ? '#525252' : '', // when disabled
+                                    backgroundColor: parseFloat(amount) < 1 || swap.loading ? '#525252' : '', // when disabled
                                 }}
-                                disabled={parseFloat(amount) === 0 || swap.loading === true}
+                                disabled={parseFloat(amount) < 1 || swap.loading === true}
                                 onClick={(e) => {
                                     handleSubmit(e);
                                 }}

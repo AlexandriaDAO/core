@@ -3,7 +3,7 @@ dfx canister snapshot list alex_frontend --network ic
 
 # # Load snapshot
 # dfx canister stop alex_frontend --network ic
-# dfx canister snapshot load alex_frontend 00000000000000110000000001f0531c0101 --network ic
+# dfx canister snapshot load alex_frontend 00000000000000120000000001f0531c0101 --network ic
 # dfx canister start alex_frontend --network ic
 
 set -x
@@ -13,7 +13,7 @@ dfx identity use mainnet
 
 # alex_frontend
 dfx canister stop alex_frontend --network ic
-dfx canister snapshot create alex_frontend --replace 00000000000000100000000001f0531c0101 --network ic
+dfx canister snapshot create alex_frontend --replace 00000000000000120000000001f0531c0101 --network ic
 dfx canister start alex_frontend --network ic
 
 # alex_wallet (done)
@@ -49,7 +49,7 @@ dfx canister start asset_manager --network ic
 
 # Emporium
 dfx canister stop emporium --network ic
-dfx canister snapshot create emporium --replace 00000000000000020000000001f07b4e0101 --network ic
+dfx canister snapshot create emporium --replace 00000000000000030000000001f07b4e0101 --network ic
 dfx canister start emporium --network ic
 
 # perpetua

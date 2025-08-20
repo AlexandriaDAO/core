@@ -22,9 +22,9 @@ const AccountButton = () => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <div className="flex-shrink h-auto w-max flex justify-center items-center gap-1 px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 text-white hover:text-white/90 hover:border-white rounded-full cursor-pointer duration-300 transition-all">
-                    <img alt="Internet Computer" className="inline-block w-4 h-4 mr-1" src="/images/ic.svg" />
-                    <span className="text-base font-normal font-roboto-condensed tracking-wider">
+                <div className="flex-shrink h-auto w-max flex justify-center items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 text-white hover:text-white/90 hover:border-white rounded-full cursor-pointer duration-300 transition-all">
+                    <img alt="Internet Computer" className="inline-block w-3 h-3 sm:w-4 sm:h-4 mr-1" src="/images/ic.svg" />
+                    <span className="text-sm sm:text-base font-normal font-roboto-condensed tracking-wider">
                         {user.principal.slice(0, 6) + "..." + user.principal.slice(-4)}
                     </span>
                 </div>

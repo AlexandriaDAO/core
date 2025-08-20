@@ -58,6 +58,7 @@ const HomePage: React.FC = () => {
           "absolute inset-0 flex flex-col items-center justify-center overflow-hidden touch-none",
           "transition-all duration-500 ease-in-out",
           "bg-background z-0",
+          "pb-16 sm:pb-24", // Compensate for header height
           isPanelOpen ? "-translate-y-full" : "translate-y-0"
         )}>
           <h1 className={cn(
@@ -194,11 +195,9 @@ const HomePage: React.FC = () => {
           )}
         </div>
       </div>
-      {!hasSeenIntro && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <IntroductionAnimation isOpen={isIntroOpen} onClose={closeIntroduction} />
-        </Suspense>
-      )}
+      <Suspense fallback={<div>Loading...</div>}>
+        <IntroductionAnimation isOpen={isIntroOpen} onClose={closeIntroduction} />
+      </Suspense>
     </>
   );
 };

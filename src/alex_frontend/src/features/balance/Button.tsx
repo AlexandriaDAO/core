@@ -105,13 +105,13 @@ const BalanceButton = () => {
     return (
         <DropdownMenu onOpenChange={setIsExpanded}>
             <DropdownMenuTrigger asChild>
-                <div className="flex-shrink h-auto w-max flex justify-center items-center gap-1 px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 text-white hover:text-white/90 hover:border-white rounded-full cursor-pointer duration-300 transition-all">
+                <div className="flex-shrink h-auto w-max flex justify-center items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 text-white hover:text-white/90 hover:border-white rounded-full cursor-pointer duration-300 transition-all">
                     {total > 0 ? <>
-                        <span className="text-base font-normal font-roboto-condensed tracking-wider">${total.toFixed(2)}</span>
+                        <span className="text-sm sm:text-base font-normal font-roboto-condensed tracking-wider">${total.toFixed(2)}</span>
                     </> : (
-                        <span className="text-base font-normal font-roboto-condensed tracking-wider">Balance</span>
+                        <span className="text-sm sm:text-base font-normal font-roboto-condensed tracking-wider">Balance</span>
                     )}
-                    {user && (isExpanded ? <ChevronUp size={16} className="ml-1" /> : <ChevronDown size={16} className="ml-1" />)}
+                    {user && (isExpanded ? <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4 ml-1" /> : <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />)}
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="font-roboto-condensed">

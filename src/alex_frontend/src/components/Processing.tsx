@@ -6,9 +6,9 @@ type ProcessingProps = {
 }
 
 const Processing: React.FC<ProcessingProps> = ({ message = "Processing..." }) => (
-    <div className="flex-shrink h-auto flex justify-between gap-1 px-4 py-2 items-center border border-white text-[#828282] rounded-full cursor-not-allowed">
-        <span className="w-max text-base font-normal font-roboto-condensed tracking-wider">{message}</span>
-        <LoaderCircle size={18} className="animate animate-spin"/>
+    <div className="flex-shrink h-auto flex justify-between gap-1 px-3 py-1.5 sm:px-4 sm:py-2 items-center border border-white text-[#828282] rounded-full cursor-not-allowed">
+        <span className="w-max text-sm sm:text-base font-normal font-roboto-condensed tracking-wider">{message}</span>
+        <LoaderCircle className="w-4 h-4 sm:w-[18px] sm:h-[18px] animate animate-spin"/>
     </div>
 )
 

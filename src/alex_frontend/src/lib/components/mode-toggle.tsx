@@ -9,10 +9,10 @@ export function ModeToggle() {
 	return (
 		<button
 			onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-			className="flex justify-center items-center hover:text-primary bg-white dark:bg-black relative w-[42px] h-[42px] border border-white rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
+			className="flex justify-center items-center hover:text-primary bg-white dark:bg-black relative w-[32px] h-[32px] sm:w-[42px] sm:h-[42px] border border-white rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
 		>
-			<Sun className="absolute rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-			<Moon className="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 dark:color-white color-[#0F172A]" />
+			<Sun className="absolute rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 w-4 h-4 sm:w-5 sm:h-5" />
+			<Moon className="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 dark:color-white color-[#0F172A] w-4 h-4 sm:w-5 sm:h-5" />
 			<span className="sr-only">Toggle theme</span>
 		</button>
 	);

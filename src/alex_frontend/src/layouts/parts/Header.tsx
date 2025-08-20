@@ -1,5 +1,4 @@
-import React, { Suspense } from "react";
-import { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Logo from "@/components/Logo";
 import Tabs from "@/components/Tabs";
@@ -100,69 +99,62 @@ export const Entry = () => {
 	// Finally, show the authenticated component
 	// load auth module only when needed
 	return (
-		<div className="flex gap-2 sm:justify-center xs:justify-start items-stretch">
-			<Suspense fallback={
-				<div className="w-28 bg-gradient-to-r from-gray-800 to-gray-500 border border-gray-600 text-white hover:border-white rounded-full cursor-not-allowed duration-800 transition-all animate-pulse">
-				</div>
-			}>
-				<BalanceButton />
-			</Suspense>
-			<Suspense fallback={
-				<div className="w-36 bg-gradient-to-r from-gray-800 to-gray-500 border border-gray-600 text-white hover:border-white rounded-full cursor-not-allowed duration-800 transition-all animate-pulse">
-				</div>
-			}>
-				<AccountButton/>
-			</Suspense>
-			<Suspense fallback={
-				<div className="w-[42px] h-[42px] border border-white rounded-full cursor-not-allowed overflow-hidden flex justify-center items-center">
-					<LoaderCircle color="white" size={18} className="animate animate-spin"/>
-				</div>
-			}>
-				<Auth />
-			</Suspense>
-		</div>
+		<>
+			{/* Desktop layout - show all buttons */}
+			<div className="hidden sm:flex gap-2 items-stretch">
+				<Suspense fallback={
+					<div className="w-28 h-[42px] bg-gradient-to-r from-gray-800 to-gray-500 border border-gray-600 text-white hover:border-white rounded-full cursor-not-allowed duration-800 transition-all animate-pulse">
+					</div>
+				}>
+					<BalanceButton />
+				</Suspense>
+				<Suspense fallback={
+					<div className="w-36 h-[42px] bg-gradient-to-r from-gray-800 to-gray-500 border border-gray-600 text-white hover:border-white rounded-full cursor-not-allowed duration-800 transition-all animate-pulse">
+					</div>
+				}>
+					<AccountButton/>
+				</Suspense>
+				<Suspense fallback={
+					<div className="w-[42px] h-[42px] border border-white rounded-full cursor-not-allowed overflow-hidden flex justify-center items-center">
+						<LoaderCircle color="white" className="w-[18px] h-[18px] animate animate-spin"/>
+					</div>
+				}>
+					<Auth />
+				</Suspense>
+			</div>
+			
+			{/* Mobile layout - just Auth button with integrated account info */}
+			<div className="sm:hidden">
+				<Suspense fallback={
+					<div className="w-[32px] h-[32px] border border-white rounded-full cursor-not-allowed overflow-hidden flex justify-center items-center">
+						<LoaderCircle color="white" className="w-4 h-4 animate animate-spin"/>
+					</div>
+				}>
+					<Auth />
+				</Suspense>
+			</div>
+		</>
 	);
 };
 
 function Header() {
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-	const toggleMenu = () => {
-		setIsMenuOpen(!isMenuOpen);
-	};
 
 	// bg-gray-900
 
 	return (
-		<div className="flex-grow-0 flex-shrink-0 bg-gray-900 basis-24 flex flex-col justify-center items-stretch lg:px-10 md:px-8 sm:px-6 xs:px-4 relative z-50">
-			<div className="flex-grow-0 flex-shrink-0 flex basis-24 justify-between items-center w-full">
-				<div className="flex items-center">
+		<div className="flex-grow-0 flex-shrink-0 bg-gray-900 basis-16 sm:basis-24 flex flex-col justify-center items-stretch px-4 sm:px-6 md:px-8 lg:px-10 relative z-50">
+			<div className="flex-grow-0 flex-shrink-0 flex basis-16 sm:basis-24 justify-between items-center w-full">
+				<div className="flex items-center flex-shrink-0">
 					<Logo />
 				</div>
-				<div className="md:flex sm:hidden xs:hidden items-center w-full justify-end">
-					<div className="flex-grow flex justify-center">
-						<Tabs />
-					</div>
-					<div className="flex gap-2 items-center ml-4">
-						<Entry />
-						<ModeToggle />
-					</div>
+				<div className="flex-1 flex justify-center px-4">
+					<Tabs />
 				</div>
-				<div className="hidden md:hidden sm:block xs:block">
-					<button className="w-6 text-foreground" onClick={toggleMenu}>
-						<img src="images/menu.svg" alt="menu-icon" />
-					</button>
+				<div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+					<Entry />
+					<ModeToggle />
 				</div>
 			</div>
-			{isMenuOpen && (
-				<div className="flex flex-col md:hidden">
-					<Tabs />
-					<div className="flex gap-2 justify-center items-center py-4">
-						<Entry />
-						<ModeToggle />
-					</div>
-				</div>
-			)}
 		</div>
 	);
 }

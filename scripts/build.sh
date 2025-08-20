@@ -324,6 +324,12 @@ if [ -f "src/declarations/icp_swap_factory/index.d.ts" ] && ! grep -q "export { 
     sed -i '/import { _SERVICE }/a\\nexport { _SERVICE };' src/declarations/icp_swap_factory/index.d.ts
 fi
 
+# Build frontend with correct environment for local development
+echo "Building frontend for local development..."
+export PUBLIC_URL=""
+export NODE_ENV=development
+npm run build
+
 dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 
 ## Helpful extras for testing.
