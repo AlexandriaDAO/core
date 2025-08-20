@@ -50,25 +50,25 @@ const Nft: React.FC<NftProps> = ({ id, action, price, token }) => {
 						</div>
 					)}
 
-					<div className="absolute top-0 left-1 pt-1 z-10 flex gap-0.5 flex-col items-start" onClick={event=>event.stopPropagation()}>
+					<div className="font-roboto-condensed absolute top-0 left-1 pt-1 z-10 flex gap-0.5 flex-col items-start" onClick={event=>event.stopPropagation()}>
 						{price && (
-							<Badge variant="outline" className="px-2 text-sm bg-background text-foreground transition-colors">
+							<Badge variant="outline" className="px-2 text-xs bg-background text-foreground transition-colors">
 								{price} ICP
 							</Badge>
 						)}
 						{token && token.alex > 0 && (
-							<Badge variant="outline" className="px-2 text-sm bg-background text-foreground transition-colors">
+							<Badge variant="outline" className="px-2 text-xs bg-background text-foreground transition-colors">
 								{token.alex.toFixed(2)} ALEX
 							</Badge>
 						)}
 						{token && token.lbry > 0 && (
-							<Badge variant="outline" className="px-2 text-sm bg-background text-foreground transition-colors">
+							<Badge variant="outline" className="px-2 text-xs bg-background text-foreground transition-colors">
 								{token.lbry.toFixed(2)} LBRY
 							</Badge>
 						)}
 						{token && token.rank && (
-							<Badge variant="outline" className="px-2 text-sm bg-background text-foreground transition-colors">
-								{`${(token.rank / 100).toFixed(2)}%`}
+							<Badge variant="outline" className="px-2 text-xs bg-background text-foreground transition-colors">
+								{`${(token.rank / 100).toFixed(2)}%`} Rare
 							</Badge>
 						)}
 					</div>
