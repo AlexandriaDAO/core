@@ -1,7 +1,7 @@
 import React from "react";
 import { Label } from "@/lib/components/label";
-import Copy from "@/components/Copy";
 import { Tags as TagsType } from "../../types";
+import { copyToClipboard } from "@/utils/general";
 
 interface TagProps {
     tags?: TagsType;
@@ -17,17 +17,14 @@ const Tags: React.FC<TagProps> = ({ tags = [] }) => {
             {tags.map((tag, index) => (
                 <div
                     key={index}
-                    className="flex items-center justify-between py-1 border-b last:border-b-0"
+                    className="flex items-center justify-between flex-wrap py-1 border-b last:border-b-0"
                 >
-                    <Label className="text-sm text-primary min-w-24">
+                    <Label className="text-sm text-primary pr-2 cursor-copy" onClick={()=>copyToClipboard(tag.name)}>
                         {tag.name}
                     </Label>
-                    <div className="flex items-center flex-1 justify-end">
-                        <span className="text-sm break-all mr-2">
-                            {tag.value}
-                        </span>
-                        <Copy text={tag.value} size="sm"/>
-                    </div>
+                    <span className="text-sm break-all cursor-copy" onClick={()=>copyToClipboard(tag.value)}>
+                        {tag.value}
+                    </span>
                 </div>
             ))}
         </div>

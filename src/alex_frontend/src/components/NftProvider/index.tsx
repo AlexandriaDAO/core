@@ -35,9 +35,10 @@ interface NftProviderProps<T> {
 	loading: boolean;
 	items: T[];
 	children: (item: T) => React.ReactNode;
+	empty?: React.ReactNode;
 }
 
-const NftProvider = <T,>({ safe, loading, items, children }: NftProviderProps<T>) => {
+const NftProvider = <T,>({ safe, loading, items, children, empty }: NftProviderProps<T>) => {
 	const [modal, setModal] = useState<Modal|null>(null);
 	const [sidebar, setSidebar] = useState<boolean>(false);
 
@@ -88,9 +89,11 @@ const NftProvider = <T,>({ safe, loading, items, children }: NftProviderProps<T>
 
 		return (
 			<div className="text-center py-12">
-				<p className="text-gray-500 dark:text-gray-400">
-					No items found
-				</p>
+				{empty || (
+					<p className="text-gray-500 dark:text-gray-400">
+						No items found
+					</p>
+				)}
 			</div>
 		);
 	}

@@ -61,7 +61,7 @@ export function useMinting() {
 		} finally {
 			setMintingTokenId(null);
 		}
-	}, [actor, mintingTokenId]);
+	}, [actor, mintingTokenId, queryClient, queryKey]);
 
 	const isMinting = useCallback((tokenId: string) => mintingTokenId === tokenId, [mintingTokenId]);
 

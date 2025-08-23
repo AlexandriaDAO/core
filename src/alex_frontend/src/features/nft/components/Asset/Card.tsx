@@ -8,18 +8,26 @@ import { BookCard } from "./Book";
 import { PdfCard } from "./Pdf";
 
 import Preview from "./Preview";
+import useInit from "../../hooks/useInit";
+import { Loader } from "lucide-react";
 
 interface AssetCardProps {
 	id: string;
-	type?: string;
 	checkNsfw: boolean;
 	setIsNsfw: (isNsfw: boolean) => void;
 }
 
-const AssetCard: React.FC<AssetCardProps> = ({ id, type, checkNsfw, setIsNsfw }) => {
-	const url = `https://arweave.net/${id}`;
+const AssetCard: React.FC<AssetCardProps> = ({ id, checkNsfw, setIsNsfw }) => {
+	const {initializing, initError, type} = useInit(id);
 
-	if(!type) return <Preview title="No Preview" description={'File type is not supported'}/>
+	if(initializing) return <Preview icon={<Loader className="animate-spin"/>} />
+
+	// if(initError) return <Preview icon={<TriangleAlert size={48} className="text-warning"/>} title="Loading Error" description={initError.message}/>
+	if(initError) return null;
+
+	if(!type) return <Preview title="No Preview" description="Unknown Type" />
+
+	const url = `https://arweave.net/${id}`;
 
 	// Binary files - use direct URL
 	if(type.startsWith("image/")) return <ImageCard url={url} checkNsfw={checkNsfw} setIsNsfw={setIsNsfw} />

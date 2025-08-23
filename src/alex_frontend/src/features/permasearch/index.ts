@@ -23,7 +23,7 @@ export {
 	clearQuery,
 	setFilterTypes,
 	setFilterCategories,
-	setFilterRange,
+	setFilterInclude,
 	setFilterCustomType,
 	setFilterTags,
 	addFilterTag,
@@ -45,5 +45,5 @@ export type {
 	SearchParams,
 	SearchState,
 	Filters,
-	DateRange,
+	IncludePreset,
 } from "./types/index";

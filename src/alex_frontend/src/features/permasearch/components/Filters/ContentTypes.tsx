@@ -47,7 +47,7 @@ export const FilterContentTypes: React.FC = () => {
 					Content Types
 				</h4>
 
-				<div className="h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md">
+				<div className="h-44 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md">
 					<div className="p-3 space-y-3">
 						{categoryOptions.map((category) => (
 							<div key={category.value} className="space-y-2">

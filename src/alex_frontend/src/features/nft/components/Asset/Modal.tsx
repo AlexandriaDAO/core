@@ -17,13 +17,11 @@ interface AssetModalProps {
 const AssetModal: React.FC<AssetModalProps> = ({ id }) => {
 	const {initializing, initError, type} = useInit(id);
 
-	if(initializing) return <div className="relative min-h-40 h-full w-full place-items-center place-content-center">
-		<Loader className="animate-spin" />
-	</div>
+	if(initializing) return <Preview icon={<Loader className="animate-spin"/>} />
 
 	if(initError) return <Preview icon={<TriangleAlert size={48} className="text-warning"/>} title="Loading Error" description={initError.message}/>
 
-	if(!type) return <Preview title="No Preview" description={'File type is not supported'}/>
+	if(!type) return <Preview title="No Preview" description="Unknown Type" />
 
 	const url = `https://arweave.net/${id}`;
 

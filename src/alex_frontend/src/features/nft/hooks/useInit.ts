@@ -11,6 +11,10 @@ const useInit = (id: string) => {
 
 			if(!headResponse.ok) throw new Error(`Asset with id: '${id}' could not be found.`);
 
+			// const contentLength = headResponse.headers.get('Content-Length');
+			// const sizeInBytes = contentLength ? parseInt(contentLength, 10) : null;
+			// console.log("Content-Length:", contentLength, "Size in bytes:", sizeInBytes);
+
 			const contentType = headResponse.headers.get('Content-Type');
 			if (!contentType) throw new Error("Unable to determine content type");
 

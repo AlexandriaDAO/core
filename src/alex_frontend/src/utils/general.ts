@@ -25,7 +25,7 @@ export const getIcPrincipal = (principal: string) => principal ? Principal.fromT
 
 // Helper function to convert timestamps to Date
 // bigint = ICP timestamps (nanoseconds), number = Arweave timestamps (seconds)
-export const convertTimestamp = (timestamp: bigint | number, format: 'iso' | 'readable' | 'relative' | 'combined' = 'iso'): string => {
+export const convertTimestamp = (timestamp: bigint | number, format: 'iso' | 'readable' | 'relative' | 'combined' | 'local' = 'iso'): string => {
     const date = new Date(
         typeof timestamp === 'bigint' 
             ? Number(timestamp) / 1_000_000  // ICP: nanoseconds to milliseconds
@@ -93,8 +93,16 @@ export const convertTimestamp = (timestamp: bigint | number, format: 'iso' | 're
             } else {
                 relativeTime = 'just now';
             }
-            
+
             return `${formattedDate} (${relativeTime})`;
+        case 'local':
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            const localHours = String(date.getHours()).padStart(2, '0');
+            const localMinutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${localHours}:${localMinutes}`;
         case 'iso':
         default:
             return date.toISOString();

@@ -1,6 +1,5 @@
 import { createTokenAdapter } from "../adapters/TokenAdapter";
-import type { IcpInfo } from "../adapters/TokenAdapter";
-import { TokenType } from "../types";
+import { IcpInfo, TokenType } from "../types";
 
 export const fetchIcpInfo = async (tokenId: string, collectionType: TokenType): Promise<IcpInfo> => {
 	const adapter = createTokenAdapter(collectionType);

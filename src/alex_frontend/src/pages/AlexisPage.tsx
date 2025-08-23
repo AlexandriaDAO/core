@@ -19,7 +19,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { AddToShelfButton } from "@/components/AddToShelfButton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
 import { Button } from "@/lib/components/button";
-import { Check } from "lucide-react";
+import { Check, LoaderPinwheel } from "lucide-react";
 
 // zdcg2-dqaaa-aaaap-qpnha-cai
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
@@ -28,7 +28,7 @@ function AlexisPage() {
 	const dispatch = useAppDispatch();
 	const {tokens, totalPages, totalItems, loading, updating, error, refresh } = useTokens();
 
-	const { safe } = useAppSelector(state => state.alexandrian);
+	const { safe, page } = useAppSelector(state => state.alexandrian);
 	const { user } = useAppSelector((state) => state.auth);
 
 
@@ -39,8 +39,8 @@ function AlexisPage() {
 	const disabled = loading || updating;
 
 	return (
-        <div className="py-10 px-4 sm:px-6 md:px-10 flex-grow flex justify-center relative">
-            <div className="max-w-7xl w-full flex flex-col gap-8">
+		<div className="py-10 px-4 flex-grow flex gap-8 flex-col items-center justify-center">
+            <div className="max-w-5xl w-full flex flex-col gap-8">
                 <div className="flex flex-col justify-center items-center gap-6 text-center">
                     <div className="space-y-4">
                         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -63,8 +63,9 @@ function AlexisPage() {
 				</div>
 
 				{error && <Alert variant="danger" title="Error">{error}</Alert>}
+            </div>
 
-				{/* <TokensGrid tokens={tokens} loading={loading} /> */}
+            <div className="w-full flex flex-col items-center gap-8">
 				<NftProvider loading={loading} items={Object.values(tokens)} safe={safe}>
 					{token => (
 						<Nft
@@ -93,6 +94,26 @@ function AlexisPage() {
 						/>
 					)}
 				</NftProvider>
+
+				<div className="flex justify-center mt-6 mb-8">
+					{ (loading || updating) ? (
+						<Button disabled={true} className="bg-gray-900 text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors flex items-center">
+							<LoaderPinwheel className="animate-spin mr-2 h-4 w-4" /> Loading more...
+						</Button>
+					): page < (totalPages - 1) ? (
+						<Button
+							onClick={() => dispatch(setPage(page + 1))}
+							disabled={disabled}
+							className="bg-gray-900 text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
+						>
+							{loading || updating ? 'Loading...' : 'Load More'}
+						</Button>
+					) : (
+						<p className="text-base font-medium text-gray-900 dark:text-gray-100">
+							That's all for now!
+						</p>
+					)}
+				</div>
 			</div>
 		</div>
 	);

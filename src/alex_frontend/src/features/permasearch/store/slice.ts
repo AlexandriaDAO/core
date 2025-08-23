@@ -4,7 +4,7 @@ import { SearchState, Filters } from '../types/index';
 const initialFilters: Filters = {
   types: ["image/jpeg"],
   categories: ["images"],
-  range: 500, // Default ±500 blocks (~17 hours)
+  include: undefined,
   customType: "",
   tags: [],
   query: "",
@@ -41,8 +41,8 @@ const permasearchSlice = createSlice({
     setFilterCategories: (state, action: PayloadAction<string[]>) => {
       state.filters.categories = action.payload;
     },
-    setFilterRange: (state, action: PayloadAction<number>) => {
-      state.filters.range = action.payload;
+    setFilterInclude: (state, action: PayloadAction<number | undefined>) => {
+      state.filters.include = action.payload;
     },
     setFilterCustomType: (state, action: PayloadAction<string>) => {
       state.filters.customType = action.payload;
@@ -111,7 +111,7 @@ export const {
   setTimestamp,
   setFilterTypes,
   setFilterCategories,
-  setFilterRange,
+  setFilterInclude,
   setFilterCustomType,
   setFilterTags,
   addFilterTag,

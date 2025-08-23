@@ -1,33 +1,33 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { ExternalLink, Flag, Check, Hash, Cloud, CloudOff, User, ArrowDownToLine, LoaderCircle, ArrowUpFromLine } from "lucide-react";
 import { Badge } from "@/lib/components/badge";
 import { Button } from "@/lib/components/button";
 import { wait } from "@/utils/lazyLoad";
 import { Link } from "@tanstack/react-router";
 import { shorten } from "@/utils/general";
-import { TokenType } from "@/features/alexandrian/types/common";
 import { withdraw_nft } from "@/features/nft/withdraw";
 import { useNftManager } from "@/hooks/actors";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { toast } from "sonner";
-import { useIcpInfo } from "@/features/nft/hooks/useIcpInfo";
 import { setUnlocked as setAlexUnlocked } from "@/features/balance/alex/alexSlice";
 import { setUnlocked as setLbryUnlocked } from "@/features/balance/lbry/lbrySlice";
 import { AlexandrianToken } from "@/features/alexandrian/types";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface IcpInfoProps {
 	token: AlexandrianToken;
 }
 
 const IcpInfo: React.FC<IcpInfoProps> = ({ token }) => {
+	const queryClient = useQueryClient();
+
 	const [copied, setCopied] = useState(false);
 	const [ownerCopied, setOwnerCopied] = useState(false);
 	const [withdrawing, setWithdrawing] = useState(false);
 
 	const { actor: nftManagerActor } = useNftManager();
 	const { user } = useAppSelector((state) => state.auth);
-	const { data, isLoading, error, invalidateQuery } = useIcpInfo(token);
 	const dispatch = useAppDispatch();
 
 	const handleCopyTokenId = async () => {
@@ -47,7 +47,7 @@ const IcpInfo: React.FC<IcpInfoProps> = ({ token }) => {
 	};
 
 	const handleWithdraw = useCallback(async () => {
-		if (!nftManagerActor || !user || withdrawing || !data) return;
+		if (!nftManagerActor || !user || withdrawing) return;
 
 		setWithdrawing(true);
 		try {
@@ -72,15 +72,45 @@ const IcpInfo: React.FC<IcpInfoProps> = ({ token }) => {
 				toast.success(message);
 
 				// Update Redux store balances with withdrawn amounts
-				if (lbryBlock !== null && data.lbry > 0) {
-					dispatch(setLbryUnlocked(data.lbry));
+				if (lbryBlock !== null && token.lbry > 0) {
+					dispatch(setLbryUnlocked(token.lbry));
 				}
-				if (alexBlock !== null && data.alex > 0) {
-					dispatch(setAlexUnlocked(data.alex));
+				if (alexBlock !== null && token.alex > 0) {
+					dispatch(setAlexUnlocked(token.alex));
 				}
 
-				// Invalidate and refetch the ICP info query to update balances
-				invalidateQuery();
+
+				// static reference to token, so we can update its balances directly
+				token.alex = 0;
+				token.lbry = 0;
+
+				// Update query cache to set token balances to zero
+				queryClient.setQueriesData(
+					{ queryKey: ['alexandrian-tokens'], exact: false },
+					(oldData: any) => {
+						if (!oldData) return oldData;
+
+						const updatedTokens = { ...oldData.tokens };
+						if (updatedTokens[token.id]) {
+							updatedTokens[token.id] = {
+								...updatedTokens[token.id],
+								alex: 0,
+								lbry: 0
+							};
+						}
+
+						return {
+							...oldData,
+							tokens: updatedTokens
+						};
+					}
+				);
+
+				// // Invalidate queries to trigger re-render
+				// queryClient.invalidateQueries({
+				// 	queryKey: ['alexandrian-tokens'],
+				// 	exact: false,
+				// });
 			}
 		} catch (error) {
 			console.error("Error withdrawing funds:", error);
@@ -88,33 +118,33 @@ const IcpInfo: React.FC<IcpInfoProps> = ({ token }) => {
 		} finally {
 			setWithdrawing(false);
 		}
-	}, [nftManagerActor, user, withdrawing, data, token.collection, token.id, dispatch, invalidateQuery]);
+	}, [nftManagerActor, user, withdrawing, token, queryClient]);
 
 
-	if (isLoading) {
-		return (
-			<div className="bg-white/80 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/30 rounded-lg p-4 shadow-sm">
-				<div className="flex flex-wrap gap-2 font-roboto-condensed">
-					<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-muted-foreground"></div>
-					<span className="text-sm text-muted-foreground">Loading ICP info...</span>
-				</div>
-			</div>
-		);
-	}
+	// if (isLoading) {
+	// 	return (
+	// 		<div className="bg-white/80 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/30 rounded-lg p-4 shadow-sm">
+	// 			<div className="flex flex-wrap gap-2 font-roboto-condensed">
+	// 				<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-muted-foreground"></div>
+	// 				<span className="text-sm text-muted-foreground">Loading ICP info...</span>
+	// 			</div>
+	// 		</div>
+	// 	);
+	// }
 
-	if (error || !data) {
-		return (
-			<div className="bg-white/80 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/30 rounded-lg p-4 shadow-sm">
-				<div className="flex flex-wrap gap-2 font-roboto-condensed">
-					<span className="text-sm text-red-500">Failed to load ICP info</span>
-				</div>
-			</div>
-		);
-	}
+	// if (error || !data) {
+	// 	return (
+	// 		<div className="bg-white/80 dark:bg-gray-900/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/30 rounded-lg p-4 shadow-sm">
+	// 			<div className="flex flex-wrap gap-2 font-roboto-condensed">
+	// 				<span className="text-sm text-red-500">Failed to load ICP info</span>
+	// 			</div>
+	// 		</div>
+	// 	);
+	// }
 
 	// Check if user is owner and has withdrawable balance
 	const isOwner = user?.principal === token.owner;
-	const hasWithdrawableBalance = data && (data.alex > 0 || data.lbry > 0);
+	const hasWithdrawableBalance = token.alex > 0 || token.lbry > 0;
 	const showWithdrawButton = isOwner && hasWithdrawableBalance;
 
 	return (
@@ -122,11 +152,11 @@ const IcpInfo: React.FC<IcpInfoProps> = ({ token }) => {
 			<div className="bg-muted dark:bg-gray-900/50 backdrop-blur-xl border border-ring rounded-lg p-2 shadow-sm">
 				<div className="flex flex-wrap gap-y-2 gap-x-1">
 				<Badge variant="outline" className="px-2 bg-orange-500/10 text-orange-700 border-orange-500/30 hover:bg-orange-500/20 hover:text-orange-800 transition-colors cursor-default">
-					{data.alex.toFixed(2)} ALEX
+					{token.alex.toFixed(2)} ALEX
 				</Badge>
 
 				<Badge variant="outline" className="px-2 bg-green-500/10 text-green-700 border-green-500/30 hover:bg-green-500/20 hover:text-green-800 transition-colors cursor-default">
-					{data.lbry.toFixed(2)} LBRY
+					{token.lbry.toFixed(2)} LBRY
 				</Badge>
 
 				<Badge variant="outline" className="px-2 flex items-center gap-1 bg-gray-500/10 text-gray-700 border-gray-500/30 hover:bg-gray-500/20 hover:text-gray-800 transition-colors cursor-pointer" onClick={handleCopyTokenId}>
@@ -147,10 +177,10 @@ const IcpInfo: React.FC<IcpInfoProps> = ({ token }) => {
 					</Badge>
 				</Link>
 
-				{data.rank && (
+				{token.rank && (
 					<Badge variant="default" className="px-2 flex items-center gap-1 bg-yellow-500/20 text-yellow-700 border-yellow-500/30 hover:bg-yellow-500/30 hover:text-yellow-800 transition-colors cursor-default">
 						<Flag size={12} className="text-yellow-600" />
-						{`${(data.rank / 100).toFixed(2)}% Rarity`}
+						{`${(token.rank / 100).toFixed(2)}% Rarity`}
 					</Badge>
 				)}
 				</div>

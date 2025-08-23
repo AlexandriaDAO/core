@@ -8,7 +8,7 @@ interface AssetSkeletonProps {
 
 const AssetSkeleton: React.FC<AssetSkeletonProps> = ({ progress }) => {
 	return (
-		<div className="relative min-h-40 h-full w-full bg-muted">
+		<div className="relative min-h-40 md:min-h-48 lg:min-h-52 xl:min-h-60 h-full w-full bg-muted">
 			<Skeleton className="h-full w-full bg-muted" />
 			<div className="absolute inset-0 flex flex-col items-center justify-center">
 				<Loader className="animate-spin text-primary h-8 w-8 mb-3" />
