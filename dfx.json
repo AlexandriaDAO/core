@@ -141,6 +141,10 @@
       "package": "feed",
       "type": "rust",
       "specified_id": "okj2q-daaaa-aaaap-qp2pa-cai"
+    },
+    "orbit_station": {
+      "type": "pull",
+      "id": "fec7w-zyaaa-aaaaa-qaffq-cai"
     }
   },
   "defaults": {

@@ -23,6 +23,7 @@ import { Route as AuthAppEmporiumMyLogsRouteImport } from './routes/_auth/app/em
 import { Route as AuthAppEmporiumMarketLogsRouteImport } from './routes/_auth/app/emporium/market-logs'
 
 const ManagerLazyRouteImport = createFileRoute('/manager')()
+const DaoLazyRouteImport = createFileRoute('/dao')()
 const InfoRouteLazyRouteImport = createFileRoute('/info')()
 const ExchangeRouteLazyRouteImport = createFileRoute('/exchange')()
 const AuthRouteLazyRouteImport = createFileRoute('/_auth')()
@@ -105,6 +106,11 @@ const ManagerLazyRoute = ManagerLazyRouteImport.update({
   path: '/manager',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/manager.lazy').then((d) => d.Route))
+const DaoLazyRoute = DaoLazyRouteImport.update({
+  id: '/dao',
+  path: '/dao',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/dao.lazy').then((d) => d.Route))
 const InfoRouteLazyRoute = InfoRouteLazyRouteImport.update({
   id: '/info',
   path: '/info',
@@ -486,6 +492,7 @@ export interface FileRoutesByFullPath {
   '/update': typeof UpdateRoute
   '/exchange': typeof AuthExchangeRouteLazyRouteWithChildren
   '/info': typeof InfoRouteLazyRouteWithChildren
+  '/dao': typeof DaoLazyRoute
   '/manager': typeof ManagerLazyRoute
   '/app/alexis': typeof AppAlexisRoute
   '/app/permafind': typeof AppPermafindRoute
@@ -541,6 +548,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/update': typeof UpdateRoute
   '/exchange': typeof AuthExchangeIndexLazyRoute
+  '/dao': typeof DaoLazyRoute
   '/manager': typeof ManagerLazyRoute
   '/app/alexis': typeof AppAlexisRoute
   '/app/permafind': typeof AppPermafindRoute
@@ -596,6 +604,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteLazyRouteWithChildren
   '/exchange': typeof ExchangeRouteLazyRouteWithChildren
   '/info': typeof InfoRouteLazyRouteWithChildren
+  '/dao': typeof DaoLazyRoute
   '/manager': typeof ManagerLazyRoute
   '/app/alexis': typeof AppAlexisRoute
   '/app/permafind': typeof AppPermafindRoute
@@ -656,6 +665,7 @@ export interface FileRouteTypes {
     | '/update'
     | '/exchange'
     | '/info'
+    | '/dao'
     | '/manager'
     | '/app/alexis'
     | '/app/permafind'
@@ -711,6 +721,7 @@ export interface FileRouteTypes {
     | '/'
     | '/update'
     | '/exchange'
+    | '/dao'
     | '/manager'
     | '/app/alexis'
     | '/app/permafind'
@@ -765,6 +776,7 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/exchange'
     | '/info'
+    | '/dao'
     | '/manager'
     | '/app/alexis'
     | '/app/permafind'
@@ -825,6 +837,7 @@ export interface RootRouteChildren {
   AuthRouteLazyRoute: typeof AuthRouteLazyRouteWithChildren
   ExchangeRouteLazyRoute: typeof ExchangeRouteLazyRouteWithChildren
   InfoRouteLazyRoute: typeof InfoRouteLazyRouteWithChildren
+  DaoLazyRoute: typeof DaoLazyRoute
   ManagerLazyRoute: typeof ManagerLazyRoute
   AppAlexisRoute: typeof AppAlexisRoute
   AppPermafindRoute: typeof AppPermafindRoute
@@ -861,6 +874,13 @@ declare module '@tanstack/react-router' {
       path: '/manager'
       fullPath: '/manager'
       preLoaderRoute: typeof ManagerLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dao': {
+      id: '/dao'
+      path: '/dao'
+      fullPath: '/dao'
+      preLoaderRoute: typeof DaoLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/info': {
@@ -1404,6 +1424,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteLazyRoute: AuthRouteLazyRouteWithChildren,
   ExchangeRouteLazyRoute: ExchangeRouteLazyRouteWithChildren,
   InfoRouteLazyRoute: InfoRouteLazyRouteWithChildren,
+  DaoLazyRoute: DaoLazyRoute,
   ManagerLazyRoute: ManagerLazyRoute,
   AppAlexisRoute: AppAlexisRoute,
   AppPermafindRoute: AppPermafindRoute,

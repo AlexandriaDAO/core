@@ -297,6 +297,16 @@ cp src/icp_swap_factory/icp_swap_factory.did src/declarations/icp_swap_factory/i
 # Ensure icp_swap_factory declarations are properly generated
 dfx generate icp_swap_factory
 
+# For orbit_station (Alexandria DAO)
+mkdir -p src/orbit_station && export DFX_WARNING=-mainnet_plaintext_identity && dfx canister --network ic metadata fec7w-zyaaa-aaaaa-qaffq-cai candid:service > src/orbit_station/orbit_station.did
+
+# Copy the .did file to declarations directory
+mkdir -p src/declarations/orbit_station
+cp src/orbit_station/orbit_station.did src/declarations/orbit_station/orbit_station.did
+
+# Ensure orbit_station declarations are properly generated
+dfx generate orbit_station
+
 # Verify the .did.js file was generated properly, if not try to fix it
 if [ ! -s "src/declarations/icp_swap_factory/icp_swap_factory.did.js" ] || ! grep -q "export const idlFactory" src/declarations/icp_swap_factory/icp_swap_factory.did.js 2>/dev/null; then
     echo "Warning: icp_swap_factory.did.js was not generated properly, attempting to fix..."
