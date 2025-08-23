@@ -13,8 +13,8 @@ function calculateFilterCount(filters: Filters): number {
 		count++;
 	}
 
-	// Count block range as 1 if different from default (500)
-	if (filters.range !== 500) {
+	// Count block range as 1 if not undefined (default)
+	if (filters.include !== undefined) {
 		count++;
 	}
 
@@ -38,7 +38,7 @@ function calculateDirtyCount(filters: Filters, appliedFilters: Filters): number 
 	}
 
 	// Check block range
-	if (filters.range !== appliedFilters.range) {
+	if (filters.include !== appliedFilters.include) {
 		dirtyCount++;
 	}
 

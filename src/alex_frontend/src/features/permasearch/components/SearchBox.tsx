@@ -27,6 +27,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({ disabled = false, isRefreshing = 
 		dispatch(applyFilters());
 	}, []);
 
+	const handleClearSearch = useCallback(()=>{
+		dispatch(clearQuery());
+
+		dispatch(applyFilters());
+	},[])
+
 	const searchTitle = filters.query.trim().length > 0 && filters.query.trim().length < 43 ? "Search query must be at least 43 characters" : "Search transactions";
 
 	return (
@@ -46,7 +52,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ disabled = false, isRefreshing = 
 				{filters.query && (
 					<button
 						type="button"
-						onClick={()=>dispatch(clearQuery())}
+						onClick={handleClearSearch}
 						className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
 						disabled={disabled}
 						title="Clear search"

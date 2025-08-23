@@ -4,6 +4,7 @@ import useTransactionMetadata from "../../hooks/useTransactionMetadata";
 import Tags from "./Tags";
 import { copyToClipboard, shorten, convertTimestamp } from "@/utils/general";
 import { formatFileSize } from "@/features/pinax/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
 
 interface ArweaveInfoProps {
     // arweave id
@@ -20,9 +21,22 @@ const ArweaveInfo: React.FC<ArweaveInfoProps> = ({ id }) => {
                 {metadata?.timestamp && metadata.timestamp > 0 && (
                     <div className="flex justify-between items-center border-b border-muted-foreground/30 dark:border-muted-foreground/50">
                         <span className="text-sm text-muted-foreground opacity-70">Uploaded</span>
-                        <span className="text-xs text-muted-foreground opacity-70">
-                            {convertTimestamp(metadata.timestamp, 'relative')}
-                        </span>
+                        <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                                <span className="text-xs text-muted-foreground opacity-70">
+                                    {convertTimestamp(metadata.timestamp, 'relative')}
+                                </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" sideOffset={8}>
+                                {new Date(metadata.timestamp * 1000).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
                 )}
 
@@ -37,14 +51,12 @@ const ArweaveInfo: React.FC<ArweaveInfoProps> = ({ id }) => {
                 )}
 
                 {/* Size row */}
-                {metadata?.size && metadata.size > 0 && (
-                    <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground opacity-70">Size</span>
-                        <span className="text-xs text-muted-foreground opacity-70">
-                            {formatFileSize(metadata.size)}
-                        </span>
-                    </div>
-                )}
+                <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground opacity-70">Size</span>
+                    <span className="text-xs text-muted-foreground opacity-70">
+                        {formatFileSize(metadata?.size || 0)}
+                    </span>
+                </div>
             </div>
 
             {metadataLoading ? (

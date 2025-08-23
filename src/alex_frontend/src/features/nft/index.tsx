@@ -19,19 +19,12 @@ interface NftProps {
 }
 
 const Nft: React.FC<NftProps> = ({ id, action, price, token }) => {
-	const {initializing, initError, type} = useInit(id);
-
 	const { safe, setModal} = useNftContext();
 	const [ nsfw, setNsfw] = useState<boolean>(false);
 
-	if(initializing) return <AssetSkeleton />;
-
-	// if(initError) return <Alert variant="warning" title="Asset Error">{initError.message}</Alert>;
-	if(initError) return <Preview icon={<TriangleAlert size={48} className="text-warning"/>} title="Loading Error" description={initError.message}/>
-
 	return (
 		<ErrorBoundary fallback={<Preview title="Asset failed to load" />}>
-			<div onClick={()=>setModal({ id , token})} className="min-h-28 min-w-36 max-w-full place-content-center place-items-center relative inline-block border-2 border-transparent hover:border-info rounded-lg overflow-hidden cursor-pointer group/nft transition-all">
+			<div onClick={()=>setModal({ id , token})} className="min-h-28 min-w-40 max-w-lg place-content-center place-items-center relative inline-block border-2 border-transparent hover:border-info rounded-lg overflow-hidden cursor-pointer group/nft transition-all">
 					{/* NSFW Frosted Glass Overlay */}
 					{safe && nsfw && (
 						<div className="absolute inset-0 z-20 backdrop-blur-lg bg-white/30 dark:bg-black/30 shadow-inner border border-white/40 dark:border-gray-600/40 rounded-md flex items-center justify-center">
@@ -73,7 +66,7 @@ const Nft: React.FC<NftProps> = ({ id, action, price, token }) => {
 						)}
 					</div>
 
-					<AssetCard id={id} type={type} checkNsfw={safe} setIsNsfw={setNsfw} />
+					<AssetCard id={id} checkNsfw={safe} setIsNsfw={setNsfw} />
 				</div>
 		</ErrorBoundary>
 	);

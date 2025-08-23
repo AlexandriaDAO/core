@@ -4,6 +4,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { Button } from "@/lib/components/button";
 import { Shuffle, RotateCcw } from "lucide-react";
 import { setTimestamp } from "../store/slice";
+import { convertTimestamp } from "@/utils/general";
 import { Input } from "@/lib/components/input";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
@@ -18,28 +19,16 @@ const RandomDateSelector: React.FC<RandomDateSelectorProps> = ({ isRefreshing })
 
 	// Timestamp constraints
 	const ARWEAVE_LAUNCH_TIMESTAMP = Math.floor(new Date('2018-06-13T00:00:00Z').getTime() / 1000);
-	const MAX_TIMESTAMP = Math.floor((Date.now() - 60 * 60 * 1000) / 1000); // Current time minus 1 hour
+	const MAX_TIMESTAMP = Math.floor(Date.now() / 1000); // Current time
 
 	// Convert timestamp to datetime-local format for display
 	const timestampToLocalString = (timestamp: number | undefined): string => {
 		if (timestamp === undefined) {
 			// Show current datetime minus 1 hour as default display
-			const defaultDate = new Date(Date.now() - 60 * 60 * 1000);
-			const year = defaultDate.getFullYear();
-			const month = String(defaultDate.getMonth() + 1).padStart(2, '0');
-			const day = String(defaultDate.getDate()).padStart(2, '0');
-			const hours = String(defaultDate.getHours()).padStart(2, '0');
-			const minutes = String(defaultDate.getMinutes()).padStart(2, '0');
-			return `${year}-${month}-${day}T${hours}:${minutes}`;
+			const defaultTimestamp = Math.floor((Date.now() - 60 * 60 * 1000) / 1000);
+			return convertTimestamp(defaultTimestamp, 'local');
 		}
-
-		const date = new Date(timestamp * 1000);
-		const year = date.getFullYear();
-		const month = String(date.getMonth() + 1).padStart(2, '0');
-		const day = String(date.getDate()).padStart(2, '0');
-		const hours = String(date.getHours()).padStart(2, '0');
-		const minutes = String(date.getMinutes()).padStart(2, '0');
-		return `${year}-${month}-${day}T${hours}:${minutes}`;
+		return convertTimestamp(timestamp, 'local');
 	};
 
 	// Convert datetime-local string to timestamp
@@ -65,9 +54,14 @@ const RandomDateSelector: React.FC<RandomDateSelectorProps> = ({ isRefreshing })
 
 	// Handle manual datetime change in input
 	const handleDateTimeChange = (value: string) => {
+		// Handle empty value (when user clicks "Clear" in date picker)
+		if (value === '') {
+			dispatch(setTimestamp(undefined));
+			return;
+		}
 		const timestamp = localStringToTimestamp(value);
 		if (!validateTimestamp(timestamp)) {
-			toast.error("DateTime must be between June 13, 2018 (Arweave launch) and 1 hour ago");
+			toast.error("DateTime must be between June 13, 2018 (Arweave launch) and now");
 			return;
 		}
 		dispatch(setTimestamp(timestamp));

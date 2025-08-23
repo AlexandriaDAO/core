@@ -57,7 +57,7 @@ export const FilterTags: React.FC = () => {
 				</h4>
 
 				{/* App-Name Tags */}
-				<div className="h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md">
+				<div className="h-44 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md">
 					<div className="p-3 space-y-3">
 						<div className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
 							App-Name

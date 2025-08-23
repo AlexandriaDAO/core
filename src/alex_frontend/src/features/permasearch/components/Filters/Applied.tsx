@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import {
 	setFilterTypes,
-	setFilterRange,
+	setFilterInclude,
 	removeFilterTag,
 	applyFilters,
 	toggleSortOrder,
@@ -12,6 +12,7 @@ import {
 import { useInvalidate } from "../../hooks/useInvalidate";
 import { useNftManager } from "@/hooks/actors";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { INCLUDE_PRESETS } from "../../constants/blockRangePresets";
 
 const AppliedFilters: React.FC = () => {
 	const {actor} = useNftManager();
@@ -57,12 +58,12 @@ const AppliedFilters: React.FC = () => {
 	}
 
 
-	if (appliedFilters.range !== 500) {
+	if (appliedFilters.include !== undefined) {
 		activeFilters.push({
-			label: `Block Range: ±${appliedFilters.range}`,
-			key: "range",
+			label: INCLUDE_PRESETS.find(preset => preset.value === appliedFilters.include)?.label || `±${appliedFilters.include} blocks`,
+			key: "include",
 			clear: () => {
-				dispatch(setFilterRange(500)); // Reset to default
+				dispatch(setFilterInclude(undefined));
 				handleApplyChanges();
 			},
 		});

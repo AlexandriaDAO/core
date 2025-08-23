@@ -8,7 +8,7 @@ import type {
 } from "../types";
 import type { ActorSubclass } from "@dfinity/agent";
 import type { _SERVICE } from "../../../../../declarations/nft_manager/nft_manager.did";
-import { estimateBlockHeight, getCurrentBlockHeight } from "../utils";
+import { estimateBlockHeight, fetchBlockHeightForTimestamp, getBlockHeightForTimestamp, getCurrentBlockHeight } from "./blocks";
 
 export const ARWEAVE_GRAPHQL_ENDPOINT = "https://arweave.net/graphql";
 
@@ -98,32 +98,26 @@ export function buildTagFilters(filters: Filters): TagFilter[] {
     return tags;
 }
 
-export async function buildBlockRange(dateRange: { from?: string; to?: string }): Promise<{ min?: number; max?: number }> {
-    if (!dateRange.from && !dateRange.to) {
-        return {};
-    }
+/**
+ * Build block range for GraphQL queries based on timestamp and include parameters
+ *
+ * @param timestamp - Target timestamp to search around (optional)
+ * @param include - Block range size from include to target (optional)
+ * @returns Promise<{min: number, max: number}> - Block range for GraphQL query
+ */
+export async function buildBlockFilters(timestamp?: number, include?: number): Promise<{ min: number; max: number }> {
+    const current = await getCurrentBlockHeight();
 
-    try {
-        const currentBlockHeight = await getCurrentBlockHeight();
-        let minBlock: number | undefined;
-        let maxBlock: number | undefined;
-
-        if (dateRange.from) {
-            const fromDate = new Date(dateRange.from);
-            const fromTimestamp = Math.floor(fromDate.getTime() / 1000);
-            minBlock = estimateBlockHeight(fromTimestamp, currentBlockHeight);
-        }
-
-        if (dateRange.to) {
-            const toDate = new Date(dateRange.to);
-            toDate.setHours(23, 59, 59, 999); // End of day
-            const toTimestamp = Math.floor(toDate.getTime() / 1000);
-            maxBlock = estimateBlockHeight(toTimestamp, currentBlockHeight);
-        }
-
-        return { min: minBlock, max: maxBlock };
-    } catch (error) {
-        console.warn('Failed to build block range from date range:', error);
-        return {};
+	if (timestamp) {
+        const targetBlock = await fetchBlockHeightForTimestamp(timestamp, current);
+        const max = Math.min(current, targetBlock);
+        const min = include ? Math.max(0, targetBlock - include) : 0;
+        console.log("Block range:", { min, max, targetBlock, include });
+        return { min, max };
+    } else {
+        const max = current - 30;
+        const min = include ? Math.max(0, current - include) : 0;
+        console.log("Block range:", { min, max, current, include });
+        return { min, max };
     }
 }

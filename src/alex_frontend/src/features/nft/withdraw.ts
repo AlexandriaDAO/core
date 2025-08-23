@@ -9,7 +9,6 @@ export const withdraw_nft = async (
   mintNumber: string,
   collection?: NftCollection
 ): Promise<[bigint | null, bigint | null]> => {
-  console.log("withdraw_nft called with mintNumber:", mintNumber, "collection:", collection);
   try {
     // Validate and convert mintNumber to bigint
     if (!mintNumber || mintNumber.trim() === '') {

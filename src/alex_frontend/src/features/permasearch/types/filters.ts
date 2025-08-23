@@ -1,14 +1,18 @@
-export interface DateRange {
-	from?: string;
-	to?: string;
+import { Tag } from "@/features/nft/types";
+
+export interface IncludePreset {
+	value: number | undefined;
+	label: string;
+	description: string;
+	info: string;
 }
 
 export interface Filters {
 	types: string[];
 	categories: string[];
-	range: number; // Block range ± from target block (default 500)
+	include: number | undefined;
 	customType: string;
-	tags: Array<{ name: string; value: string }>;
+	tags: Tag[];
 	query: string;
 	timestamp: number | undefined; // Unix timestamp in seconds, undefined for no timestamp filtering
 }

@@ -16,11 +16,12 @@ import { UnauthenticatedWarning } from "@/components/UnauthenticatedWarning";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { AddToShelfButton } from "@/components/AddToShelfButton";
 import NftProvider from "@/components/NftProvider";
+import { PermaSearchEmptyState } from "@/features/permasearch/components/EmptyState";
 
 function PermaFindPage() {
     const { user } = useAppSelector(state => state.auth);
 
-    const { showFilters, safeSearch, continuousScroll } = useAppSelector(state => state.permasearch);
+    const { appliedFilters: {query, timestamp}, showFilters, safeSearch, continuousScroll } = useAppSelector(state => state.permasearch);
 
     const { transactions, isLoading, isLoadingMore, isRefreshing, error, hasNextPage, isEmpty, loadMore, refresh} = useSearch();
 
@@ -35,8 +36,8 @@ function PermaFindPage() {
     });
 
     return (
-        <div className="py-10 px-4 sm:px-6 md:px-10 flex-grow flex justify-center">
-            <div className="max-w-7xl w-full flex flex-col gap-8">
+        <div className="py-10 px-4 flex-grow flex gap-8 flex-col items-center justify-center">
+            <div className="max-w-5xl w-full flex flex-col gap-8">
                 <div className="flex flex-col justify-center items-center gap-6 text-center">
                     <div className="space-y-4">
                         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -59,8 +60,10 @@ function PermaFindPage() {
                 {showFilters && <AdvanceFilters />}
 
                 {error && <Alert variant="danger" title="Error">{error.message}</Alert>}
+            </div>
 
-                <NftProvider loading={isLoading} items={transactions} safe={safeSearch}>
+            <div className="w-full flex flex-col items-center gap-8">
+                <NftProvider loading={isLoading} items={(query || timestamp) ? transactions : transactions.filter(tx=>Number(tx.data.size)>0)} safe={safeSearch} empty={<PermaSearchEmptyState disabled={isLoading || isLoadingMore || isRefreshing} />} >
                     {tx => (
                         <Nft
                             id={tx.id}

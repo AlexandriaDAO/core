@@ -39,7 +39,7 @@ const TextCard: React.FC<AssetProps> = ({ url }) => {
 
     return (
         <>
-            <pre className="truncate font-mono text-xs max-h-80 h-full w-full bg-gray-50 dark:bg-gray-800 p-3 rounded-md border border-input whitespace-break-spaces overflow-hidden">
+            <pre className="truncate font-mono text-xs max-h-80 h-full w-full bg-gray-50 dark:bg-gray-800 p-3 rounded-md border border-input whitespace-break-spaces break-all overflow-hidden">
                 {displayText}
             </pre>
             {isTruncated && (
