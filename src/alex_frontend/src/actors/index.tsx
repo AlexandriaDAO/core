@@ -16,4 +16,3 @@ export { default as PerpetuaActor } from './PerpetuaActor';
 export { default as EmporiumActor } from './EmporiumActor';
 export { default as IcpSwapFactoryActor } from './IcpSwapFactoryActor';
 export { default as LogsActor } from './LogsActor';
-export { default as OrbitStationActor } from './OrbitStationActor';
