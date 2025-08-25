@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { ExternalLink, Flag, Check, Hash, Cloud, CloudOff, User, ArrowDownToLine, LoaderCircle, ArrowUpFromLine } from "lucide-react";
+import UsernameBadge from "@/components/UsernameBadge";
 import { Badge } from "@/lib/components/badge";
 import { Button } from "@/lib/components/button";
 import { wait } from "@/utils/lazyLoad";
@@ -169,6 +170,10 @@ const IcpInfo: React.FC<IcpInfoProps> = ({ token }) => {
 						{ownerCopied ? <Check size={12} /> : <User size={12} />}
 						{ownerCopied ? 'Copied!' : shorten(token.owner, 3, 3)}
 					</Badge>
+				)}
+
+				{token.owner && (
+					<UsernameBadge principal={token.owner} />
 				)}
 
 				<Link to="/nft/$tokenId" params={{ tokenId: token.id }}>

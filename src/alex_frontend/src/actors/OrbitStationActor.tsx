@@ -22,7 +22,9 @@ export default function OrbitStationActor({ children }: { children: ReactNode })
 			context={OrbitStationContext}
 			identity={anonymousIdentity}
 			idlFactory={idlFactory}
-			host="https://ic0.app"
+			httpAgentOptions={{
+				host: process.env.DFX_NETWORK !== 'ic' ? "http://localhost:8080" : "https://ic0.app"
+			}}
 
 			onRequest={(data: InterceptorRequestData) => {
 				console.log("[OrbitStationActor] Request:", data);

@@ -23,11 +23,11 @@ export async function fetchSearchResults({ query, filters, sortOrder, cursor, ac
 
 	const queryStr = query ?
 		`query GetTransactions($after: String, $tags: [TagFilter!], $owners: [String!], $ids: [ID!]) {
-			byOwners: transactions(first: 24, sort: ${sortOrder}, after: $after, tags: $tags, owners: $owners, ${blockFilter}) { ${transactionFields} }
-			byIds: transactions(first: 24, sort: ${sortOrder}, after: $after, tags: $tags, ids: $ids, ${blockFilter}) { ${transactionFields} }
+			byOwners: transactions(first: 100, sort: ${sortOrder}, after: $after, tags: $tags, owners: $owners, ${blockFilter}) { ${transactionFields} }
+			byIds: transactions(first: 100, sort: ${sortOrder}, after: $after, tags: $tags, ids: $ids, ${blockFilter}) { ${transactionFields} }
 		}` :
 		`query GetTransactions($after: String, $tags: [TagFilter!]) {
-			transactions(first: 24, sort: ${sortOrder}, after: $after, tags: $tags, ${blockFilter}) { ${transactionFields} }
+			transactions(first: 100, sort: ${sortOrder}, after: $after, tags: $tags, ${blockFilter}) { ${transactionFields} }
 		}`;
 
 	const response = await fetch(ARWEAVE_GRAPHQL_ENDPOINT, {
