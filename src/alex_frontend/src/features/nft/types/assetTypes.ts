@@ -10,12 +10,7 @@ export interface AssetProps {
 	url: string;
 }
 
-export interface NsfwAssetProps extends AssetProps {
-	checkNsfw: boolean;
-	setIsNsfw: (isNsfw: boolean) => void;
-}
-
-export interface VideoAssetProps extends NsfwAssetProps {
+export interface VideoAssetProps extends AssetProps {
 	contentType: string;
 }
 

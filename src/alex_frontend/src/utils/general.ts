@@ -37,7 +37,7 @@ export const convertTimestamp = (timestamp: bigint | number, format: 'iso' | 're
             // Format: "May 15, 2025 at 2:30 PM"
             return date.toLocaleDateString('en-US', { 
                 year: 'numeric', 
-                month: 'short', 
+                month: 'long', 
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'

@@ -9,7 +9,7 @@ const initialState: AlexandrianState = {
 	selectedUser: null, // null means "Most Recent"
 	collectionType: "NFT",
 	sortOrder: "newest",
-	safe: true,
+	safe: false,
 
 	// Pagination
 	page: 0,

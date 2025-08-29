@@ -33,3 +33,7 @@ export interface TagFilter {
 	values: string[];
 }
 
+export interface BlockFilter {
+	min: number;
+	max: number;
+}

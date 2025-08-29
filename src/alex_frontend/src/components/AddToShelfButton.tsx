@@ -9,6 +9,8 @@ import {
 	ChevronsUpDown,
 	X,
 	LoaderPinwheel,
+	RefreshCw,
+	RotateCw,
 } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
@@ -56,6 +58,7 @@ import { useTagData } from "@/apps/app/Perpetua/features/tags/hooks/useTagData";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { Principal } from "@dfinity/principal";
 import { toast } from "sonner";
+import { AddShelfButton } from "./AddShelfButton";
 
 type SearchMode = "mySignedIn" | "publicByTag" | "publicByUser";
 
@@ -334,7 +337,7 @@ export function AddToShelfButton({ item, variant = "outline", scale = "sm", clas
 						</DialogDescription>
 					</DialogHeader>
 
-					<div className="space-y-4">
+					<div className="space-y-4 max-w-full overflow-x-hidden">
 						{/* Mode switching tabs */}
 						<div className="flex gap-1">
 							<Button
@@ -385,8 +388,8 @@ export function AddToShelfButton({ item, variant = "outline", scale = "sm", clas
 
 						{/* My Shelves Mode */}
 						{searchMode === "mySignedIn" && (
-							<>
-								<div className="relative">
+							<div className="flex items-stretch gap-2">
+								<div className="flex-grow relative">
 									<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 									<Input
 										placeholder="Search your shelves..."
@@ -399,7 +402,16 @@ export function AddToShelfButton({ item, variant = "outline", scale = "sm", clas
 										className="pl-10"
 									/>
 								</div>
-							</>
+								<Button
+									type="button"
+									variant="outline"
+									onClick={loadMyShelves}
+									disabled={isCurrentlyLoading}
+								>
+									<RotateCw className={`${isCurrentlyLoading ? 'animate-spin':''}`} />
+								</Button>
+
+							</div>
 						)}
 
 						{/* Public By Tags Mode */}
@@ -621,7 +633,7 @@ export function AddToShelfButton({ item, variant = "outline", scale = "sm", clas
 								currentShelves.map((shelf) => (
 									<div
 										key={shelf.shelf_id}
-										className="flex items-center space-x-2 p-2 border rounded-lg hover:bg-accent"
+										className="flex items-start space-x-2 p-2 border rounded-lg hover:bg-accent"
 									>
 										<Checkbox
 											id={shelf.shelf_id}
@@ -633,33 +645,27 @@ export function AddToShelfButton({ item, variant = "outline", scale = "sm", clas
 													shelf.shelf_id
 												)
 											}
+											className="mt-0.5"
 										/>
 										<Label
 											htmlFor={shelf.shelf_id}
-											className="flex-1 cursor-pointer"
+											className="flex-grow max-w-full flex-col gap-0 items-start cursor-pointer"
 										>
-											<div>
-												<p className="font-medium text-sm">
-													{shelf.title}
-												</p>
-												{shelf.description &&
-													shelf.description.length >
-														0 && (
-														<p className="text-xs text-muted-foreground">
-															{
-																shelf
-																	.description[0]
-															}
-														</p>
-													)}
-												<p className="text-xs text-muted-foreground">
-													by{" "}
-													{shelf.owner
-														.toString()
-														.slice(0, 8)}
-													...
-												</p>
-											</div>
+											<span className="font-medium text-sm">
+												{shelf.title}
+											</span>
+											{shelf.description &&
+												shelf.description.length >
+													0 && (
+													<span className="text-xs text-muted-foreground ">{shelf.description[0]}</span>
+												)}
+											{/* <p className="text-xs text-muted-foreground">
+												by{" "}
+												{shelf.owner
+													.toString()
+													.slice(0, 8)}
+												...
+											</p> */}
 										</Label>
 									</div>
 								))
@@ -677,18 +683,10 @@ export function AddToShelfButton({ item, variant = "outline", scale = "sm", clas
 					</div>
 
 					<DialogFooter>
-						<Button
-							variant="outline"
-							onClick={() => setIsOpen(false)}
-							disabled={isLoading}
-						>
-							Cancel
-						</Button>
+						{searchMode === "mySignedIn" && <AddShelfButton />}
 						<Button
 							onClick={handleAddToShelves}
-							disabled={
-								isLoading || selectedShelfIds.length === 0
-							}
+							disabled={isLoading || selectedShelfIds.length === 0}
 						>
 							{isLoading ? (
 								<>

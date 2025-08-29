@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { Button } from "@/lib/components/button";
-import { Shuffle, RotateCcw } from "lucide-react";
+import { Shuffle, Calendar } from "lucide-react";
 import { setTimestamp } from "../store/slice";
 import { convertTimestamp } from "@/utils/general";
 import { Input } from "@/lib/components/input";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface RandomDateSelectorProps {
 	isRefreshing: boolean;
@@ -15,7 +16,9 @@ interface RandomDateSelectorProps {
 
 const RandomDateSelector: React.FC<RandomDateSelectorProps> = ({ isRefreshing }) => {
 	const dispatch = useAppDispatch();
+	const {theme} = useTheme();
 	const { filters } = useAppSelector(state => state.permasearch);
+	const dateTimeInputRef = useRef<HTMLInputElement>(null);
 
 	// Timestamp constraints
 	const ARWEAVE_LAUNCH_TIMESTAMP = Math.floor(new Date('2018-06-13T00:00:00Z').getTime() / 1000);
@@ -41,9 +44,11 @@ const RandomDateSelector: React.FC<RandomDateSelectorProps> = ({ isRefreshing })
 		return timestamp >= ARWEAVE_LAUNCH_TIMESTAMP && timestamp <= MAX_TIMESTAMP;
 	};
 
-	// Reset to default timestamp (undefined)
-	const resetTimestamp = () => {
-		dispatch(setTimestamp(undefined));
+	// Trigger datetime picker
+	const openDateTimePicker = () => {
+		if (dateTimeInputRef.current) {
+			dateTimeInputRef.current.showPicker();
+		}
 	};
 
 	// Generate random timestamp
@@ -68,45 +73,8 @@ const RandomDateSelector: React.FC<RandomDateSelectorProps> = ({ isRefreshing })
 	};
 
 	return (
-		<div className="relative flex items-stretch">
-			{/* Reset Button - Left Side */}
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						type="button"
-						variant="muted"
-						scale="icon"
-						rounded="full"
-						onClick={resetTimestamp}
-						disabled={isRefreshing || !filters.timestamp}
-						className="p-0 absolute left-2 top-1/2 transform -translate-y-1/2 z-10"
-					>
-						<RotateCcw size={20} />
-					</Button>
-				</TooltipTrigger>
-				<TooltipContent side="left" sideOffset={8}>
-					<p>Reset to default time (1 hour ago)</p>
-				</TooltipContent>
-			</Tooltip>
-
-			{/* DateTime Input */}
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Input
-						scale="sm"
-						type="datetime-local"
-						value={timestampToLocalString(filters.timestamp)}
-						onChange={(e) => handleDateTimeChange(e.target.value)}
-						onClick={(e)=>e.currentTarget.showPicker()}
-						className="h-10 px-6 cursor-pointer text-center [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-local-picker-indicator]:hidden"
-					/>
-				</TooltipTrigger>
-				<TooltipContent side="top" sideOffset={0}>
-					<p>Click to select date & time for search</p>
-				</TooltipContent>
-			</Tooltip>
-
-			{/* Random Button - Right Side */}
+		<div className="relative flex items-center">
+			{/* Random Button - Left Side */}
 			<Tooltip>
 				<TooltipTrigger asChild>
 					<Button
@@ -116,15 +84,32 @@ const RandomDateSelector: React.FC<RandomDateSelectorProps> = ({ isRefreshing })
 						rounded="full"
 						onClick={generateRandomDateTime}
 						disabled={isRefreshing}
-						className="p-0 absolute right-2 top-1/2 transform -translate-y-1/2 z-10"
+						className="absolute left-1 z-10"
 					>
-						<Shuffle size={20} />
+						<Shuffle size={16} />
 					</Button>
 				</TooltipTrigger>
-				<TooltipContent side="right" sideOffset={8}>
-					<p>Generate random date & time</p>
-				</TooltipContent>
+				<TooltipContent side="left" sideOffset={8}>Generate random date & time</TooltipContent>
 			</Tooltip>
+
+			{/* DateTime Input */}
+			<Input
+				variant="default"
+				scale="default"
+				rounded="md"
+				ref={dateTimeInputRef}
+				type="datetime-local"
+				value={timestampToLocalString(filters.timestamp)}
+				onChange={(e) => handleDateTimeChange(e.target.value)}
+				min={ARWEAVE_LAUNCH_TIMESTAMP}
+				max={MAX_TIMESTAMP}
+				className="text-muted-foreground dark:text-white h-10 pl-6 cursor-pointer text-center 
+					[&::-webkit-calendar-picker-indicator]:cursor-pointer 
+					[&::-webkit-calendar-picker-indicator]:opacity-60 
+					[&::-webkit-calendar-picker-indicator]:mr-2"
+				style={{ colorScheme: theme }}
+				title="Select date and time"
+			/>
 		</div>
 	);
 };

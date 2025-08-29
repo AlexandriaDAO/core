@@ -4,7 +4,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { Alert } from "@/components/Alert";
 import FilterBar from "@/features/marketplace/components/FilterBar";
 import { setPage, setPageSize, setSafe } from "@/features/marketplace/marketplaceSlice";
-import Nft from "@/features/nft";
+import {NFTCard} from "@/features/nft";
 import Purchase from "@/features/marketplace/actions/Purchase";
 import { PaginationControls } from "@/features/marketplace/components/PaginationControls";
 import { UnauthenticatedWarning } from "@/components/UnauthenticatedWarning";
@@ -78,7 +78,7 @@ const EmporiumPage = () => {
 				safe={safe}
 			>
 				{(nft) => (
-					<Nft
+					<NFTCard
 						key={nft.arweave_id}
 						id={nft.arweave_id}
 						action={

@@ -11,7 +11,7 @@ import { setPage } from "@/features/alexandrian/alexandrianSlice";
 import useTokens from "@/features/alexandrian/hooks/useTokens";
 
 // Components
-import Nft from "@/features/nft";
+import { NFTCard } from "@/features/nft";
 import { FilterBar, PaginationControls } from "@/features/alexandrian/components";
 import { MintButton, SellButton } from "@/features/alexandrian/actions";
 import NftProvider from "@/components/NftProvider";
@@ -68,7 +68,7 @@ function AlexisPage() {
             <div className="w-full flex flex-col items-center gap-8">
 				<NftProvider loading={loading} items={Object.values(tokens)} safe={safe}>
 					{token => (
-						<Nft
+						<NFTCard
 							id={token.arweaveId}
 							action={
 								user && <>

@@ -6,23 +6,33 @@ import AssetSkeleton from "@/layouts/skeletons/emporium/components/AssetSkeleton
 import useAssetLoading from "../../../hooks/useAssetLoading";
 import { VideoAssetProps } from "../../../types/assetTypes";
 import useVideoAnalysis from "@/features/nft/hooks/useVideoAnalysis";
+import { useNftContext } from "@/components/NftProvider";
 
-const VideoCard: React.FC<VideoAssetProps> = ({ url, contentType, checkNsfw, setIsNsfw }) => {
+const VideoCard: React.FC<VideoAssetProps> = ({ url, contentType }) => {
 	const { loading, setLoading, error, setError } = useAssetLoading(url);
-	const { nsfw, analyzing } = useVideoAnalysis(url, checkNsfw);
 
-	// Update parent component when NSFW analysis completes
-	useEffect(() => {
-		if (!analyzing && nsfw) {
-			setIsNsfw(nsfw);
-		}
-	}, [nsfw, analyzing, setIsNsfw]);
+	const { safe } = useNftContext();
+
+	const { nsfw } = useVideoAnalysis(url, safe);
 
 	if (error) return <Preview icon={<Video size={48} />} title="Loading Error" description={error || 'Unable to load Video'} />;
 
 	return (
 		<>
+			{/* NSFW Frosted Glass Overlay */}
+			{safe && nsfw && (
+				<div className="absolute inset-0 z-20 backdrop-blur-lg bg-white/30 dark:bg-black/30 shadow-inner border border-white/40 dark:border-gray-600/40 rounded-md flex items-center justify-center">
+					<div className="bg-white/90 dark:bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg border border-white/60 dark:border-gray-500/60">
+						<div className="text-gray-800 dark:text-gray-200 text-xs font-medium flex items-center gap-2">
+							<div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+							Content Filtered
+						</div>
+					</div>
+				</div>
+			)}
+
 			{loading && <AssetSkeleton />}
+
 			<div className={`relative w-full h-full bg-black/5 rounded-md overflow-hidden group ${loading ? 'hidden' : ''}`}>
 				<video
 					className="w-full h-full object-cover max-w-full max-h-[19rem]"

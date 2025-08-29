@@ -19,7 +19,7 @@ const TextModal: React.FC<AssetProps> = ({ url }) => {
     const scrollClasses = "overflow-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400";
 
     return (
-        <pre className={`relative p-2 w-full h-full font-mono text-xs bg-gray-50 dark:bg-gray-800 rounded-lg border border-border/30 whitespace-break-spaces break-all ${scrollClasses}`}>
+        <pre className={`p-2 w-full h-full font-mono text-xs whitespace-break-spaces break-all ${scrollClasses}`}>
             {data}
         </pre>
     )
