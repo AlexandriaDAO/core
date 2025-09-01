@@ -4,7 +4,8 @@ import type {
 	CanisterResponse,
 	CanisterMintedResult,
 	TagFilter,
-	Filters
+	Filters,
+	BlockFilter
 } from "../types";
 import type { ActorSubclass } from "@dfinity/agent";
 import type { _SERVICE } from "../../../../../declarations/nft_manager/nft_manager.did";
@@ -105,7 +106,7 @@ export function buildTagFilters(filters: Filters): TagFilter[] {
  * @param include - Block range size from include to target (optional)
  * @returns Promise<{min: number, max: number}> - Block range for GraphQL query
  */
-export async function buildBlockFilters(timestamp?: number, include?: number): Promise<{ min: number; max: number }> {
+export async function buildBlockFilters(timestamp?: number, include?: number): Promise<BlockFilter> {
     const current = await getCurrentBlockHeight();
 
 	if (timestamp) {

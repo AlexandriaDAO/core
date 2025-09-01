@@ -6,10 +6,9 @@ import {ImageCard} from "../Image";
 import Preview from "../Preview";
 import { BookIcon } from "lucide-react";
 
-// NEW: Import our shared types
-import { NsfwAssetProps } from "../../../types/assetTypes";
+import { AssetProps } from "../../../types/assetTypes";
 
-const BookCard: React.FC<NsfwAssetProps> = ({ url, checkNsfw, setIsNsfw }) => {
+const BookCard: React.FC<AssetProps> = ({ url }) => {
     const { data: cover, error, isLoading } = useQuery({
         queryKey: ['epub-cover', url],
         queryFn: () => getCover(url),
@@ -33,7 +32,7 @@ const BookCard: React.FC<NsfwAssetProps> = ({ url, checkNsfw, setIsNsfw }) => {
     }
 
     // Cover is available - show it (cover is guaranteed to be string here)
-    return <ImageCard url={cover} checkNsfw={checkNsfw} setIsNsfw={setIsNsfw} />;
+    return <ImageCard url={cover} />;
 };
 
 export default BookCard;

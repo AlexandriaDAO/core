@@ -5,12 +5,14 @@ import { setFilterInclude, applyFilters } from "../store/slice";
 import { useInvalidate } from "../hooks/useInvalidate";
 import { INCLUDE_PRESETS } from "../constants/blockRangePresets";
 import { Button } from "@/lib/components/button";
+import { convertTimestamp } from "@/utils/general";
 
 interface PermaSearchEmptyStateProps {
+	title?: string;
 	disabled?: boolean;
 }
 
-export const PermaSearchEmptyState: React.FC<PermaSearchEmptyStateProps> = ({disabled = false}) => {
+export const PermaSearchEmptyState: React.FC<PermaSearchEmptyStateProps> = ({title, disabled = false}) => {
 	const dispatch = useAppDispatch();
 	const { appliedFilters } = useAppSelector(state => state.permasearch);
 	const invalidate = useInvalidate();
@@ -35,13 +37,12 @@ export const PermaSearchEmptyState: React.FC<PermaSearchEmptyStateProps> = ({dis
 
 	return (
 		<div className="text-center py-12 max-w-md mx-auto">
-			<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-				No Results Found
-			</h3>
+			{title &&<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{title}</h3>}
 
 			<div className="text-sm text-gray-600 dark:text-gray-400 mb-6">
 				<p>Try expanding your search range to find more results.</p>
-				<p className="mt-2">Including Previous: <span className="font-medium">{INCLUDE_PRESETS.find(p => p.value === appliedFilters.include)?.label}</span></p>
+				<p className="mt-2">Including Data from Previous: <span className="font-bold text-info">{INCLUDE_PRESETS.find(p => p.value === appliedFilters.include)?.label}</span></p>
+				{appliedFilters.timestamp && <p className="mt-2">Before: <span className="font-bold text-info">{convertTimestamp(appliedFilters.timestamp , 'readable')}</span></p>}
 			</div>
 
 			{
@@ -52,6 +53,7 @@ export const PermaSearchEmptyState: React.FC<PermaSearchEmptyStateProps> = ({dis
 							<Button
 								onClick={increaseRange}
 								variant="link"
+								scale="sm"
 								disabled={disabled}
 								className="flex-1 sm:flex-initial"
 							>
@@ -62,6 +64,7 @@ export const PermaSearchEmptyState: React.FC<PermaSearchEmptyStateProps> = ({dis
 						<Button
 							onClick={removeRange}
 							variant="link"
+							scale="sm"
 							disabled={disabled}
 							className="flex-1 sm:flex-initial"
 						>

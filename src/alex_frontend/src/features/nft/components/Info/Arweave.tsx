@@ -28,13 +28,7 @@ const ArweaveInfo: React.FC<ArweaveInfoProps> = ({ id }) => {
                                 </span>
                             </TooltipTrigger>
                             <TooltipContent side="right" sideOffset={8}>
-                                {new Date(metadata.timestamp * 1000).toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                })}
+                                {convertTimestamp(metadata.timestamp, 'readable')}
                             </TooltipContent>
                         </Tooltip>
                     </div>

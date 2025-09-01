@@ -1,7 +1,7 @@
 import React from "react";
 import { LoaderPinwheel } from "lucide-react";
 import { Alert } from "@/components/Alert";
-import Nft from "@/features/nft";
+import { NFTCard } from "@/features/nft";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import {
     FilterBar,
@@ -32,7 +32,7 @@ function PermaFindPage() {
         isLoading: isLoading || isLoadingMore,
         loadMore,
         threshold: 0.1,
-        rootMargin: '200px',
+        rootMargin: '2000px',
     });
 
     return (
@@ -63,9 +63,14 @@ function PermaFindPage() {
             </div>
 
             <div className="w-full flex flex-col items-center gap-8">
-                <NftProvider loading={isLoading} items={(query || timestamp) ? transactions : transactions.filter(tx=>Number(tx.data.size)>0)} safe={safeSearch} empty={<PermaSearchEmptyState disabled={isLoading || isLoadingMore || isRefreshing} />} >
+                <NftProvider
+                    safe={safeSearch}
+                    loading={isLoading}
+                    empty={<PermaSearchEmptyState title="No Results Found" disabled={isLoading || isLoadingMore || isRefreshing} />}
+                    items={(query || timestamp) ? transactions : transactions.filter(tx=>Number(tx.data.size)>0)}
+                >
                     {tx => (
-                        <Nft
+                        <NFTCard
                             id={tx.id}
                             action={
                                 user && <>
@@ -89,27 +94,14 @@ function PermaFindPage() {
                                 {isLoadingMore && (
                                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                                         <LoaderPinwheel className="h-4 w-4 animate-spin" />
-                                        Loading results...
+                                        Fetching Transactions...
                                     </div>
                                 )}
                             </div>
                         )}
 
                         {/* Fallback for when there are no more results */}
-                        {!hasNextPage && !isEmpty && (
-                            <div className="flex flex-col items-center justify-center py-12 space-y-3">
-                                <div className="text-center space-y-1">
-                                    <p className="text-base font-medium text-gray-900 dark:text-gray-100">
-                                        That's all for now!
-                                    </p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {transactions.length > 0
-                                            ? `Showing all ${transactions.length} result${transactions.length === 1 ? "" : "s"}`
-                                            : "No more results to load"}
-                                    </p>
-                                </div>
-                            </div>
-                        )}
+                        {!hasNextPage && !isEmpty && <PermaSearchEmptyState title={`${transactions.length > 0 ? "That's all for now!" : "No more results to load"}`} disabled={isLoading || isLoadingMore || isRefreshing} /> }
                     </>
                 ) : (
                     /* Load More Button */
