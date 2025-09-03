@@ -18,7 +18,7 @@ import { AddToShelfButton } from "@/components/AddToShelfButton";
 import NftProvider from "@/components/NftProvider";
 import { PermaSearchEmptyState } from "@/features/permasearch/components/EmptyState";
 
-function PermaFindPage() {
+function PermaSearchPage() {
     const { user } = useAppSelector(state => state.auth);
 
     const { appliedFilters: {query, timestamp}, showFilters, safeSearch, continuousScroll } = useAppSelector(state => state.permasearch);
@@ -41,7 +41,7 @@ function PermaFindPage() {
                 <div className="flex flex-col justify-center items-center gap-6 text-center">
                     <div className="space-y-4">
                         <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                            PermaFind
+                            PermaSearch
                         </h1>
                         <div className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-4xl mx-auto">
 							<p> Discover and mint NFTs from Arweave's permanent storage network. </p>
@@ -119,4 +119,4 @@ function PermaFindPage() {
     );
 }
 
-export default PermaFindPage;
+export default PermaSearchPage;

@@ -16,8 +16,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SwapTransactionRouteImport } from './routes/swap/transaction'
 import { Route as NftTokenIdRouteImport } from './routes/nft.$tokenId'
 import { Route as ExchangeInsightsRouteImport } from './routes/exchange/insights'
-import { Route as AppPermafindRouteImport } from './routes/app/permafind'
-import { Route as AppAlexisRouteImport } from './routes/app/alexis'
+import { Route as AppPermasearchRouteImport } from './routes/app/permasearch'
+import { Route as AppAlexandrianRouteImport } from './routes/app/alexandrian'
 import { Route as AuthAppEmporiumIndexRouteImport } from './routes/_auth/app/emporium/index'
 import { Route as AuthAppEmporiumMyLogsRouteImport } from './routes/_auth/app/emporium/my-logs'
 import { Route as AuthAppEmporiumMarketLogsRouteImport } from './routes/_auth/app/emporium/market-logs'
@@ -45,10 +45,14 @@ const ExchangeStakeLazyRouteImport = createFileRoute('/exchange/stake')()
 const ExchangeRedeemLazyRouteImport = createFileRoute('/exchange/redeem')()
 const ExchangeHistoryLazyRouteImport = createFileRoute('/exchange/history')()
 const AppSyllogosLazyRouteImport = createFileRoute('/app/syllogos')()
-const AppPermasearchLazyRouteImport = createFileRoute('/app/permasearch')()
+const AppLegacy_permasearchLazyRouteImport = createFileRoute(
+  '/app/legacy_permasearch',
+)()
+const AppLegacy_alexandrianLazyRouteImport = createFileRoute(
+  '/app/legacy_alexandrian',
+)()
 const AppDialecticaLazyRouteImport = createFileRoute('/app/dialectica')()
 const AppBibliothecaLazyRouteImport = createFileRoute('/app/bibliotheca')()
-const AppAlexandrianLazyRouteImport = createFileRoute('/app/alexandrian')()
 const AuthExchangeRouteLazyRouteImport = createFileRoute('/_auth/exchange')()
 const AuthDashboardRouteLazyRouteImport = createFileRoute('/_auth/dashboard')()
 const AppPerpetuaIndexLazyRouteImport = createFileRoute('/app/perpetua/')()
@@ -234,13 +238,22 @@ const AppSyllogosLazyRoute = AppSyllogosLazyRouteImport.update({
   path: '/app/syllogos',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/app/syllogos.lazy').then((d) => d.Route))
-const AppPermasearchLazyRoute = AppPermasearchLazyRouteImport.update({
-  id: '/app/permasearch',
-  path: '/app/permasearch',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() =>
-  import('./routes/app/permasearch.lazy').then((d) => d.Route),
-)
+const AppLegacy_permasearchLazyRoute =
+  AppLegacy_permasearchLazyRouteImport.update({
+    id: '/app/legacy_permasearch',
+    path: '/app/legacy_permasearch',
+    getParentRoute: () => rootRouteImport,
+  } as any).lazy(() =>
+    import('./routes/app/legacy_permasearch.lazy').then((d) => d.Route),
+  )
+const AppLegacy_alexandrianLazyRoute =
+  AppLegacy_alexandrianLazyRouteImport.update({
+    id: '/app/legacy_alexandrian',
+    path: '/app/legacy_alexandrian',
+    getParentRoute: () => rootRouteImport,
+  } as any).lazy(() =>
+    import('./routes/app/legacy_alexandrian.lazy').then((d) => d.Route),
+  )
 const AppDialecticaLazyRoute = AppDialecticaLazyRouteImport.update({
   id: '/app/dialectica',
   path: '/app/dialectica',
@@ -254,13 +267,6 @@ const AppBibliothecaLazyRoute = AppBibliothecaLazyRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/app/bibliotheca.lazy').then((d) => d.Route),
-)
-const AppAlexandrianLazyRoute = AppAlexandrianLazyRouteImport.update({
-  id: '/app/alexandrian',
-  path: '/app/alexandrian',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() =>
-  import('./routes/app/alexandrian.lazy').then((d) => d.Route),
 )
 const AuthExchangeRouteLazyRoute = AuthExchangeRouteLazyRouteImport.update({
   id: '/exchange',
@@ -295,16 +301,20 @@ const ExchangeInsightsRoute = ExchangeInsightsRouteImport.update({
 } as any).lazy(() =>
   import('./routes/exchange/insights.lazy').then((d) => d.Route),
 )
-const AppPermafindRoute = AppPermafindRouteImport.update({
-  id: '/app/permafind',
-  path: '/app/permafind',
+const AppPermasearchRoute = AppPermasearchRouteImport.update({
+  id: '/app/permasearch',
+  path: '/app/permasearch',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/app/permafind.lazy').then((d) => d.Route))
-const AppAlexisRoute = AppAlexisRouteImport.update({
-  id: '/app/alexis',
-  path: '/app/alexis',
+} as any).lazy(() =>
+  import('./routes/app/permasearch.lazy').then((d) => d.Route),
+)
+const AppAlexandrianRoute = AppAlexandrianRouteImport.update({
+  id: '/app/alexandrian',
+  path: '/app/alexandrian',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/app/alexis.lazy').then((d) => d.Route))
+} as any).lazy(() =>
+  import('./routes/app/alexandrian.lazy').then((d) => d.Route),
+)
 const AppPerpetuaIndexLazyRoute = AppPerpetuaIndexLazyRouteImport.update({
   id: '/app/perpetua/',
   path: '/app/perpetua/',
@@ -487,16 +497,16 @@ export interface FileRoutesByFullPath {
   '/exchange': typeof AuthExchangeRouteLazyRouteWithChildren
   '/info': typeof InfoRouteLazyRouteWithChildren
   '/manager': typeof ManagerLazyRoute
-  '/app/alexis': typeof AppAlexisRoute
-  '/app/permafind': typeof AppPermafindRoute
+  '/app/alexandrian': typeof AppAlexandrianRoute
+  '/app/permasearch': typeof AppPermasearchRoute
   '/exchange/insights': typeof ExchangeInsightsRoute
   '/nft/$tokenId': typeof NftTokenIdRoute
   '/swap/transaction': typeof SwapTransactionRoute
   '/dashboard': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
-  '/app/alexandrian': typeof AppAlexandrianLazyRoute
   '/app/bibliotheca': typeof AppBibliothecaLazyRoute
   '/app/dialectica': typeof AppDialecticaLazyRoute
-  '/app/permasearch': typeof AppPermasearchLazyRoute
+  '/app/legacy_alexandrian': typeof AppLegacy_alexandrianLazyRoute
+  '/app/legacy_permasearch': typeof AppLegacy_permasearchLazyRoute
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
   '/exchange/redeem': typeof ExchangeRedeemLazyRoute
@@ -542,16 +552,16 @@ export interface FileRoutesByTo {
   '/update': typeof UpdateRoute
   '/exchange': typeof AuthExchangeIndexLazyRoute
   '/manager': typeof ManagerLazyRoute
-  '/app/alexis': typeof AppAlexisRoute
-  '/app/permafind': typeof AppPermafindRoute
+  '/app/alexandrian': typeof AppAlexandrianRoute
+  '/app/permasearch': typeof AppPermasearchRoute
   '/exchange/insights': typeof ExchangeInsightsRoute
   '/nft/$tokenId': typeof NftTokenIdRoute
   '/swap/transaction': typeof SwapTransactionRoute
   '/dashboard': typeof AuthDashboardLibrarianIndexLazyRoute
-  '/app/alexandrian': typeof AppAlexandrianLazyRoute
   '/app/bibliotheca': typeof AppBibliothecaLazyRoute
   '/app/dialectica': typeof AppDialecticaLazyRoute
-  '/app/permasearch': typeof AppPermasearchLazyRoute
+  '/app/legacy_alexandrian': typeof AppLegacy_alexandrianLazyRoute
+  '/app/legacy_permasearch': typeof AppLegacy_permasearchLazyRoute
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
   '/exchange/redeem': typeof ExchangeRedeemLazyRoute
@@ -597,17 +607,17 @@ export interface FileRoutesById {
   '/exchange': typeof ExchangeRouteLazyRouteWithChildren
   '/info': typeof InfoRouteLazyRouteWithChildren
   '/manager': typeof ManagerLazyRoute
-  '/app/alexis': typeof AppAlexisRoute
-  '/app/permafind': typeof AppPermafindRoute
+  '/app/alexandrian': typeof AppAlexandrianRoute
+  '/app/permasearch': typeof AppPermasearchRoute
   '/exchange/insights': typeof ExchangeInsightsRoute
   '/nft/$tokenId': typeof NftTokenIdRoute
   '/swap/transaction': typeof SwapTransactionRoute
   '/_auth/dashboard': typeof AuthDashboardRouteLazyRouteWithChildren
   '/_auth/exchange': typeof AuthExchangeRouteLazyRouteWithChildren
-  '/app/alexandrian': typeof AppAlexandrianLazyRoute
   '/app/bibliotheca': typeof AppBibliothecaLazyRoute
   '/app/dialectica': typeof AppDialecticaLazyRoute
-  '/app/permasearch': typeof AppPermasearchLazyRoute
+  '/app/legacy_alexandrian': typeof AppLegacy_alexandrianLazyRoute
+  '/app/legacy_permasearch': typeof AppLegacy_permasearchLazyRoute
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
   '/exchange/redeem': typeof ExchangeRedeemLazyRoute
@@ -657,16 +667,16 @@ export interface FileRouteTypes {
     | '/exchange'
     | '/info'
     | '/manager'
-    | '/app/alexis'
-    | '/app/permafind'
+    | '/app/alexandrian'
+    | '/app/permasearch'
     | '/exchange/insights'
     | '/nft/$tokenId'
     | '/swap/transaction'
     | '/dashboard'
-    | '/app/alexandrian'
     | '/app/bibliotheca'
     | '/app/dialectica'
-    | '/app/permasearch'
+    | '/app/legacy_alexandrian'
+    | '/app/legacy_permasearch'
     | '/app/syllogos'
     | '/exchange/history'
     | '/exchange/redeem'
@@ -712,16 +722,16 @@ export interface FileRouteTypes {
     | '/update'
     | '/exchange'
     | '/manager'
-    | '/app/alexis'
-    | '/app/permafind'
+    | '/app/alexandrian'
+    | '/app/permasearch'
     | '/exchange/insights'
     | '/nft/$tokenId'
     | '/swap/transaction'
     | '/dashboard'
-    | '/app/alexandrian'
     | '/app/bibliotheca'
     | '/app/dialectica'
-    | '/app/permasearch'
+    | '/app/legacy_alexandrian'
+    | '/app/legacy_permasearch'
     | '/app/syllogos'
     | '/exchange/history'
     | '/exchange/redeem'
@@ -766,17 +776,17 @@ export interface FileRouteTypes {
     | '/exchange'
     | '/info'
     | '/manager'
-    | '/app/alexis'
-    | '/app/permafind'
+    | '/app/alexandrian'
+    | '/app/permasearch'
     | '/exchange/insights'
     | '/nft/$tokenId'
     | '/swap/transaction'
     | '/_auth/dashboard'
     | '/_auth/exchange'
-    | '/app/alexandrian'
     | '/app/bibliotheca'
     | '/app/dialectica'
-    | '/app/permasearch'
+    | '/app/legacy_alexandrian'
+    | '/app/legacy_permasearch'
     | '/app/syllogos'
     | '/exchange/history'
     | '/exchange/redeem'
@@ -826,14 +836,14 @@ export interface RootRouteChildren {
   ExchangeRouteLazyRoute: typeof ExchangeRouteLazyRouteWithChildren
   InfoRouteLazyRoute: typeof InfoRouteLazyRouteWithChildren
   ManagerLazyRoute: typeof ManagerLazyRoute
-  AppAlexisRoute: typeof AppAlexisRoute
-  AppPermafindRoute: typeof AppPermafindRoute
+  AppAlexandrianRoute: typeof AppAlexandrianRoute
+  AppPermasearchRoute: typeof AppPermasearchRoute
   NftTokenIdRoute: typeof NftTokenIdRoute
   SwapTransactionRoute: typeof SwapTransactionRoute
-  AppAlexandrianLazyRoute: typeof AppAlexandrianLazyRoute
   AppBibliothecaLazyRoute: typeof AppBibliothecaLazyRoute
   AppDialecticaLazyRoute: typeof AppDialecticaLazyRoute
-  AppPermasearchLazyRoute: typeof AppPermasearchLazyRoute
+  AppLegacy_alexandrianLazyRoute: typeof AppLegacy_alexandrianLazyRoute
+  AppLegacy_permasearchLazyRoute: typeof AppLegacy_permasearchLazyRoute
   AppSyllogosLazyRoute: typeof AppSyllogosLazyRoute
   SwapBalanceLazyRoute: typeof SwapBalanceLazyRoute
   SwapBurnLazyRoute: typeof SwapBurnLazyRoute
@@ -1031,11 +1041,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSyllogosLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/permasearch': {
-      id: '/app/permasearch'
-      path: '/app/permasearch'
-      fullPath: '/app/permasearch'
-      preLoaderRoute: typeof AppPermasearchLazyRouteImport
+    '/app/legacy_permasearch': {
+      id: '/app/legacy_permasearch'
+      path: '/app/legacy_permasearch'
+      fullPath: '/app/legacy_permasearch'
+      preLoaderRoute: typeof AppLegacy_permasearchLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/legacy_alexandrian': {
+      id: '/app/legacy_alexandrian'
+      path: '/app/legacy_alexandrian'
+      fullPath: '/app/legacy_alexandrian'
+      preLoaderRoute: typeof AppLegacy_alexandrianLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/dialectica': {
@@ -1050,13 +1067,6 @@ declare module '@tanstack/react-router' {
       path: '/app/bibliotheca'
       fullPath: '/app/bibliotheca'
       preLoaderRoute: typeof AppBibliothecaLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/alexandrian': {
-      id: '/app/alexandrian'
-      path: '/app/alexandrian'
-      fullPath: '/app/alexandrian'
-      preLoaderRoute: typeof AppAlexandrianLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/exchange': {
@@ -1094,18 +1104,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExchangeInsightsRouteImport
       parentRoute: typeof ExchangeRouteLazyRoute
     }
-    '/app/permafind': {
-      id: '/app/permafind'
-      path: '/app/permafind'
-      fullPath: '/app/permafind'
-      preLoaderRoute: typeof AppPermafindRouteImport
+    '/app/permasearch': {
+      id: '/app/permasearch'
+      path: '/app/permasearch'
+      fullPath: '/app/permasearch'
+      preLoaderRoute: typeof AppPermasearchRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/alexis': {
-      id: '/app/alexis'
-      path: '/app/alexis'
-      fullPath: '/app/alexis'
-      preLoaderRoute: typeof AppAlexisRouteImport
+    '/app/alexandrian': {
+      id: '/app/alexandrian'
+      path: '/app/alexandrian'
+      fullPath: '/app/alexandrian'
+      preLoaderRoute: typeof AppAlexandrianRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/perpetua/': {
@@ -1405,14 +1415,14 @@ const rootRouteChildren: RootRouteChildren = {
   ExchangeRouteLazyRoute: ExchangeRouteLazyRouteWithChildren,
   InfoRouteLazyRoute: InfoRouteLazyRouteWithChildren,
   ManagerLazyRoute: ManagerLazyRoute,
-  AppAlexisRoute: AppAlexisRoute,
-  AppPermafindRoute: AppPermafindRoute,
+  AppAlexandrianRoute: AppAlexandrianRoute,
+  AppPermasearchRoute: AppPermasearchRoute,
   NftTokenIdRoute: NftTokenIdRoute,
   SwapTransactionRoute: SwapTransactionRoute,
-  AppAlexandrianLazyRoute: AppAlexandrianLazyRoute,
   AppBibliothecaLazyRoute: AppBibliothecaLazyRoute,
   AppDialecticaLazyRoute: AppDialecticaLazyRoute,
-  AppPermasearchLazyRoute: AppPermasearchLazyRoute,
+  AppLegacy_alexandrianLazyRoute: AppLegacy_alexandrianLazyRoute,
+  AppLegacy_permasearchLazyRoute: AppLegacy_permasearchLazyRoute,
   AppSyllogosLazyRoute: AppSyllogosLazyRoute,
   SwapBalanceLazyRoute: SwapBalanceLazyRoute,
   SwapBurnLazyRoute: SwapBurnLazyRoute,

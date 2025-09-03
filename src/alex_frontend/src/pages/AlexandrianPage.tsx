@@ -24,7 +24,7 @@ import { Check, LoaderPinwheel } from "lucide-react";
 // zdcg2-dqaaa-aaaap-qpnha-cai
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 
-function AlexisPage() {
+function AlexandrianPage() {
 	const dispatch = useAppDispatch();
 	const {tokens, totalPages, totalItems, loading, updating, error, refresh } = useTokens();
 
@@ -119,4 +119,4 @@ function AlexisPage() {
 	);
 }
 
-export default AlexisPage;
+export default AlexandrianPage;
