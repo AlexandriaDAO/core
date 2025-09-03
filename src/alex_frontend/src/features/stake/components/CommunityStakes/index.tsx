@@ -7,9 +7,13 @@ import getStakers from "../../thunks/getStakers";
 import getYield from "../../thunks/getYield";
 import getStaked from "../../thunks/getStaked";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import fetchIcpPrice from "@/features/icp-ledger/thunks/getIcpPrice";
+import fetchAlexPrice from "@/features/balance/alex/thunks/price";
+import { useIcpSwapFactory } from "@/hooks/actors";
 
 const CommunityStakes: React.FC = () => {
     const dispatch = useAppDispatch();
+    const {actor} = useIcpSwapFactory();
 
     const {stake} = useAppSelector(state=>state.stake)
 
@@ -17,7 +21,9 @@ const CommunityStakes: React.FC = () => {
         dispatch(getStakers());
         dispatch(getStaked());
         dispatch(getYield());
-    }, [stake]);
+        dispatch(fetchIcpPrice());
+        dispatch(fetchAlexPrice());
+    }, [stake, actor]);
 
     return (
         <div className={`stake-info flex flex-col gap-5`}>

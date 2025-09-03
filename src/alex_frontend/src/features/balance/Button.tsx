@@ -51,7 +51,7 @@ const BalanceButton = () => {
 
         dispatch(fetchUnlockedAlex());
         dispatch(fetchLockedAlex());
-        if(actor) dispatch(fetchAlexPrice(actor));
+        dispatch(fetchAlexPrice());
 
         dispatch(fetchUnlockedLbry());
         dispatch(fetchLockedLbry());

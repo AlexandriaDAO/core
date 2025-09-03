@@ -21,8 +21,8 @@ const AlexUnlockedBalance: React.FC<AlexUnlockedBalanceProps> = ({ menu }) => {
 
   const handleRefresh = useCallback(() => {
     dispatch(fetchUnlockedAlex());
-    if(actor) dispatch(fetchAlexPrice(actor));
-  }, [actor]);
+    dispatch(fetchAlexPrice());
+  }, []);
 
   if (menu) {
     return (

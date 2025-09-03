@@ -19,7 +19,7 @@ import {
 } from "@/lib/components/dropdown-menu";
 import getAlexSpendingBalance from '@/features/swap/thunks/alexIcrc/getAlexSpendingBalance';
 import getIcpPrice from '@/features/icp-ledger/thunks/getIcpPrice';
-import getAlexPrice from '@/features/swap/thunks/alexIcrc/getAlexPrice';
+import fetchAlexPrice from '@/features/balance/alex/thunks/price';
 import getSpendingBalance from '@/features/swap/thunks/lbryIcrc/getSpendingBalance';
 
 const BalanceDisplay: React.FC = () => {
@@ -67,7 +67,7 @@ const BalanceDisplay: React.FC = () => {
 
         dispatch(getIcpPrice());
         if (!icpSwapFactory) return;
-        dispatch(getAlexPrice(icpSwapFactory))
+        dispatch(fetchAlexPrice())
     }, [dispatch, user, icpLedgerActor, alexActor, lbryActor, nftManagerActor, icpSwapFactory]);
 
 
@@ -86,7 +86,7 @@ const BalanceDisplay: React.FC = () => {
     useEffect(() => {
         dispatch(getIcpPrice());
         if (!icpSwapFactory) return;
-        dispatch(getAlexPrice(icpSwapFactory))
+        dispatch(fetchAlexPrice())
     }, [icpSwapFactory]);
 
 

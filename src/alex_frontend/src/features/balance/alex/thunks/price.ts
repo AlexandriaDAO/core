@@ -1,16 +1,14 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-
-import { _SERVICE } from '../../../../../../declarations/icp_swap_factory/icp_swap_factory.did';
-import { ActorSubclass } from '@dfinity/agent';
+import { icp_swap_factory } from '../../../../../../declarations/icp_swap_factory';
 
 // ALEX token canister ID
 const ALEX_TOKEN_ID = 'ysy5f-2qaaa-aaaap-qkmmq-cai';
 
 const price = createAsyncThunk<
 	number,
-	ActorSubclass<_SERVICE>,
+	void,
 	{ rejectValue: string }
->('balance/alex/price', async (icp_swap_factory, { rejectWithValue }) => {
+>('balance/alex/price', async (_, { rejectWithValue }) => {
 	try {
 		// Skip price fetching in local development
 		if (process.env.DFX_NETWORK === 'local') {

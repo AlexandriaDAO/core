@@ -3,7 +3,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
 import React, { useEffect, useState } from "react";
-import getAlexPrice from "../../thunks/alexIcrc/getAlexPrice";
+import fetchAlexPrice from "@/features/balance/alex/thunks/price";
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import { toast } from "sonner";
 import { useAlex, useIcpSwapFactory } from "@/hooks/actors";
@@ -25,11 +25,11 @@ const AlexBalanceCard = () => {
     useEffect(() => {
         if(!icpSwapFactoryActor) return;
         try {
-            dispatch(getAlexPrice(icpSwapFactoryActor))
+            dispatch(fetchAlexPrice())
         } catch (error) {
             console.error("Failed to get ALEX price:", error);
         }
-    }, [icpSwapFactoryActor])
+    }, [])
 
     useEffect(() => {
         setAlexBalUsd(Number(alex.alexBal) * Number(alex.alexPriceUsd));

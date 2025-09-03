@@ -53,7 +53,6 @@ I think it'd be cool to
 
 XWKa-Q2gppignoX_Ngs7VJYZPN_yhiy1ToovQ1NBMFs
 NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
-8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I 09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)

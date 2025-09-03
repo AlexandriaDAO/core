@@ -8,9 +8,9 @@ const getIcpPrice = createAsyncThunk<
 >("icp_swap/getIcpPrice", async (_, { rejectWithValue }) => {
   try {
     const ratio = await icp_swap.get_current_LBRY_ratio();
-    // The ratio is returned as a BigInt, so we need to convert it to a number.
-    // The ratio is scaled by 10^8, so we divide by 10^8 to get the actual ratio.
-    return Number(ratio) / 1e8;
+    // The ratio is returned as LBRY tokens per ICP (e.g., 478 LBRY per ICP).
+    // Convert to USD: LBRY count * $0.01 per LBRY token.
+    return Number(ratio) * 0.01;
   } catch (error) {
     console.error("Failed to get ICP price:", error);
 

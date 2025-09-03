@@ -4,6 +4,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
+import fetchAlexPrice from "@/features/balance/alex/thunks/price";
 import { flagHandler } from "../../swapSlice";
 import stakeAlex from "../../thunks/stakeAlex";
 import StakedInfo from "./stakeInfo";
@@ -66,15 +67,25 @@ const StakeContent = () => {
         const estimatedRewardIcp = Number(swap.totalStaked) * swap.averageAPY;
         const stakedUsd = Number(swap.totalStaked) * Number(alex.alexPriceUsd);
 
+        console.log('[StakeContent] APY Calculation:', {
+            totalStaked: swap.totalStaked,
+            averageAPY: swap.averageAPY,
+            alexPriceUsd: alex.alexPriceUsd,
+            icpPrice: icpLedger.icpPrice,
+            estimatedRewardIcp,
+            stakedUsd,
+            calculation: stakedUsd > 0 ? ((estimatedRewardIcp * Number(icpLedger.icpPrice)) / stakedUsd) * 100 : 'N/A'
+        });
+
         // Check if `stakedUsd` is valid before dividing
-        if (stakedUsd > 0) {
+        if (stakedUsd > 0 && estimatedRewardIcp > 0) {
             const hourlyAprPercentage = ((estimatedRewardIcp * Number(icpLedger.icpPrice)) / stakedUsd) * 100;
             const annualAprPercentage = hourlyAprPercentage * 24 * 365; // Convert hourly to annual
             setApr(hourlyAprPercentage.toFixed(4) + "%");
             setAnnualizedApr(annualAprPercentage.toFixed(2) + "%");
         } else {
-            setApr(''); // Fallback value if division by zero
-            setAnnualizedApr('');
+            setApr('0.0000%'); // Show 0 instead of empty
+            setAnnualizedApr('0.00%');
         }
     }, [alex.alexPriceUsd, icpLedger.icpPrice, swap.averageAPY, swap.stakeInfo.stakedAlex]);
 
@@ -83,6 +94,7 @@ const StakeContent = () => {
         if (!user || !actorAlex) return;
 
         dispatch(getAccountAlexBalance({actor: actorAlex, account: user.principal}))
+        dispatch(fetchAlexPrice());
     }, [user, actorAlex])
 
     useEffect(() => {

@@ -4,6 +4,7 @@ const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default:
 const LbryActor = lazy(() => import("@/actors").then(module => ({ default: module.LbryActor })));
 const AlexActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexActor })));
 const IcpSwapActor = lazy(() => import("@/actors").then(module => ({ default: module.IcpSwapActor })));
+const IcpSwapFactoryActor = lazy(() => import("@/actors").then(module => ({ default: module.IcpSwapFactoryActor })));
 const TokenomicsActor = lazy(() => import("@/actors").then(module => ({ default: module.TokenomicsActor })));
 const IcpLedgerActor = lazy(() => import("@/actors").then(module => ({ default: module.IcpLedgerActor })));
 const LogsActor = lazy(() => import("@/actors").then(module => ({ default: module.LogsActor })));
