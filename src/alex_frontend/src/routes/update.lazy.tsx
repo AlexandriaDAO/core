@@ -9,14 +9,6 @@ export const Route = createLazyFileRoute("/update")({
 function UpdatePage() {
 	return (
 		<div className="p-10 flex-grow flex flex-col gap-4 justify-center items-start">
-			<Link className="hover:text-info dark:text-info-foreground dark:hover:text-info" to="/app/alexis">Alexandrian {"("}/app/alexis{")"}</Link>
-			<Link className="hover:text-info dark:text-info-foreground dark:hover:text-info" to="/app/permafind">PermaSearch {"("}/app/permafind{")"}</Link>
-			<Link className="hover:text-info dark:text-info-foreground dark:hover:text-info" to="/app/emporium">Emporium {"("}/app/emporium{")"}</Link>
-			<div className="flex flex-col gap-1 ml-4">
-				<Link className="hover:text-info dark:text-info-foreground dark:hover:text-info" to="/app/emporium/my-logs">Emporium/My Logs  {"("}/app/emporium/my-logs{") (Auth Required)"}</Link>
-				<Link className="hover:text-info dark:text-info-foreground dark:hover:text-info" to="/app/emporium/market-logs">Emporium/Market Logs  {"("}/app/emporium/market-logs{")"}</Link>
-			</div>
-
 			<Link className="hover:text-info dark:text-info-foreground dark:hover:text-info" to="/exchange">Exchange {"("}/exchange{") (Auth Required)"}</Link>
 			<div className="flex flex-col gap-1 ml-4">
 				<Link className="hover:text-info dark:text-info-foreground dark:hover:text-info" to="/exchange/insights">Exchange/Insights {"("}/exchange/insights{")"}</Link>

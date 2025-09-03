@@ -1,14 +1,18 @@
 import React from 'react'
 import { createLazyFileRoute } from '@tanstack/react-router'
-import Alexandrian from '@/apps/app/Alexandrian'
-import { LbryActor, NftManagerActor, PerpetuaActor } from '@/actors'
+import { EmporiumActor, Icrc7Actor, LbryActor, NftManagerActor, PerpetuaActor } from '@/actors'
+import AlexandrianPage from '@/pages/AlexandrianPage'
 
 export const Route = createLazyFileRoute('/app/alexandrian')({
   component: ()=>(
     <PerpetuaActor>
       <LbryActor>
         <NftManagerActor>
-          <Alexandrian />
+          <EmporiumActor>
+            <Icrc7Actor>
+              <AlexandrianPage />
+            </Icrc7Actor>
+          </EmporiumActor>
         </NftManagerActor>
       </LbryActor>
     </PerpetuaActor>
