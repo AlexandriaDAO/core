@@ -26,7 +26,7 @@ const initialState: MarketplaceState = {
 	editing: '',
 	unlisting: '',
 	purchasing: '',
-	safe: true,
+	safe: false,
 	selectedUser: undefined,
 	searchTerm: undefined,
 	sortBy: "Time",

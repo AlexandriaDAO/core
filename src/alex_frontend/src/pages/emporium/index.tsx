@@ -3,7 +3,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { Alert } from "@/components/Alert";
 import FilterBar from "@/features/marketplace/components/FilterBar";
-import { setPage, setPageSize, setSafe } from "@/features/marketplace/marketplaceSlice";
+import { setPage, setPageSize } from "@/features/marketplace/marketplaceSlice";
 import {NFTCard} from "@/features/nft";
 import Purchase from "@/features/marketplace/actions/Purchase";
 import { PaginationControls } from "@/features/marketplace/components/PaginationControls";
@@ -12,13 +12,11 @@ import TopupBalanceWarning from "@/components/TopupBalanceWarning";
 import { useListing } from "@/features/marketplace/hooks";
 import Remove from "@/features/marketplace/actions/Remove";
 import Update from "@/features/marketplace/actions/Update";
-import SafeSearchToggle from "@/components/SafeSearchToggle";
 import NftProvider from "@/components/NftProvider";
 
 const EmporiumPage = () => {
 	const dispatch = useAppDispatch();
-	const { user, canisters } = useAppSelector((state) => state.auth);
-	const { safe } = useAppSelector((state) => state.marketplace);
+	const { user } = useAppSelector((state) => state.auth);
 
 	// Fetch data using TanStack Query
 	const { data, isLoading, isFetching, error, refresh, isEmpty } = useListing();
@@ -49,16 +47,12 @@ const EmporiumPage = () => {
 
 			<TopupBalanceWarning minimumBalance={15} />
 
-			<div className="space-y-3 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-lg shadow-lg border">
-				<div className="flex flex-col md:flex-row justify-between items-center gap-4">
-					<div className="text-sm text-muted-foreground">
-						Each action burns 20 LBRY tokens.
-					</div>
-					{/* <div className="flex flex-wrap items-center gap-4"> */}
-					<SafeSearchToggle enabled={safe} setEnabled={() => dispatch(setSafe(!safe))} />
-					{/* </div> */}
+			<div className="flex flex-col md:flex-row justify-between items-center gap-4">
+				<div className="text-sm text-muted-foreground">
+					Each action burns 20 LBRY tokens.
 				</div>
-
+			</div>
+			<div className="space-y-3 p-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-lg shadow-lg border">
 				<FilterBar onRefresh={refresh} disabled={disabled} />
 
 				{data && data.total_pages > 1 && (
@@ -75,7 +69,7 @@ const EmporiumPage = () => {
 			<NftProvider
 				loading={isLoading}
 				items={data?.nfts || []}
-				safe={safe}
+				safe={false}
 			>
 				{(nft) => (
 					<NFTCard
