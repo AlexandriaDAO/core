@@ -14,6 +14,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UpdateRouteImport } from './routes/update'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SwapTransactionRouteImport } from './routes/swap/transaction'
+import { Route as SwapInsightsRouteImport } from './routes/swap/insights'
 import { Route as NftTokenIdRouteImport } from './routes/nft.$tokenId'
 import { Route as ExchangeInsightsRouteImport } from './routes/exchange/insights'
 import { Route as AppPermasearchRouteImport } from './routes/app/permasearch'
@@ -34,7 +35,6 @@ const SwapStakeLazyRouteImport = createFileRoute('/swap/stake')()
 const SwapSendLazyRouteImport = createFileRoute('/swap/send')()
 const SwapRedeemLazyRouteImport = createFileRoute('/swap/redeem')()
 const SwapReceiveLazyRouteImport = createFileRoute('/swap/receive')()
-const SwapInsightsLazyRouteImport = createFileRoute('/swap/insights')()
 const SwapHistoryLazyRouteImport = createFileRoute('/swap/history')()
 const SwapBurnLazyRouteImport = createFileRoute('/swap/burn')()
 const SwapBalanceLazyRouteImport = createFileRoute('/swap/balance')()
@@ -175,11 +175,6 @@ const SwapReceiveLazyRoute = SwapReceiveLazyRouteImport.update({
   path: '/swap/receive',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/swap/receive.lazy').then((d) => d.Route))
-const SwapInsightsLazyRoute = SwapInsightsLazyRouteImport.update({
-  id: '/swap/insights',
-  path: '/swap/insights',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/swap/insights.lazy').then((d) => d.Route))
 const SwapHistoryLazyRoute = SwapHistoryLazyRouteImport.update({
   id: '/swap/history',
   path: '/swap/history',
@@ -289,6 +284,11 @@ const SwapTransactionRoute = SwapTransactionRouteImport.update({
 } as any).lazy(() =>
   import('./routes/swap/transaction.lazy').then((d) => d.Route),
 )
+const SwapInsightsRoute = SwapInsightsRouteImport.update({
+  id: '/swap/insights',
+  path: '/swap/insights',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/swap/insights.lazy').then((d) => d.Route))
 const NftTokenIdRoute = NftTokenIdRouteImport.update({
   id: '/nft/$tokenId',
   path: '/nft/$tokenId',
@@ -501,6 +501,7 @@ export interface FileRoutesByFullPath {
   '/app/permasearch': typeof AppPermasearchRoute
   '/exchange/insights': typeof ExchangeInsightsRoute
   '/nft/$tokenId': typeof NftTokenIdRoute
+  '/swap/insights': typeof SwapInsightsRoute
   '/swap/transaction': typeof SwapTransactionRoute
   '/dashboard': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   '/app/bibliotheca': typeof AppBibliothecaLazyRoute
@@ -517,7 +518,6 @@ export interface FileRoutesByFullPath {
   '/swap/balance': typeof SwapBalanceLazyRoute
   '/swap/burn': typeof SwapBurnLazyRoute
   '/swap/history': typeof SwapHistoryLazyRoute
-  '/swap/insights': typeof SwapInsightsLazyRoute
   '/swap/receive': typeof SwapReceiveLazyRoute
   '/swap/redeem': typeof SwapRedeemLazyRoute
   '/swap/send': typeof SwapSendLazyRoute
@@ -556,6 +556,7 @@ export interface FileRoutesByTo {
   '/app/permasearch': typeof AppPermasearchRoute
   '/exchange/insights': typeof ExchangeInsightsRoute
   '/nft/$tokenId': typeof NftTokenIdRoute
+  '/swap/insights': typeof SwapInsightsRoute
   '/swap/transaction': typeof SwapTransactionRoute
   '/dashboard': typeof AuthDashboardLibrarianIndexLazyRoute
   '/app/bibliotheca': typeof AppBibliothecaLazyRoute
@@ -572,7 +573,6 @@ export interface FileRoutesByTo {
   '/swap/balance': typeof SwapBalanceLazyRoute
   '/swap/burn': typeof SwapBurnLazyRoute
   '/swap/history': typeof SwapHistoryLazyRoute
-  '/swap/insights': typeof SwapInsightsLazyRoute
   '/swap/receive': typeof SwapReceiveLazyRoute
   '/swap/redeem': typeof SwapRedeemLazyRoute
   '/swap/send': typeof SwapSendLazyRoute
@@ -611,6 +611,7 @@ export interface FileRoutesById {
   '/app/permasearch': typeof AppPermasearchRoute
   '/exchange/insights': typeof ExchangeInsightsRoute
   '/nft/$tokenId': typeof NftTokenIdRoute
+  '/swap/insights': typeof SwapInsightsRoute
   '/swap/transaction': typeof SwapTransactionRoute
   '/_auth/dashboard': typeof AuthDashboardRouteLazyRouteWithChildren
   '/_auth/exchange': typeof AuthExchangeRouteLazyRouteWithChildren
@@ -628,7 +629,6 @@ export interface FileRoutesById {
   '/swap/balance': typeof SwapBalanceLazyRoute
   '/swap/burn': typeof SwapBurnLazyRoute
   '/swap/history': typeof SwapHistoryLazyRoute
-  '/swap/insights': typeof SwapInsightsLazyRoute
   '/swap/receive': typeof SwapReceiveLazyRoute
   '/swap/redeem': typeof SwapRedeemLazyRoute
   '/swap/send': typeof SwapSendLazyRoute
@@ -671,6 +671,7 @@ export interface FileRouteTypes {
     | '/app/permasearch'
     | '/exchange/insights'
     | '/nft/$tokenId'
+    | '/swap/insights'
     | '/swap/transaction'
     | '/dashboard'
     | '/app/bibliotheca'
@@ -687,7 +688,6 @@ export interface FileRouteTypes {
     | '/swap/balance'
     | '/swap/burn'
     | '/swap/history'
-    | '/swap/insights'
     | '/swap/receive'
     | '/swap/redeem'
     | '/swap/send'
@@ -726,6 +726,7 @@ export interface FileRouteTypes {
     | '/app/permasearch'
     | '/exchange/insights'
     | '/nft/$tokenId'
+    | '/swap/insights'
     | '/swap/transaction'
     | '/dashboard'
     | '/app/bibliotheca'
@@ -742,7 +743,6 @@ export interface FileRouteTypes {
     | '/swap/balance'
     | '/swap/burn'
     | '/swap/history'
-    | '/swap/insights'
     | '/swap/receive'
     | '/swap/redeem'
     | '/swap/send'
@@ -780,6 +780,7 @@ export interface FileRouteTypes {
     | '/app/permasearch'
     | '/exchange/insights'
     | '/nft/$tokenId'
+    | '/swap/insights'
     | '/swap/transaction'
     | '/_auth/dashboard'
     | '/_auth/exchange'
@@ -797,7 +798,6 @@ export interface FileRouteTypes {
     | '/swap/balance'
     | '/swap/burn'
     | '/swap/history'
-    | '/swap/insights'
     | '/swap/receive'
     | '/swap/redeem'
     | '/swap/send'
@@ -839,6 +839,7 @@ export interface RootRouteChildren {
   AppAlexandrianRoute: typeof AppAlexandrianRoute
   AppPermasearchRoute: typeof AppPermasearchRoute
   NftTokenIdRoute: typeof NftTokenIdRoute
+  SwapInsightsRoute: typeof SwapInsightsRoute
   SwapTransactionRoute: typeof SwapTransactionRoute
   AppBibliothecaLazyRoute: typeof AppBibliothecaLazyRoute
   AppDialecticaLazyRoute: typeof AppDialecticaLazyRoute
@@ -848,7 +849,6 @@ export interface RootRouteChildren {
   SwapBalanceLazyRoute: typeof SwapBalanceLazyRoute
   SwapBurnLazyRoute: typeof SwapBurnLazyRoute
   SwapHistoryLazyRoute: typeof SwapHistoryLazyRoute
-  SwapInsightsLazyRoute: typeof SwapInsightsLazyRoute
   SwapReceiveLazyRoute: typeof SwapReceiveLazyRoute
   SwapRedeemLazyRoute: typeof SwapRedeemLazyRoute
   SwapSendLazyRoute: typeof SwapSendLazyRoute
@@ -962,13 +962,6 @@ declare module '@tanstack/react-router' {
       path: '/swap/receive'
       fullPath: '/swap/receive'
       preLoaderRoute: typeof SwapReceiveLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/swap/insights': {
-      id: '/swap/insights'
-      path: '/swap/insights'
-      fullPath: '/swap/insights'
-      preLoaderRoute: typeof SwapInsightsLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/swap/history': {
@@ -1088,6 +1081,13 @@ declare module '@tanstack/react-router' {
       path: '/swap/transaction'
       fullPath: '/swap/transaction'
       preLoaderRoute: typeof SwapTransactionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap/insights': {
+      id: '/swap/insights'
+      path: '/swap/insights'
+      fullPath: '/swap/insights'
+      preLoaderRoute: typeof SwapInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/nft/$tokenId': {
@@ -1418,6 +1418,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppAlexandrianRoute: AppAlexandrianRoute,
   AppPermasearchRoute: AppPermasearchRoute,
   NftTokenIdRoute: NftTokenIdRoute,
+  SwapInsightsRoute: SwapInsightsRoute,
   SwapTransactionRoute: SwapTransactionRoute,
   AppBibliothecaLazyRoute: AppBibliothecaLazyRoute,
   AppDialecticaLazyRoute: AppDialecticaLazyRoute,
@@ -1427,7 +1428,6 @@ const rootRouteChildren: RootRouteChildren = {
   SwapBalanceLazyRoute: SwapBalanceLazyRoute,
   SwapBurnLazyRoute: SwapBurnLazyRoute,
   SwapHistoryLazyRoute: SwapHistoryLazyRoute,
-  SwapInsightsLazyRoute: SwapInsightsLazyRoute,
   SwapReceiveLazyRoute: SwapReceiveLazyRoute,
   SwapRedeemLazyRoute: SwapRedeemLazyRoute,
   SwapSendLazyRoute: SwapSendLazyRoute,

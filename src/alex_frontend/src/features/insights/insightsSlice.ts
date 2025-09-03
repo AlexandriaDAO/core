@@ -10,6 +10,7 @@ export interface ChartDataPoint {
   stakerCount: number;
   alexRate: number;
   totalLbryBurn: number;
+  rewardRate: number; // ICP rewards per ALEX per hour (scaled)
 }
 
 export interface InsightsState {
