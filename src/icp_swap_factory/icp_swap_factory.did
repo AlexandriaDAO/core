@@ -46,13 +46,6 @@ type Transaction =
    token1Standard: text;
    token1Symbol: text;
  };
-type Token = record {arbitrary_data: text;};
-type StreamingStrategy = variant {Callback: CallbackStrategy;};
-type StreamingCallbackHttpResponse = 
- record {
-   body: blob;
-   token: opt Token;
- };
 type PublicTokenOverview = 
  record {
    address: text;
@@ -103,31 +96,6 @@ type NatResult =
    err: text;
    ok: nat;
  };
-type HttpResponse = 
- record {
-   body: blob;
-   headers: vec HeaderField;
-   status_code: nat16;
-   streaming_strategy: opt StreamingStrategy;
-   upgrade: opt bool;
- };
-type HttpRequest = 
- record {
-   body: blob;
-   headers: vec HeaderField;
-   method: text;
-   url: text;
- };
-type HeaderField = 
- record {
-   text;
-   text;
- };
-type CallbackStrategy = 
- record {
-   callback: func (Token) -> (StreamingCallbackHttpResponse) query;
-   token: Token;
- };
 type Address = text;
 service : {
   addInvalidPoolIds: (vec text) -> ();
@@ -167,7 +135,6 @@ service : {
                                  text;
                                  nat;
                                }) query;
-  http_request: (HttpRequest) -> (HttpResponse) query;
   insert: (Transaction) -> ();
   poolMapping: () -> (vec record {
                             text;
