@@ -4,6 +4,7 @@ import { ActorSubclass } from "@dfinity/agent/lib/cjs";
 import { _SERVICE as _SERVICE_LBRY } from "../../../../../../declarations/LBRY/LBRY.did";
 import { _SERVICE as _SERVICE_SWAP } from "../../../../../../declarations/icp_swap/icp_swap.did";
 import { RootState } from "@/store";
+import { getErrorMessage } from "@/features/swap/utlis/erorrs";
 
 const burn = createAsyncThunk<
   void,
@@ -63,7 +64,7 @@ const burn = createAsyncThunk<
       if ("Ok" in result) {
         return;
       } else if ("Err" in result) {
-        return rejectWithValue(result.Err.toString());
+        return rejectWithValue(getErrorMessage(result.Err).message);
       }
     } catch (error) {
       console.error(error);
