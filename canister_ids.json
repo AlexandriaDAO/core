@@ -11,6 +11,9 @@
   "alex_frontend": {
     "ic": "yj5ba-aiaaa-aaaap-qkmoa-cai"
   },
+  "alex_revshare": {
+    "ic": "e454q-riaaa-aaaap-qqcyq-cai"
+  },
   "alex_wallet": {
     "ic": "yh7mi-3yaaa-aaaap-qkmpa-cai"
   },
@@ -20,14 +23,26 @@
   "emporium": {
     "ic": "zdcg2-dqaaa-aaaap-qpnha-cai"
   },
+  "extra1": {
+    "ic": "ev6xm-haaaa-aaaap-qqcza-cai"
+  },
+  "extra2": {
+    "ic": "es7ry-kyaaa-aaaap-qqczq-cai"
+  },
+  "extra3": {
+    "ic": "ehyav-lqaaa-aaaap-qqc2a-cai"
+  },
+  "extra4": {
+    "ic": "eazgb-giaaa-aaaap-qqc2q-cai"
+  },
   "feed": {
     "ic": "okj2q-daaaa-aaaap-qp2pa-cai"
   },
-  "ic_siwo": {
-    "ic": "odkrm-viaaa-aaaap-qp2oq-cai"
-  },
   "ic_siwe_provider": {
     "ic": "w4vlu-paaaa-aaaaj-azxyq-cai"
+  },
+  "ic_siwo": {
+    "ic": "odkrm-viaaa-aaaap-qp2oq-cai"
   },
   "ic_siws_provider": {
     "ic": "w3una-cyaaa-aaaaj-azxya-cai"
@@ -47,14 +62,14 @@
   "internet_identity": {
     "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
   },
-  "perpetua": {
-    "ic": "ya6k4-waaaa-aaaap-qkmpq-cai"
-  },
   "logs": {
     "ic": "yn33w-uaaaa-aaaap-qpk5q-cai"
   },
   "nft_manager": {
     "ic": "5sh5r-gyaaa-aaaap-qkmra-cai"
+  },
+  "perpetua": {
+    "ic": "ya6k4-waaaa-aaaap-qkmpq-cai"
   },
   "system_api": {
     "ic": "5vg3f-laaaa-aaaap-qkmrq-cai"

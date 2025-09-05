@@ -6,7 +6,6 @@ set -x
 echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
 
 #!/bin/bash
-cp dfx_local.json dfx.json
 
 # # Step 1: Start dfx
 # kill -9 $(lsof -t -i:4943)
@@ -20,10 +19,10 @@ dfx deps deploy
 dfx deps deploy internet_identity
 
 ## xrc first because it's used in init functions of others.
-dfx canister create xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
+dfx canister create xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai --network local
 cargo build --release --target wasm32-unknown-unknown --package xrc
 candid-extractor target/wasm32-unknown-unknown/release/xrc.wasm > src/xrc/xrc.did
-dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
+dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai --network local
 
 # Step 3: Deploy nft_manager, which deploys icrc7
 
@@ -94,6 +93,11 @@ dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 cargo build --release --target wasm32-unknown-unknown --package asset_manager
 candid-extractor target/wasm32-unknown-unknown/release/asset_manager.wasm > src/asset_manager/asset_manager.did
 dfx deploy asset_manager --specified-id zhcno-qqaaa-aaaap-qpv7a-cai
+
+# For alex_revshare canister
+cargo build --release --target wasm32-unknown-unknown --package alex_revshare
+candid-extractor target/wasm32-unknown-unknown/release/alex_revshare.wasm > src/alex_revshare/alex_revshare.did
+dfx deploy alex_revshare --specified-id e454q-riaaa-aaaap-qqcyq-cai
 
 
 dfx ledger fabricate-cycles --canister zhcno-qqaaa-aaaap-qpv7a-cai --cycles 10000000000000000

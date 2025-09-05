@@ -5,9 +5,14 @@ uxyan-oyaaa-aaaap-qhezq-cai
 
 
 
-dfx canister create asset_manager --next-to uxyan-oyaaa-aaaap-qhezq-cai --network ic  --with-cycles 10000000000000
-dfx canister update-settings asset_manager --add-controller yog5q-6fxnl-g4zd4-s2nuh-f7fkw-ijb4e-z7dmo-jrarx-uoe2x-wx5sh-dae --network ic
+dfx canister create alex_revshare --next-to ysy5f-2qaaa-aaaap-qkmmq-cai --network ic  --with-cycles 10000000000000
+
+
+dfx canister update-settings e454q-riaaa-aaaap-qqcyq-cai --add-controller yog5q-6fxnl-g4zd4-s2nuh-f7fkw-ijb4e-z7dmo-jrarx-uoe2x-wx5sh-dae --network ic
+
+
 zhcno-qqaaa-aaaap-qpv7a-cai
+
 
 (2) Add nns as a controller: yog5q-6fxnl-g4zd4-s2nuh-f7fkw-ijb4e-z7dmo-jrarx-uoe2x-wx5sh-dae
 

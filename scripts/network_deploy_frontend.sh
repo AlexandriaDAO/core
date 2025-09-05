@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cp dfx_mainnet.json dfx.json
-
 cd ./.dfx/
 rm -rf local/canisters/
 cp -r ic/canisters/ local/

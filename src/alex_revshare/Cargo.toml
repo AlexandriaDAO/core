@@ -1,0 +1,16 @@
+[package]
+name = "alex_revshare"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = "0.10"
+ic-cdk = "0.13"
+ic-cdk-timers = "0.7"
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+candid_parser = "0.1.4"

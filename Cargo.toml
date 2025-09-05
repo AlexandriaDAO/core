@@ -17,5 +17,6 @@ members = [
     "src/logs",
     "src/asset_manager",
     "src/feed",
+    "src/alex_revshare",
 ]
 resolver = "2"
