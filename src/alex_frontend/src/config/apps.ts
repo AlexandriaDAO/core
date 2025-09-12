@@ -20,10 +20,10 @@ export const appsData: App[] = [
 ];
 
 export const thirdPartyAppsData: App[] = [
-  { name: 'lbry.fun', description: 'launchpad', path: 'https://lbry.fun', logo: '/logos/lbry.svg', comingSoon: true, isThirdParty: true },
+  { name: 'DAOPad', description: 'launchpad', path: 'https://daopad.org', logo: '/logos/third_party/daopad_logo.png', comingSoon: false, isThirdParty: true },
+  { name: 'KongLocker', description: 'token locker', path: 'https://konglocker.com', logo: '/logos/third_party/kong_locker.png', comingSoon: false, isThirdParty: true },
+  { name: 'lbry.fun', description: 'zero token', path: 'https://lbry.fun', logo: '/logos/third_party/lbry_fun.svg', comingSoon: false, isThirdParty: true },
   { name: 'fission.bridge', description: 'bridge', path: 'https://fission.bridge', logo: '/logos/fission.svg', comingSoon: true, isThirdParty: true },
-  { name: 'lbry.finance', description: 'lend', path: 'https://lbry.finance', logo: '/logos/lbry.svg', comingSoon: true, isThirdParty: true },
-  { name: '...', description: 'come build with us', path: '', logo: '', comingSoon: true, isThirdParty: true },
 ];
 
 // Helper function to find an app by name
