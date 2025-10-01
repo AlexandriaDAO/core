@@ -20,16 +20,13 @@ import fetchAlexPrice from './alex/thunks/price';
 import fetchUnlockedLbry from './lbry/thunks/unlocked';
 import fetchLockedLbry from './lbry/thunks/locked';
 import { AlexActor, IcpLedgerActor, LbryActor, NftManagerActor } from '@/actors';
-import { useIcpSwapFactory } from '@/hooks/actors';
 
 const BalancePanel = () => {
-    const {actor} = useIcpSwapFactory();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
 
-    // Use balance slice state from new structure
-    const { lastRefresh, total } = useAppSelector((state) => state.balance);
-    const { amount: icp, price: icpPrice, amountError, amountLoading, priceError, priceLoading } = useAppSelector((state) => state.balance.icp);
+    const { total } = useAppSelector((state) => state.balance);
+    const { amount: icp, price: icpPrice } = useAppSelector((state) => state.balance.icp);
     const { unlocked: unlockedAlex, locked: lockedAlex, price: alexPrice } = useAppSelector((state) => state.balance.alex);
 
     const refresh = useCallback(() => {
@@ -41,7 +38,7 @@ const BalancePanel = () => {
         dispatch(fetchUnlockedLbry());
         dispatch(fetchLockedLbry());
         dispatch(setLastRefresh());
-    }, [actor]);
+    }, []);
 
     useEffect(() => {
         refresh();
