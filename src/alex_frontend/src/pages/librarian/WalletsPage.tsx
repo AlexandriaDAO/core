@@ -7,7 +7,6 @@ import { AddArweaveWallet } from "@/features/add-wallet";
 import { Button } from "@/lib/components/button";
 import { RefreshCcw } from "lucide-react";
 
-const AlexWalletActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexWalletActor })));
 const Wallets = lazy(() => import("@/features/wallets"));
 
 function WalletsPageCore() {
@@ -54,9 +53,7 @@ function WalletsPageCore() {
 function WalletsPage() {
 	return (
 		<Suspense fallback={<div>Loading components...</div>}>
-			<AlexWalletActor>
-				<WalletsPageCore />
-			</AlexWalletActor>
+			<WalletsPageCore />
 		</Suspense>
 	)
 }

@@ -26,6 +26,7 @@ export function useAssetManager({
 					? `http://localhost:${window.location.port}`
 					: 'https://ic0.app',
 				identity,
+				verifyQuerySignatures: !isLocal,
 			});
 
 			if (isLocal) {

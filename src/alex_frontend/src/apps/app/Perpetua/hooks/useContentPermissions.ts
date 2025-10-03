@@ -1,4 +1,4 @@
-import { useIdentity } from '@/hooks/useIdentity';
+import { useIdentity } from '@/lib/ic-use-identity';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useCallback } from 'react';
 

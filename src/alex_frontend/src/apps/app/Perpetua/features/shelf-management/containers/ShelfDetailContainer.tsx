@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { useIdentity } from "@/hooks/useIdentity";
+import { useIdentity } from "@/lib/ic-use-identity";
 import { ShelfPublic, Item, ItemContent } from "@/../../declarations/perpetua/perpetua.did";
 import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";

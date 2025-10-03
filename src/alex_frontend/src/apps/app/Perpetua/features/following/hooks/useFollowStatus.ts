@@ -7,7 +7,7 @@ import {
   followUser,
   unfollowUser
 } from '@/apps/app/Perpetua/state/services/followService';
-import { useIdentity } from '@/hooks/useIdentity';
+import { useIdentity } from '@/lib/ic-use-identity';
 import { Result } from '@/apps/app/Perpetua/utils'; // Import Result from its definition file
 import { QueryError } from '@/../../declarations/perpetua/perpetua.did'; // Import QueryError from declarations
 import { usePerpetua } from '@/hooks/actors';

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useIdentity } from "@/hooks/useIdentity";
 import { useAssetManager } from "@/hooks/useAssetManager";
 import upload from "../thunks/upload";
 import { Input } from "@/lib/components/input";
 import { Button } from "@/lib/components/button";
+import { useIdentity } from "@/lib/ic-use-identity";
 
 const ICPAssetUploader: React.FC = () => {
 	const dispatch = useAppDispatch();

@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
-import { ActorSubclass } from "@dfinity/agent/lib/cjs";
+import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE } from "../../../../../../declarations/LBRY/LBRY.did";
 
 // Define the asyn thunk

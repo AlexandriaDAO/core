@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { useIdentity } from '@/hooks/useIdentity';
+import { useIdentity } from '@/lib/ic-use-identity';
 import { Button } from '@/lib/components/button';
 import { Badge } from '@/lib/components/badge';
 import { toast } from 'sonner';

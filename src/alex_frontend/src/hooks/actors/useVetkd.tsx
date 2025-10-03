@@ -1,7 +1,9 @@
-import { createUseActorHook } from 'ic-use-actor';
+import { createActorHook } from "ic-use-actor";
 import { _SERVICE } from "../../../../declarations/vetkd/vetkd.did";
-import { VetkdContext } from '@/contexts/actors';
+import { canisterId, idlFactory } from "../../../../declarations/vetkd";
 
-const useVetkd = createUseActorHook<_SERVICE>(VetkdContext);
-
-export default useVetkd
+const useVetkd = createActorHook<_SERVICE>({
+	canisterId: canisterId,
+	idlFactory: idlFactory,
+});
+export default useVetkd;

@@ -17,7 +17,7 @@ import EmporiumMarketLogs from "./component/emporiumLogs";
 import { getCallerAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 import { useAssetManager } from "@/hooks/useAssetManager";
 import fetch from "@/features/icp-assets/thunks/fetch";
-import { useIdentity } from "@/hooks/useIdentity";
+import { useIdentity } from "@/lib/ic-use-identity";
 import { useEmporium, useLbry, useNftManager } from "@/hooks/actors";
 
 const Emporium = () => {

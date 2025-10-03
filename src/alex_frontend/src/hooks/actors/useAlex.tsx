@@ -1,7 +1,10 @@
-import { createUseActorHook } from 'ic-use-actor';
+import { createActorHook } from "ic-use-actor";
 import { _SERVICE } from "../../../../declarations/ALEX/ALEX.did";
-import { AlexContext } from '@/contexts/actors';
+import { canisterId, idlFactory } from "../../../../declarations/ALEX";
 
-const useAlex = createUseActorHook<_SERVICE>(AlexContext);
+const useAlex = createActorHook<_SERVICE>({
+	canisterId: canisterId,
+	idlFactory: idlFactory,
+});
 
-export default useAlex
+export default useAlex;

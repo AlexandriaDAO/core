@@ -38,6 +38,7 @@ const getAllLogs = createAsyncThunk<
     stakerCount: number;
     alexRate: number;
     totalLbryBurn: number;
+    rewardRate: number;
   }[],
   void,
   { rejectValue: string }

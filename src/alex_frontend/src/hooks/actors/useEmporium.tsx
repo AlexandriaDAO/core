@@ -1,7 +1,10 @@
-import { createUseActorHook } from 'ic-use-actor';
+import { createActorHook } from "ic-use-actor";
 import { _SERVICE } from "../../../../declarations/emporium/emporium.did";
-import { EmporiumContext } from '@/contexts/actors';
+import { canisterId, idlFactory } from "../../../../declarations/emporium";
 
-const useEmporium = createUseActorHook<_SERVICE>(EmporiumContext);
+const useEmporium = createActorHook<_SERVICE>({
+	canisterId: canisterId,
+	idlFactory: idlFactory,
+});
 
-export default useEmporium
+export default useEmporium;

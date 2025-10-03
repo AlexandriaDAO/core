@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
-import { useIdentity } from '@/hooks/useIdentity';
+import { useIdentity } from '@/lib/ic-use-identity';
 import { isEqual } from 'lodash';
 import { useDragAndDrop } from './useDragAndDrop';
 import { ReorderableItem, ReorderParams } from '../../../../types/reordering.types';

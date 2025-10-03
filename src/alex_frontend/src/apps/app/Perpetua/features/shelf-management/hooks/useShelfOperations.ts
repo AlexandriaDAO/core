@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useIdentity } from "@/hooks/useIdentity";
+import { useIdentity } from "@/lib/ic-use-identity";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { 

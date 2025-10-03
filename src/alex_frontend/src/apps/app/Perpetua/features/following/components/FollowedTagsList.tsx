@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
-import { useIdentity } from '@/hooks/useIdentity';
+import { useIdentity } from '@/lib/ic-use-identity';
 
 import { Button } from '@/lib/components/button';
 import { Badge } from '@/lib/components/badge';

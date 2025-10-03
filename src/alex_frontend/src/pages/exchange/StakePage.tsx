@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from 'react';
-import { AlexActor, IcpSwapActor } from '@/actors';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { Alert } from '@/components/Alert';
@@ -22,41 +21,37 @@ const StakePage: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <AlexActor>
-      <IcpSwapActor>
-        <div className="px-4 py-8">
-          <div className="max-w-7xl mx-auto">
+    <div className="px-4 py-8">
+      <div className="max-w-7xl mx-auto">
 
-            {/* Error Alert */}
-            {error && (
-              <div className="relative mb-6">
-                <Alert variant="danger" title="Error">
-                  {error}
-                </Alert>
-                <Button
-                  variant='muted'
-                  scale='icon'
-                  rounded="full"
-                  onClick={handleDismissError}
-                  className="absolute top-2 right-2"
-                >
-                  <X size={16}/>
-                </Button>
-              </div>
-            )}
-
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <StakeForm />
-                <CommunityStakes />
-              </div>
-
-              {user && <MyStakes />}
+        {/* Error Alert */}
+        {error && (
+          <div className="relative mb-6">
+            <Alert variant="danger" title="Error">
+              {error}
+            </Alert>
+            <Button
+              variant='muted'
+              scale='icon'
+              rounded="full"
+              onClick={handleDismissError}
+              className="absolute top-2 right-2"
+            >
+              <X size={16}/>
+            </Button>
           </div>
+        )}
+
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <StakeForm />
+            <CommunityStakes />
           </div>
-        </div>
-      </IcpSwapActor>
-    </AlexActor>
+
+          {user && <MyStakes />}
+      </div>
+      </div>
+    </div>
   );
 }
 

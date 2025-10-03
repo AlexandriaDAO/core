@@ -8,7 +8,6 @@ import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import LbryBalanceCard from "./lbryBalanceCard";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import { useAlex, useLbry } from "@/hooks/actors";
-import { IcpSwapFactoryActor } from "@/actors";
 
 const BalanceContent: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -31,7 +30,7 @@ const BalanceContent: React.FC = () => {
                     <h3 className="text-tabsheading 2xl:text-xxltabsheading xl:text-xltabsheading lg:text-lgtabsheading md:text-mdtabsheading sm:text-smtabsheading font-bold">Balance</h3>
                 </div>
                 <div className="flex md:flex-row flex-col">
-                    <IcpSwapFactoryActor><AlexBalanceCard /></IcpSwapFactoryActor>
+                    <AlexBalanceCard />
                     <LbryBalanceCard />
                 </div>
             </div>

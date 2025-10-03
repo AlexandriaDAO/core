@@ -1,7 +1,10 @@
-import { createUseActorHook } from 'ic-use-actor';
+import { createActorHook } from "ic-use-actor";
 import { _SERVICE } from "../../../../declarations/user/user.did";
-import { UserContext } from '@/contexts/actors';
+import { canisterId, idlFactory } from "../../../../declarations/user";
 
-const useUser = createUseActorHook<_SERVICE>(UserContext);
+const useUser = createActorHook<_SERVICE>({
+	canisterId: canisterId,
+	idlFactory: idlFactory,
+});
 
-export default useUser
+export default useUser;

@@ -1,7 +1,10 @@
-import { createUseActorHook } from 'ic-use-actor';
+import { createActorHook } from "ic-use-actor";
 import { _SERVICE } from "../../../../declarations/alex_wallet/alex_wallet.did";
-import { AlexWalletContext } from '@/contexts/actors';
+import { canisterId, idlFactory } from "../../../../declarations/alex_wallet";
 
-const useAlexWallet = createUseActorHook<_SERVICE>(AlexWalletContext);
+const useAlexWallet = createActorHook<_SERVICE>({
+	canisterId: canisterId,
+	idlFactory: idlFactory,
+});
 
 export default useAlexWallet;

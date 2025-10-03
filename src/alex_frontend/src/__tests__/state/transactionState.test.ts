@@ -40,7 +40,7 @@ jest.mock('@/apps/Modules/shared/state/transactions/transactionSortUtils', () =>
 
 // Import the mocked selector
 import { selectFilteredAndSortedTransactions } from '@/apps/Modules/shared/state/transactions/transactionSortUtils';
-import { ActorSubclass } from '@dfinity/agent/lib/cjs/actor';
+import { ActorSubclass } from '@dfinity/agent';
 import { _SERVICE } from '../../../../declarations/asset_manager/asset_manager.did';
 
 // Mock the external dependencies

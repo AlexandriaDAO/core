@@ -1,21 +1,21 @@
 import React from "react";
-import { useIdentity } from "@/hooks/useIdentity";
+import { useIdentity } from "@/lib/ic-use-identity";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Loading from "@/components/Loading";
 import { FullPageSignup } from "@/features/signup";
-import { FullPageLogin } from "@/features/login";
+import Login from "@/features/login";
 import { Outlet } from "@tanstack/react-router";
 
 
 const AuthGuard = () => {
-	const {identity, isInitializing} = useIdentity();
+	const {identity, status} = useIdentity();
 
 	const {user} = useAppSelector(state=>state.auth);
 	const {loading, error} = useAppSelector(state=>state.login);
 
-    if (isInitializing || loading ) return <Loading />;
+    if (status === 'initializing' || loading ) return <Loading />;
 
-    if (!identity) return <FullPageLogin/>;
+    if (!identity) return <Login fullpage/>;
 
     if(!user){
         if(error){
