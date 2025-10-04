@@ -18,6 +18,8 @@ import {LbryUnlockedBalance} from './lbry';
 import {LbryLockedBalance} from './lbry';
 
 // Import thunks from sub-slices
+import fetchUsdAmount from './usd/thunks/amount';
+
 import fetchIcpAmount from './icp/thunks/amount';
 import fetchIcpPrice from '../icp-ledger/thunks/getIcpPrice';
 
@@ -27,14 +29,20 @@ import fetchAlexPrice from './alex/thunks/price';
 
 import fetchUnlockedLbry from './lbry/thunks/unlocked';
 import fetchLockedLbry from './lbry/thunks/locked';
+import { useStripe } from '@/hooks/actors';
+import UsdBalance from './usd';
 
 const BalanceDetails = () => {
     const dispatch = useAppDispatch();
+    const {actor} = useStripe();
 
+    const { amount: usd } = useAppSelector((state) => state.balance.usd);
     const { amount: icp, price: icpPrice } = useAppSelector((state) => state.balance.icp);
     const { unlocked: unlockedAlex, locked: lockedAlex, price: alexPrice } = useAppSelector((state) => state.balance.alex);
 
     const refresh = useCallback(() => {
+        if(actor) dispatch(fetchUsdAmount(actor));
+
         dispatch(fetchIcpAmount());
         dispatch(fetchIcpPrice());
 
@@ -46,7 +54,7 @@ const BalanceDetails = () => {
         dispatch(fetchLockedLbry());
 
         dispatch(setLastRefresh());
-    }, [dispatch]);
+    }, [actor]);
 
     useEffect(()=>{
         refresh();
@@ -62,8 +70,8 @@ const BalanceDetails = () => {
         const totalUnockedAlexInUSD = alexPrice * unlockedAlex;
         const totalLockedAlexInUSD = alexPrice * lockedAlex;
 
-        dispatch(setTotal(totalIcpInUSD + totalUnockedAlexInUSD + totalLockedAlexInUSD))
-    },[icpPrice, alexPrice, icp, unlockedAlex, lockedAlex, dispatch])
+        dispatch(setTotal(Math.max(0,usd) + totalIcpInUSD + totalUnockedAlexInUSD + totalLockedAlexInUSD))
+    },[icpPrice, alexPrice, usd, icp, unlockedAlex, lockedAlex, dispatch])
 
     return (
         <>
@@ -73,6 +81,8 @@ const BalanceDetails = () => {
             </DropdownMenuLabel>
 
             <DropdownMenuSeparator />
+
+            <UsdBalance menu/>
 
             <IcpBalance menu/>
 

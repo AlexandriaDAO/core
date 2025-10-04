@@ -1,3 +1,4 @@
+export { default as useStripe } from './useStripe';
 export { default as useAuthentication } from './useAuthentication';
 export { default as useAlexBackend } from './useAlexBackend';
 export { default as useAlex } from './useAlex';

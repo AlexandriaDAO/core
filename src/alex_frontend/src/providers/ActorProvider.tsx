@@ -13,6 +13,7 @@ import { getIdentity, useIdentity } from "../lib/ic-use-identity";
 import { toast } from "sonner";
 import {
 	useAlex,
+	useStripe,
 	useAuthentication,
 	useAlexBackend,
 	useAssetManager,
@@ -37,6 +38,7 @@ export default function ActorProvider() {
 	const { identity, clear } = useIdentity();
 
 	const alex = useAlex();
+	const stripe = useStripe();
 	const authentication = useAuthentication();
 	const alexBackend = useAlexBackend();
 	const assetManager = useAssetManager();
@@ -113,6 +115,7 @@ export default function ActorProvider() {
 	useEffect(() => {
 		ensureAllInitialized().then(() => {
 			alex.setInterceptors(interceptors);
+			stripe.setInterceptors(interceptors);
 			authentication.setInterceptors(interceptors);
 			alexBackend.setInterceptors(interceptors);
 			assetManager.setInterceptors(interceptors);

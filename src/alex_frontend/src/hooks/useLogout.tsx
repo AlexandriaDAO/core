@@ -4,6 +4,7 @@ import { setUser } from '@/features/auth/authSlice';
 
 import {
 	useAlex,
+	useStripe,
 	useAuthentication,
 	useAlexBackend,
 	useAssetManager,
@@ -28,6 +29,7 @@ export function useLogout() {
     const {clear} = useIdentity();
 
     const alex = useAlex();
+    const stripe = useStripe();
 	const authentication = useAuthentication();
 	const alexBackend = useAlexBackend();
 	const assetManager = useAssetManager();
@@ -51,6 +53,7 @@ export function useLogout() {
         dispatch(setUser(null));
 
         alex.reset();
+        stripe.reset();
         authentication.reset();
         alexBackend.reset();
         assetManager.reset();

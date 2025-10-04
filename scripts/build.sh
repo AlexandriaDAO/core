@@ -100,6 +100,18 @@ candid-extractor target/wasm32-unknown-unknown/release/alex_revshare.wasm > src/
 dfx deploy alex_revshare --specified-id e454q-riaaa-aaaap-qqcyq-cai
 
 
+# For Authentication
+cargo build --release --target wasm32-unknown-unknown --package authentication
+candid-extractor target/wasm32-unknown-unknown/release/authentication.wasm > src/authentication/authentication.did
+dfx deploy authentication --specified-id uxrrr-q7777-77774-qaaaq-cai
+
+# For Stripe
+cargo build --release --target wasm32-unknown-unknown --package stripe
+candid-extractor target/wasm32-unknown-unknown/release/stripe.wasm > src/stripe/stripe.did
+dfx deploy stripe --specified-id uzt4z-lp777-77774-qaabq-cai
+
+
+
 dfx ledger fabricate-cycles --canister zhcno-qqaaa-aaaap-qpv7a-cai --cycles 10000000000000000
 
 
@@ -256,7 +268,7 @@ if [ -f "src/declarations/icp_swap_factory/index.d.ts" ] && ! grep -q "export { 
     sed -i '/import { _SERVICE }/a\\nexport { _SERVICE };' src/declarations/icp_swap_factory/index.d.ts
 fi
 
-npm i
+npm install --legacy-peer-deps
 
 # Fix declarations after npm install (which may run dfx generate and overwrite our changes)
 # Re-check and fix the .did.js file

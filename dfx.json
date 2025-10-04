@@ -5,6 +5,11 @@
       "package": "authentication",
 			"candid": "src/authentication/authentication.did"
 		},
+    "stripe": {
+			"type": "rust",
+			"package": "stripe",
+			"candid": "src/stripe/stripe.did"
+		},
     "vetkd": {
       "type": "rust",
       "package": "vetkd",

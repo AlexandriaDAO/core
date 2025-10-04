@@ -1,5 +1,5 @@
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
-import { toast } from "sonner";
+import usdReducer from './usd/usdSlice';
 import icpReducer from './icp/icpSlice';
 import alexReducer from './alex/alexSlice';
 import lbryReducer from './lbry/lbrySlice';
@@ -135,7 +135,7 @@ const balanceReducer = (state: any = {}, action: any) => {
   const isInitialState = Object.keys(state).length === 0;
   
   // Extract the main state properties (excluding nested reducers)
-  const { icp, alex, lbry, ...mainStateProps } = state;
+  const { usd, icp, alex, lbry, ...mainStateProps } = state;
   
   // For initial state, pass undefined to get proper initial values
   // Otherwise, pass the current main state props
@@ -145,6 +145,7 @@ const balanceReducer = (state: any = {}, action: any) => {
   );
 
   // Then get states from the sub-slices
+  const usdState = usdReducer(state?.usd, action);
   const icpState = icpReducer(state?.icp, action);
   const alexState = alexReducer(state?.alex, action);
   const lbryState = lbryReducer(state?.lbry, action);
@@ -152,6 +153,7 @@ const balanceReducer = (state: any = {}, action: any) => {
   // Return combined state with main properties at root level
   return {
     ...mainState,
+    usd: usdState,
     icp: icpState,
     alex: alexState,
     lbry: lbryState,

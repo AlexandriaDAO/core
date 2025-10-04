@@ -4,7 +4,8 @@ import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { RotateCw } from 'lucide-react';
 import { Button } from "@/lib/components/button";
 
-import { setLastRefresh, setTotal } from './balanceSlice';
+import { setLastRefresh } from './balanceSlice';
+import UsdBalance from './usd';
 import IcpBalance from './icp';
 import { AlexUnlockedBalance } from './alex';
 import { AlexLockedBalance } from './alex';
@@ -12,6 +13,7 @@ import { LbryUnlockedBalance } from './lbry';
 import { LbryLockedBalance } from './lbry';
 
 // Import thunks from sub-slices
+import fetchUsdAmount from './usd/thunks/amount';
 import fetchIcpAmount from './icp/thunks/amount';
 import fetchIcpPrice from '../icp-ledger/thunks/getIcpPrice';
 import fetchUnlockedAlex from './alex/thunks/unlocked';
@@ -19,16 +21,20 @@ import fetchLockedAlex from './alex/thunks/locked';
 import fetchAlexPrice from './alex/thunks/price';
 import fetchUnlockedLbry from './lbry/thunks/unlocked';
 import fetchLockedLbry from './lbry/thunks/locked';
+import { useStripe } from '@/hooks/actors';
 
 const BalancePanel = () => {
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
+    const { actor } = useStripe();
 
-    const { total } = useAppSelector((state) => state.balance);
+    // const { total } = useAppSelector((state) => state.balance);
+    const { amount: usd } = useAppSelector((state) => state.balance.usd);
     const { amount: icp, price: icpPrice } = useAppSelector((state) => state.balance.icp);
     const { unlocked: unlockedAlex, locked: lockedAlex, price: alexPrice } = useAppSelector((state) => state.balance.alex);
 
     const refresh = useCallback(() => {
+        if(actor) dispatch(fetchUsdAmount(actor));
         dispatch(fetchIcpAmount());
         dispatch(fetchIcpPrice());
         dispatch(fetchUnlockedAlex());
@@ -37,26 +43,29 @@ const BalancePanel = () => {
         dispatch(fetchUnlockedLbry());
         dispatch(fetchLockedLbry());
         dispatch(setLastRefresh());
-    }, []);
+    }, [actor]);
 
     useEffect(() => {
         refresh();
     }, [refresh]);
 
-    useEffect(() => {
-        if (icpPrice <= 0 || alexPrice <= 0) {
-            dispatch(setTotal(-1));
-            return;
-        }
+    const total = Math.max(0, usd) + Math.max(0, icpPrice * icp) + Math.max(alexPrice* unlockedAlex) + Math.max(alexPrice* lockedAlex)
 
-        const totalIcpInUSD = icpPrice * icp;
-        const totalUnlockedAlexInUSD = alexPrice * unlockedAlex;
-        const totalLockedAlexInUSD = alexPrice * lockedAlex;
 
-        const totalUSDValue = totalIcpInUSD + totalUnlockedAlexInUSD + totalLockedAlexInUSD;
+    // useEffect(() => {
+    //     if (icpPrice <= 0 || alexPrice <= 0) {
+    //         dispatch(setTotal(-1));
+    //         return;
+    //     }
 
-        dispatch(setTotal(totalUSDValue));
-    }, [icpPrice, alexPrice, icp, unlockedAlex, lockedAlex, dispatch]);
+    //     const totalIcpInUSD = icpPrice * icp;
+    //     const totalUnlockedAlexInUSD = alexPrice * unlockedAlex;
+    //     const totalLockedAlexInUSD = alexPrice * lockedAlex;
+
+    //     const totalUSDValue = totalIcpInUSD + totalUnlockedAlexInUSD + totalLockedAlexInUSD;
+
+    //     dispatch(setTotal(totalUSDValue));
+    // }, [icpPrice, alexPrice, icp, unlockedAlex, lockedAlex, dispatch]);
 
     if (!user) return null;
 
@@ -109,7 +118,8 @@ const BalancePanel = () => {
                             <RotateCw size={12} />
                         </Button>
                     </div>
-                    <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3 space-y-2">
+                    <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3">
+                        <UsdBalance />
                         <IcpBalance />
                         <AlexUnlockedBalance />
                         <LbryUnlockedBalance />
@@ -117,10 +127,10 @@ const BalancePanel = () => {
                 </div>
 
                 <div className="group">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between my-2">
                         <span className="text-sm font-medium text-gray-300">Spending wallet</span>
                     </div>
-                    <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3 space-y-2">
+                    <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3">
                         <AlexLockedBalance />
                         <LbryLockedBalance />
                     </div>

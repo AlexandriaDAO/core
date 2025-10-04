@@ -2,6 +2,7 @@
 members = [
     "src/alex_backend",
     "src/authentication",
+    "src/stripe",
     "src/system_api",
     "src/vetkd",
     "src/icp_swap",
