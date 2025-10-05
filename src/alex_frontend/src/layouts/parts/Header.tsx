@@ -11,6 +11,7 @@ import { lazy } from "react";
 import { ModeToggle } from "@/lib/components/mode-toggle";
 
 import { LoaderCircle } from "lucide-react";
+import Pinax from "@/features/pinax";
 
 const InlineSignup = lazy(() =>
 	import("@/features/signup").then((module) => ({
@@ -62,6 +63,12 @@ export const Entry = () => {
 					<div className="w-28 h-[42px] bg-gradient-to-r from-gray-800 to-gray-500 border border-gray-600 text-white hover:border-white rounded-full cursor-not-allowed duration-800 transition-all animate-pulse">
 					</div>
 				}>
+					<Pinax />
+				</Suspense>
+				{/* <Suspense fallback={
+					<div className="w-28 h-[42px] bg-gradient-to-r from-gray-800 to-gray-500 border border-gray-600 text-white hover:border-white rounded-full cursor-not-allowed duration-800 transition-all animate-pulse">
+					</div>
+				}>
 					<BalanceButton />
 				</Suspense>
 				<Suspense fallback={
@@ -69,7 +76,7 @@ export const Entry = () => {
 					</div>
 				}>
 					<AccountButton/>
-				</Suspense>
+				</Suspense> */}
 				<Suspense fallback={
 					<div className="w-[42px] h-[42px] border border-white rounded-full cursor-not-allowed overflow-hidden flex justify-center items-center">
 						<LoaderCircle color="white" className="w-[18px] h-[18px] animate animate-spin"/>
