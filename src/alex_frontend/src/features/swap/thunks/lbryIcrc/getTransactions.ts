@@ -2,7 +2,7 @@ import { _SERVICE as _SERVICELBRY } from "../../../../../../declarations/LBRY/LB
 import { _SERVICE as _SERVICEALEX } from "../../../../../../declarations/ALEX/ALEX.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
-import { ActorSubclass } from "@dfinity/agent/lib/cjs";
+import { ActorSubclass } from "@dfinity/agent";
 
 export interface TransactionType {
   type: string;

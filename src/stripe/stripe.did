@@ -1,0 +1,39 @@
+type HttpHeader = record { value : text; name : text };
+type HttpRequest = record {
+  url : text;
+  method : text;
+  body : blob;
+  headers : vec record { text; text };
+};
+type HttpResponse = record {
+  body : blob;
+  headers : vec record { text; text };
+  upgrade : opt bool;
+  status_code : nat16;
+};
+type HttpResponse_1 = record {
+  status : nat;
+  body : blob;
+  headers : vec HttpHeader;
+};
+type Result = variant { Ok : UserBalance; Err : text };
+type Result_1 = variant { Ok : text; Err : text };
+type TransformArgs = record { context : blob; response : HttpResponse_1 };
+type UserBalance = record {
+  balance : nat64;
+  total_deposits : nat64;
+  deposit_count : nat32;
+  last_updated : nat64;
+};
+service : () -> {
+  create_session : (nat64) -> (text);
+  get_balance : () -> (Result) query;
+  health : () -> (text) query;
+  http_request : (HttpRequest) -> (HttpResponse) query;
+  http_request_update : (HttpRequest) -> (HttpResponse);
+  swap_usd_to_icp : () -> (Result_1);
+  transform_first : (TransformArgs) -> (HttpResponse) query;
+  transform_second : (TransformArgs) -> (HttpResponse) query;
+  update_stripe_api_secret : (text) -> (Result_1);
+  update_stripe_webhook_secret : (text) -> (Result_1);
+}

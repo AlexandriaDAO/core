@@ -21,6 +21,8 @@ import {LbryUnlockedBalance} from './lbry';
 import {LbryLockedBalance} from './lbry';
 
 // Import thunks from sub-slices
+import fetchUsdAmount from './usd/thunks/amount';
+
 import fetchIcpAmount from './icp/thunks/amount';
 import fetchIcpPrice from '../icp-ledger/thunks/getIcpPrice';
 
@@ -30,22 +32,24 @@ import fetchAlexPrice from './alex/thunks/price';
 
 import fetchUnlockedLbry from './lbry/thunks/unlocked';
 import fetchLockedLbry from './lbry/thunks/locked';
-import { useIcpSwapFactory } from '@/hooks/actors';
+import { useStripe } from '@/hooks/actors';
+import UsdBalance from './usd';
 
 const BalanceButton = () => {
-    const {actor} = useIcpSwapFactory();
     const dispatch = useAppDispatch();
+    const {actor} = useStripe();
     const { user } = useAppSelector((state) => state.auth);
 
-    // Use balance slice state from new structure
-    const { lastRefresh, total } = useAppSelector((state) => state.balance);
-    const { amount: icp, price: icpPrice, amountError, amountLoading, priceError, priceLoading } = useAppSelector((state) => state.balance.icp);
+    const { amount: usd } = useAppSelector((state) => state.balance.usd);
+    const { amount: icp, price: icpPrice } = useAppSelector((state) => state.balance.icp);
     const { unlocked: unlockedAlex, locked: lockedAlex, price: alexPrice } = useAppSelector((state) => state.balance.alex);
 
     const [isExpanded, setIsExpanded] = useState(false);
 
 
     const refresh = useCallback(() => {
+        if(actor) dispatch(fetchUsdAmount(actor));
+
         dispatch(fetchIcpAmount());
         dispatch(fetchIcpPrice());
 
@@ -63,20 +67,22 @@ const BalanceButton = () => {
         refresh();
     },[])
 
-    useEffect(()=>{
-        if(icpPrice <= 0 || alexPrice <= 0){
-            dispatch(setTotal(-1));
-            return;
-        }
+    const total = Math.max(0, usd) + Math.max(0, icpPrice * icp) + Math.max(alexPrice* unlockedAlex) + Math.max(alexPrice* lockedAlex)
 
-        const totalIcpInUSD = icpPrice * icp;
+    // useEffect(()=>{
+    //     if(icpPrice <= 0 || alexPrice <= 0){
+    //         dispatch(setTotal(-1));
+    //         return;
+    //     }
 
-        const totalUnockedAlexInUSD = alexPrice * unlockedAlex;
+    //     const totalIcpInUSD = icpPrice * icp;
 
-        const totalLockedAlexInUSD = alexPrice * lockedAlex;
+    //     const totalUnockedAlexInUSD = alexPrice * unlockedAlex;
 
-        dispatch(setTotal(totalIcpInUSD + totalUnockedAlexInUSD + totalLockedAlexInUSD))
-    },[icpPrice, alexPrice, icp, unlockedAlex, lockedAlex])
+    //     const totalLockedAlexInUSD = alexPrice * lockedAlex;
+
+    //     dispatch(setTotal(usd + totalIcpInUSD + totalUnockedAlexInUSD + totalLockedAlexInUSD))
+    // },[icpPrice, alexPrice, usd, icp, unlockedAlex, lockedAlex])
 
 
     // // Initial load effect
@@ -121,6 +127,8 @@ const BalanceButton = () => {
                 </DropdownMenuLabel>
 
                 <DropdownMenuSeparator />
+
+                <UsdBalance menu/>
 
                 <IcpBalance menu/>
 

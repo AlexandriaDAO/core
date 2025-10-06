@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { IcpSwapActor, LbryActor } from "@/actors";
 import LoginPrompt from "./LoginPrompt";
 import LoadingView from "./LoadingView";
 import BurnForm from "./BurnForm";
@@ -35,33 +34,29 @@ const BurnPage: React.FC = () => {
 	}, [ratio, amount, archived, unclaimed])
 
 	return (
-		<LbryActor>
-			<IcpSwapActor>
-				<div className="px-4 py-8">
-					<div className="max-w-7xl mx-auto">
-						{/* Error Alert */}
-						<BurnError />
+		<div className="px-4 py-8">
+			<div className="max-w-7xl mx-auto">
+				{/* Error Alert */}
+				<BurnError />
 
-						<div className="space-y-8">
-							<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-								<div className="space-y-4">
-									<div>
-										<h2 className="text-2xl font-bold text-gray-900 dark:text-white">Burn LBRY</h2>
-										<p className="text-gray-600 dark:text-gray-400">
-											Burn LBRY tokens to earn ICP and ALEX rewards.
-										</p>
-									</div>
-
-									{!user ? <LoginPrompt /> : burning ? <LoadingView /> : <BurnForm /> }
-								</div>
-
-								<BurnInfo />
+				<div className="space-y-8">
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+						<div className="space-y-4">
+							<div>
+								<h2 className="text-2xl font-bold text-gray-900 dark:text-white">Burn LBRY</h2>
+								<p className="text-gray-600 dark:text-gray-400">
+									Burn LBRY tokens to earn ICP and ALEX rewards.
+								</p>
 							</div>
+
+							{!user ? <LoginPrompt /> : burning ? <LoadingView /> : <BurnForm /> }
 						</div>
+
+						<BurnInfo />
 					</div>
 				</div>
-			</IcpSwapActor>
-		</LbryActor>
+			</div>
+		</div>
 	);
 };
 

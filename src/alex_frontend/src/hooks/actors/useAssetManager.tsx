@@ -1,7 +1,10 @@
-import { createUseActorHook } from 'ic-use-actor';
+import { createActorHook } from "ic-use-actor";
 import { _SERVICE } from "../../../../declarations/asset_manager/asset_manager.did";
-import { AssetManagerContext } from '@/contexts/actors';
+import { canisterId, idlFactory } from "../../../../declarations/asset_manager";
 
-const useAssetManager = createUseActorHook<_SERVICE>(AssetManagerContext);
+const useAssetManager = createActorHook<_SERVICE>({
+	canisterId: canisterId,
+	idlFactory: idlFactory,
+});
 
-export default useAssetManager
+export default useAssetManager;

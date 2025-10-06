@@ -1,6 +1,5 @@
 import React from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import AssetCanisterActor from "@/actors/AssetCanisterActor";
 import { Alert } from "@/components/Alert";
 import { Button } from "@/lib/components/button";
 import { Link } from "@tanstack/react-router";
@@ -33,7 +32,7 @@ const ICPAssetsPage: React.FC = () => {
 					</Button>
 				</Alert>
 			) : (
-				<AssetCanisterActor canisterId={canister}>
+				<>
 					<ICPAssetUploader />
 
 					<div className="mt-8 bg-card p-4 rounded-lg border">
@@ -47,7 +46,7 @@ const ICPAssetsPage: React.FC = () => {
 					</div>
 
 					<ICPAssets />
-				</AssetCanisterActor>
+				</>
 			)}
 		</>
 	);

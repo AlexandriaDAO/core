@@ -3,7 +3,7 @@ import { Principal } from "@dfinity/principal";
 // import getCanisterBal from "@/features/icp-ledger/thunks/getCanisterBal";
 // import getCanisterArchivedBal from "./getCanisterArchivedBal";
 import { ErrorMessage, getErrorMessage } from "../utlis/erorrs";
-import { ActorSubclass } from "@dfinity/agent/lib/cjs";
+import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE as _SERVICE_LBRY } from "../../../../../declarations/LBRY/LBRY.did";
 import { _SERVICE as _SERVICE_SWAP } from "../../../../../declarations/icp_swap/icp_swap.did";
 

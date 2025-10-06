@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { useIdentity } from '@/hooks/useIdentity';
+import { useIdentity } from '@/lib/ic-use-identity';
 import isEqual from 'lodash/isEqual';
 import { ShelfPublic } from '@/../../declarations/perpetua/perpetua.did';
 import { BaseShelfList } from '../../cards/components/BaseShelfList';

@@ -100,6 +100,18 @@ candid-extractor target/wasm32-unknown-unknown/release/alex_revshare.wasm > src/
 dfx deploy alex_revshare --specified-id e454q-riaaa-aaaap-qqcyq-cai
 
 
+# For Authentication
+cargo build --release --target wasm32-unknown-unknown --package authentication
+candid-extractor target/wasm32-unknown-unknown/release/authentication.wasm > src/authentication/authentication.did
+dfx deploy authentication --specified-id uxrrr-q7777-77774-qaaaq-cai
+
+# For Stripe
+cargo build --release --target wasm32-unknown-unknown --package stripe
+candid-extractor target/wasm32-unknown-unknown/release/stripe.wasm > src/stripe/stripe.did
+dfx deploy stripe --specified-id uzt4z-lp777-77774-qaabq-cai
+
+
+
 dfx ledger fabricate-cycles --canister zhcno-qqaaa-aaaap-qpv7a-cai --cycles 10000000000000000
 
 
@@ -214,74 +226,6 @@ record {
 })'
 
 
-# for ic_siwo
-cargo build --release --target wasm32-unknown-unknown --package ic_siwo
-candid-extractor target/wasm32-unknown-unknown/release/ic_siwo.wasm > src/ic_siwo/ic_siwo.did
-
-# create and deploy sign in with ethereum provider
-dfx canister create ic_siwo --specified-id odkrm-viaaa-aaaap-qp2oq-cai
-
-dfx deploy ic_siwo --argument $'(
-    record {
-      domain = "yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io";
-      uri = "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io";
-      salt = "FuriousSalter";
-      scheme = opt "https";
-      statement = opt "Login to Alexandria";
-      challenge_expires_in = opt 300000000000;
-      session_expires_in = opt 604800000000000;
-      targets = opt vec {
-          "'$(dfx canister id ic_siwo)'";
-          "'$(dfx canister id nft_manager)'";
-          "'$(dfx canister id user)'";
-      };
-    }
-)'
-
-# create and deploy sign in with ethereum provider
-dfx canister create ic_siwe_provider --specified-id w4vlu-paaaa-aaaaj-azxyq-cai
-
-# opt 300000000000; /* 5 minutes */
-# opt 604800000000000; /* 1 week */
-dfx deploy ic_siwe_provider --argument $'(
-    record {
-        domain = "127.0.0.1";
-        uri = "http://127.0.0.1:4943";
-        salt = "secretsalt000";
-        chain_id = opt 1;
-        scheme = opt "http";
-        statement = opt "Login to the Alexandria";
-        sign_in_expires_in = opt 300000000000;
-        session_expires_in = opt 604800000000000;
-        targets = opt vec {
-            "'$(dfx canister id ic_siwe_provider)'";
-            "'$(dfx canister id nft_manager)'";
-            "'$(dfx canister id user)'";
-        };
-    }
-)'
-
-# create and deploy sign in with solana provider
-dfx canister create ic_siws_provider --specified-id w3una-cyaaa-aaaaj-azxya-cai
-dfx deploy ic_siws_provider --argument $'(
-    record {
-        domain = "127.0.0.1";
-        uri = "http://127.0.0.1:4943";
-        salt = "secretsalt000";
-        chain_id = opt "mainnet";
-        scheme = opt "http";
-        statement = opt "Login to the Alexandria";
-        sign_in_expires_in = opt 300000000000;
-        session_expires_in = opt 604800000000000;
-        targets = opt vec {
-            "'$(dfx canister id ic_siws_provider)'";
-            "'$(dfx canister id nft_manager)'";
-            "'$(dfx canister id user)'";
-        };
-    }
-)'
-
-
 # echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."
 # exit 1
 
@@ -324,7 +268,7 @@ if [ -f "src/declarations/icp_swap_factory/index.d.ts" ] && ! grep -q "export { 
     sed -i '/import { _SERVICE }/a\\nexport { _SERVICE };' src/declarations/icp_swap_factory/index.d.ts
 fi
 
-npm i
+npm install --legacy-peer-deps
 
 # Fix declarations after npm install (which may run dfx generate and overwrite our changes)
 # Re-check and fix the .did.js file

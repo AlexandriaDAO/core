@@ -1,9 +1,9 @@
-import React, { Suspense, useState } from "react";
+import React, { Suspense } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Logo from "@/components/Logo";
 import Tabs from "@/components/Tabs";
-import { useIdentity } from "@/hooks/useIdentity";
-import { InlineLogin } from "@/features/login";
+import { useIdentity } from "@/lib/ic-use-identity";
+import Login from "@/features/login";
 import Processing from "@/components/Processing";
 import { useUser } from "@/hooks/actors";
 
@@ -11,6 +11,7 @@ import { lazy } from "react";
 import { ModeToggle } from "@/lib/components/mode-toggle";
 
 import { LoaderCircle } from "lucide-react";
+import Pinax from "@/features/pinax";
 
 const InlineSignup = lazy(() =>
 	import("@/features/signup").then((module) => ({
@@ -30,56 +31,12 @@ const AccountButton = lazy(() => import("@/features/account").then((module) => (
 
 export const Entry = () => {
 	const { actor } = useUser();
-	const { identity, isInitializing, isLoggingIn } = useIdentity();
+	const { identity } = useIdentity();
 	const { user } = useAppSelector((state) => state.auth);
 	const { loading } = useAppSelector((state) => state.login);
-	// const [countdown, setCountdown] = useState(60);
-
-	// // relevant logic in /src/providers/UserProvider/IIUserProvider.tsx
-	// // Handle countdown timer and page refresh
-	// useEffect(() => {
-	// 	let timerInterval = null;
-
-	// 	// Only start countdown if in a loading state
-	// 	if (isLoggingIn) {
-	// 		timerInterval = setInterval(() => {
-	// 		setCountdown(prev => {
-	// 			if (prev <= 1) { 
-	// 				return 0;
-	// 			}
-	// 			return prev - 1;
-	// 		});
-	// 		}, 1000);
-	// 	} else {
-	// 		// Reset countdown when not in loading state
-	// 		setCountdown(60);
-	// 	}
-
-	// 	return () => {
-	// 		if (timerInterval) clearInterval(timerInterval);
-	// 	};
-	// }, [isLoggingIn]);
-
-	// sequence matters
-
-	// First, check initialization state
-	if (isInitializing) return <Processing message="Initializing..." />;
-
-	// Show loading state during login on frontend
-	if (isLoggingIn) return <Processing message="Logging in..." />;
-
-	// // Show loading state during login on frontend with countdown
-	// if (isLoggingIn) return (
-	// 	<>
-	// 		<div className="flex-shrink h-auto flex justify-between gap-1 px-4 py-2 items-center border border-white text-[#828282] rounded-full cursor-not-allowed">
-	// 			<span className="w-max text-base font-normal font-roboto-condensed tracking-wider">Page refreshes in {countdown}s</span>
-	// 		</div>
-	// 		<Processing message={`Logging in...`} />
-	// 	</>
-	// );
 
 	// Then check if we have an identity
-	if (!identity) return <InlineLogin />;
+	if (!identity) return <Login />;
 
 	// Show loading state while waiting for actor
 	if (!actor) return <Processing message="Loading Actor..." />;
@@ -106,6 +63,12 @@ export const Entry = () => {
 					<div className="w-28 h-[42px] bg-gradient-to-r from-gray-800 to-gray-500 border border-gray-600 text-white hover:border-white rounded-full cursor-not-allowed duration-800 transition-all animate-pulse">
 					</div>
 				}>
+					<Pinax />
+				</Suspense>
+				{/* <Suspense fallback={
+					<div className="w-28 h-[42px] bg-gradient-to-r from-gray-800 to-gray-500 border border-gray-600 text-white hover:border-white rounded-full cursor-not-allowed duration-800 transition-all animate-pulse">
+					</div>
+				}>
 					<BalanceButton />
 				</Suspense>
 				<Suspense fallback={
@@ -113,7 +76,7 @@ export const Entry = () => {
 					</div>
 				}>
 					<AccountButton/>
-				</Suspense>
+				</Suspense> */}
 				<Suspense fallback={
 					<div className="w-[42px] h-[42px] border border-white rounded-full cursor-not-allowed overflow-hidden flex justify-center items-center">
 						<LoaderCircle color="white" className="w-[18px] h-[18px] animate animate-spin"/>

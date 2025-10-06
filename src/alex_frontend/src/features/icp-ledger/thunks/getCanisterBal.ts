@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
 import { Principal } from "@dfinity/principal";
-import { ActorSubclass } from "@dfinity/agent/lib/cjs";
+import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE } from "../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 // import { getIcpLedgerActor } from "@/features/auth/utils/authUtils";
 

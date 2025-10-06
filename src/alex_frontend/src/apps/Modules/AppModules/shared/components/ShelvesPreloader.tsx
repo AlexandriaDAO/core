@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useIdentity } from '@/hooks/useIdentity';
+import { useIdentity } from '@/lib/ic-use-identity';
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { selectLoading, selectUserShelves } from "@/apps/app/Perpetua/state/perpetuaSlice";

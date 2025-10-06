@@ -16,7 +16,6 @@ import {
 } from "../../../app/Permasearch/styles";
 import { ArrowUp, LoaderPinwheel, RotateCcw, RotateCw } from "lucide-react";
 import { Button } from '@/lib/components/button';
-import { NftManagerActor } from "@/actors";
 
 interface SearchContainerProps {
   title: string;

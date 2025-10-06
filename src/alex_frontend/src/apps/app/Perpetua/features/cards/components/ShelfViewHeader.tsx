@@ -8,7 +8,6 @@ import { Principal } from '@dfinity/principal';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { UnifiedCardActions } from '@/apps/Modules/shared/components/UnifiedCardActions/UnifiedCardActions';
-import { NftManagerActor } from '@/actors';
 
 interface ShelfViewHeaderProps {
   shelf: any;
@@ -113,16 +112,14 @@ export const ShelfViewHeader: React.FC<ShelfViewHeaderProps> = ({
         <div className="flex items-center gap-2">
           <h2 className="text-2xl font-bold font-serif">{shelf?.title}</h2>
           {shelf && shelf.shelf_id && (
-            <NftManagerActor>
-                <UnifiedCardActions
-                  contentId={shelf.shelf_id}
-                  contentType="Shelf"
-                  isOwned={isOwned}
-                  ownerPrincipal={shelfOwnerPrincipal}
-                  currentShelfId={shelf.shelf_id}
-                  containerClassName=""
-                />
-            </NftManagerActor>
+            <UnifiedCardActions
+              contentId={shelf.shelf_id}
+              contentType="Shelf"
+              isOwned={isOwned}
+              ownerPrincipal={shelfOwnerPrincipal}
+              currentShelfId={shelf.shelf_id}
+              containerClassName=""
+            />
           )}
         </div>
         {shelf?.description && (

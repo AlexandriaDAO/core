@@ -8,14 +8,12 @@ import { Link } from "@tanstack/react-router";
 import fetchUnlockedAlex from './thunks/unlocked';
 import fetchAlexPrice from './thunks/price';
 import Withdraw from './components/Withdraw';
-import { useIcpSwapFactory } from '@/hooks/actors';
 
 interface AlexUnlockedBalanceProps {
   menu?: boolean;
 }
 
 const AlexUnlockedBalance: React.FC<AlexUnlockedBalanceProps> = ({ menu }) => {
-  const {actor} = useIcpSwapFactory()
   const dispatch = useAppDispatch();
   const { unlocked, unlockedLoading, price, priceLoading } = useAppSelector((state) => state.balance.alex);
 

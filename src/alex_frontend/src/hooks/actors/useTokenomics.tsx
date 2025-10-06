@@ -1,7 +1,10 @@
-import { createUseActorHook } from 'ic-use-actor';
+import { createActorHook } from "ic-use-actor";
 import { _SERVICE } from "../../../../declarations/tokenomics/tokenomics.did";
-import { TokenomicsContext } from '@/contexts/actors';
+import { canisterId, idlFactory } from "../../../../declarations/tokenomics";
 
-const useTokenomics = createUseActorHook<_SERVICE>(TokenomicsContext);
+const useTokenomics = createActorHook<_SERVICE>({
+	canisterId: canisterId,
+	idlFactory: idlFactory,
+});
 
-export default useTokenomics
+export default useTokenomics;

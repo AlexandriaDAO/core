@@ -1,6 +1,8 @@
 [workspace]
 members = [
     "src/alex_backend",
+    "src/authentication",
+    "src/stripe",
     "src/system_api",
     "src/vetkd",
     "src/icp_swap",
@@ -12,7 +14,6 @@ members = [
     "src/user",
     "src/alex_wallet",
     "src/emporium",
-    "src/ic_siwo",
     "src/logs",
     "src/asset_manager",
     "src/feed",

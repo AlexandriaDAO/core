@@ -11,13 +11,10 @@ import NProgress from "nprogress";
 
 import "nprogress/nprogress.css";
 
-import AuthProvider from "./providers/AuthProvider";
-// import ActorProvider from "./providers/ActorProvider";
 import UserProvider from "./providers/UserProvider";
-// import { AppRoutes } from "./routes";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import ActorProvider from "./providers/ActorProvider";
-import IdentityProvider from "./providers/IdentityProvider";
+import { IdentityProvider } from "./lib/ic-use-identity";
 import NsfwProvider from "./providers/NsfwProvider";
 import ErrorFallback from "./components/fallbacks/ErrorFallback";
 
@@ -95,18 +92,13 @@ export default function App() {
                     >
                         <ReduxProvider>
                             <IdentityProvider>
-                                <AuthProvider>
-                                    <ActorProvider>
-                                    <UserProvider>
-                                            <NsfwProvider>
-                                                {/* <AppRoutes /> */}
-                                                <TooltipProvider delayDuration={0} skipDelayDuration={0}>
-                                                    <RouterProvider router={router} />
-                                                </TooltipProvider>
-                                            </NsfwProvider>
-                                        </UserProvider>
-                                    </ActorProvider>
-                                </AuthProvider>
+                                <ActorProvider />
+                                <UserProvider />
+                                <NsfwProvider>
+                                    <TooltipProvider delayDuration={0} skipDelayDuration={0}>
+                                        <RouterProvider router={router} />
+                                    </TooltipProvider>
+                                </NsfwProvider>
                             </IdentityProvider>
                         </ReduxProvider>
                     </SWRConfig>

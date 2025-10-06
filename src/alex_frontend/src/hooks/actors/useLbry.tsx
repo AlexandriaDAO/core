@@ -1,7 +1,13 @@
-import { createUseActorHook } from 'ic-use-actor';
+import { createActorHook } from "ic-use-actor";
 import { _SERVICE } from "../../../../declarations/LBRY/LBRY.did";
-import { LbryContext } from '@/contexts/actors';
+import {
+	canisterId,
+	idlFactory,
+} from "../../../../declarations/LBRY";
 
-const useLbry = createUseActorHook<_SERVICE>(LbryContext);
+const useLbry = createActorHook<_SERVICE>({
+	canisterId: canisterId,
+	idlFactory: idlFactory,
+});
 
-export default useLbry
+export default useLbry;

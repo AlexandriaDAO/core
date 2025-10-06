@@ -33,7 +33,7 @@ import { useContentPermissions } from "../hooks/useContentPermissions";
 import { Principal } from "@dfinity/principal";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { loadShelves } from "../state";
-import { useIdentity } from "@/hooks/useIdentity";
+import { useIdentity } from "@/lib/ic-use-identity";
 import { useUsername } from '@/hooks/useUsername';
 
 // Import UI components

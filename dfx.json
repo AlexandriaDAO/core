@@ -1,5 +1,15 @@
 {
   "canisters": {
+    "authentication": {
+			"type": "rust",
+      "package": "authentication",
+			"candid": "src/authentication/authentication.did"
+		},
+    "stripe": {
+			"type": "rust",
+			"package": "stripe",
+			"candid": "src/stripe/stripe.did"
+		},
     "vetkd": {
       "type": "rust",
       "package": "vetkd",
@@ -68,24 +78,6 @@
       "package": "tokenomics",
       "type": "rust",
       "id": "5abki-kiaaa-aaaap-qkmsa-cai"
-    },
-    "ic_siwo": {
-      "type": "rust",
-      "package": "ic_siwo",
-      "candid": "src/ic_siwo/ic_siwo.did",
-      "specified_id": "odkrm-viaaa-aaaap-qp2oq-cai"
-    },
-    "ic_siwe_provider": {
-      "type": "custom",
-      "candid": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.did",
-      "wasm": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.wasm.gz",
-      "specified_id": "w4vlu-paaaa-aaaaj-azxyq-cai"
-    },  
-    "ic_siws_provider": {
-      "type": "custom",
-      "candid": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.did",
-      "wasm": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.wasm.gz",
-      "specified_id": "w3una-cyaaa-aaaaj-azxya-cai"
     },
     "LBRY": {
       "type": "custom",

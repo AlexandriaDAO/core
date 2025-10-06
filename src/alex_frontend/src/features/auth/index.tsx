@@ -8,7 +8,7 @@ import {
 	User,
 	Wallet,
 	Fingerprint,
-	ChevronRight,
+    Shell,
 } from "lucide-react";
 
 import {
@@ -121,6 +121,12 @@ const Auth = () => {
                 </div>
                 
                     <DropdownMenuGroup>
+                        <Link to='/exchange'>
+                            <DropdownMenuItem className="cursor-pointer">
+                                <Shell />
+                                <span>Exchange</span>
+                            </DropdownMenuItem>
+                        </Link>
                         <Link to='/dashboard'>
                             <DropdownMenuItem className="cursor-pointer">
                                 <LayoutDashboard />

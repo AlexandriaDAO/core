@@ -1,7 +1,7 @@
 import { _SERVICE } from "../../../../../../declarations/ALEX/ALEX.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
-import { ActorSubclass } from "@dfinity/agent/lib/cjs";
+import { ActorSubclass } from "@dfinity/agent";
 
 // Define the asyn thunk
 const getAlexFee = createAsyncThunk<

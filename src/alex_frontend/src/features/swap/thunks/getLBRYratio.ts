@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { ActorSubclass } from "@dfinity/agent/lib/cjs";
+import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE } from "../../../../../declarations/icp_swap/icp_swap.did";
 
 // Define the async thunk

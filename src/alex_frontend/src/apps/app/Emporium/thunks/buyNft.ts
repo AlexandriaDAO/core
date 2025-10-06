@@ -2,7 +2,7 @@ import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import { arweaveIdToNat } from "@/utils/id_convert";
 import { Principal } from "@dfinity/principal";
 import { removeTransaction } from "@/apps/Modules/shared/state/transactions/transactionThunks";
-import { ActorSubclass } from "@dfinity/agent/lib/cjs";
+import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE as _SERVICE_EMPORIUM} from "../../../../../../declarations/emporium/emporium.did";
 import { _SERVICE as _SERVICE_ICP_LEDGER} from "../../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 

@@ -1,0 +1,372 @@
+type ArweaveSettings = record {
+  uri : text;
+  domain : text;
+  session_ttl : nat64;
+  statement : text;
+  salt : text;
+  network : text;
+  version : text;
+  message_ttl : nat64;
+};
+type AuthError = variant {
+  MessageExpiredError : text;
+  ValidationFailed;
+  SignatureInvalidError : text;
+  AddressFormat;
+  DelegationHashMismatchError : text;
+  ChainIdInvalid;
+  DelegationNotFound;
+  RecoveryFailed;
+  SessionNotFound;
+  MessageNotFoundError : text;
+  MessageNotFound;
+  DelegationHashMismatch;
+  StorageFailed;
+  WitnessHashMismatch;
+  SessionNotFoundError : text;
+  ValidationError : text;
+  RecoveryFailedError : text;
+  HexDecodingError : text;
+  SerializationFailed;
+  SignatureInvalid;
+  NonceInvalid;
+  AddressFormatError : text;
+  AuthenticationError : text;
+  MessageExpired;
+  ChainIdInvalidError : text;
+  StorageError : text;
+  HexDecodingFailed;
+  DelegationNotFoundError : text;
+  WitnessHashMismatchError : text;
+  SerializationError : text;
+  NonceInvalidError : text;
+};
+type Delegation = record { pubkey : blob; expiration : nat64 };
+type EthereumSettings = record {
+  uri : text;
+  domain : text;
+  session_ttl : nat64;
+  statement : text;
+  salt : text;
+  version : text;
+  message_ttl : nat64;
+  chain_id : nat64;
+};
+type Icrc21ConsentInfo = record {
+  metadata : Icrc21ConsentMessageMetadata;
+  consent_message : Icrc21ConsentMessage;
+};
+type Icrc21ConsentMessage = variant {
+  FieldsDisplayMessage : record {
+    fields : vec record { text; text };
+    intent : text;
+  };
+  GenericDisplayMessage : text;
+};
+type Icrc21ConsentMessageMetadata = record {
+  utc_offset_minutes : opt int16;
+  language : text;
+};
+type Icrc21ConsentMessageRequest = record {
+  arg : blob;
+  method : text;
+  user_preferences : Icrc21ConsentMessageSpec;
+};
+type Icrc21ConsentMessageSpec = record {
+  metadata : Icrc21ConsentMessageMetadata;
+  device_spec : opt Icrc21DeviceSpec;
+};
+type Icrc21DeviceSpec = variant { GenericDisplay; FieldsDisplay };
+type Icrc21Error = variant {
+  GenericError : record { description : text; error_code : nat };
+  InsufficientPayment : Icrc21ErrorInfo;
+  UnsupportedCanisterCall : Icrc21ErrorInfo;
+  ConsentMessageUnavailable : Icrc21ErrorInfo;
+};
+type Icrc21ErrorInfo = record { description : text };
+type LoginRequest = record {
+  signature : text;
+  session_key : blob;
+  message_id : text;
+};
+type LoginResponse = record { session_id : text; user_canister_pubkey : blob };
+type MessageResponse = record { message : text; message_id : text };
+type OisySettings = record {
+  uri : text;
+  domain : text;
+  session_ttl : nat64;
+  statement : text;
+  salt : text;
+  version : text;
+};
+type Result = variant { Ok : Icrc21ConsentInfo; Err : Icrc21Error };
+type Result_1 = variant { Ok : SignedDelegation; Err : AuthError };
+type Result_2 = variant { Ok : LoginResponse; Err : AuthError };
+type Result_3 = variant { Ok : SIWAMessageResponse; Err : AuthError };
+type Result_4 = variant { Ok : MessageResponse; Err : AuthError };
+type Result_5 = variant { Ok : SIWSMessageResponse; Err : AuthError };
+type Result_6 = variant { Ok : text; Err : text };
+type SIWALoginRequest = record {
+  signature : blob;
+  session_key : blob;
+  message_id : text;
+};
+type SIWAMessageRequest = record { public_key : text; address : text };
+type SIWAMessageResponse = record { message : blob; message_id : text };
+type SIWOLoginRequest = record { session_key : blob };
+type SIWSLoginRequest = record {
+  signature : blob;
+  session_key : blob;
+  message_id : text;
+};
+type SIWSMessageResponse = record { message : blob; message_id : text };
+type SignedDelegation = record { signature : blob; delegation : Delegation };
+type SolanaSettings = record {
+  uri : text;
+  domain : text;
+  session_ttl : nat64;
+  statement : text;
+  salt : text;
+  version : text;
+  message_ttl : nat64;
+  cluster : text;
+};
+service : () -> {
+  // Get current Arweave authentication settings
+  // Public read access for configuration queries
+  get_arweave_settings : () -> (ArweaveSettings) query;
+  // Get current Ethereum authentication settings
+  // Public read access for configuration queries
+  get_ethereum_settings : () -> (EthereumSettings) query;
+  // Get current Oisy authentication settings
+  // Public read access for configuration queries
+  get_oisy_settings : () -> (OisySettings) query;
+  // Get current Solana authentication settings
+  // Public read access for configuration queries
+  get_solana_settings : () -> (SolanaSettings) query;
+  icrc21_canister_call_consent_message : (Icrc21ConsentMessageRequest) -> (
+      Result,
+    );
+  // Get the signed delegation for a session
+  // 
+  // This query endpoint retrieves the delegation that was created during login,
+  // along with the IC-certified signature that proves its validity. The frontend
+  // uses this to create a DelegationChain for IC identity authentication.
+  // 
+  // # Example
+  // ```bash
+  // dfx canister call mulauth siwa_delegation '("abc123def456...")'
+  // ```
+  siwa_delegation : (text) -> (Result_1) query;
+  // SIWA login endpoint for IC canister
+  // 
+  // This update function provides the complete SIWA authentication flow.
+  // It's an update function (not query) because it modifies storage by:
+  // - Consuming the used message
+  // - Creating session and certificate entries
+  // - Creating IC certificate tree entries (hash(seed_hash) -> delegation_hash -> Unit)
+  // - Cleaning up expired sessions and certificate signatures
+  // 
+  // The authentication flow:
+  // 1. Validates and consumes the SIWA message
+  // 2. Verifies the signature against the message (RSA-PSS verification)
+  // 3. Creates a new session with delegation
+  // 4. Stores certificate entry for IC authentication (1-minute expiration)
+  // 5. Cleans up expired sessions and certificates
+  // 6. Returns session data and user canister public key
+  // 
+  // **KEY DIFFERENCE FROM ETHEREUM/SOLANA**: Uses RSA-PSS signature verification, no address recovery possible
+  // 
+  // Example usage:
+  // ```bash
+  // # First, prepare a login message
+  // dfx canister call mulauth siwa_message '(record {
+  // address = "1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY";
+  // public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...";
+  // })'
+  // 
+  // # Then use the returned message_id and get user to sign the message
+  // # Finally, call login with signature
+  // dfx canister call mulauth siwa_login '(record {
+  // signature = blob "base64url_signature_from_arweave_wallet";
+  // message_id = "hex_message_id_from_siwa_message";
+  // session_key = blob "session_public_key_bytes";
+  // })'
+  // ```
+  siwa_login : (SIWALoginRequest) -> (Result_2);
+  // Generate a SIWA message for user authentication
+  // 
+  // Example call:
+  // ```
+  // dfx canister call mulauth siwa_message '(record {
+  // address = "1seRanklLU_1VTGkEk7P0xAwMJfA7owA1JHW5KyZKlY";
+  // public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA...";
+  // })'
+  // ```
+  // 
+  // Returns: MessageResponse with message text and nonce
+  siwa_message : (SIWAMessageRequest) -> (Result_3);
+  // Get all stored SIWA messages (for testing/debugging)
+  siwa_messages : () -> (vec text) query;
+  // Get the signed delegation for a session
+  // 
+  // This query endpoint retrieves the delegation that was created during login,
+  // along with the IC-certified signature that proves its validity. The frontend
+  // uses this to create a DelegationChain for IC identity authentication.
+  // 
+  // # Example
+  // ```bash
+  // dfx canister call mulauth siwe_delegation '("abc123def456...")'
+  // ```
+  siwe_delegation : (text) -> (Result_1) query;
+  // SIWE login endpoint for IC canister
+  // 
+  // This update function provides the complete SIWE authentication flow.
+  // It's an update function (not query) because it modifies storage by:
+  // - Consuming the used message
+  // - Creating session and certificate entries
+  // - Creating IC certificate tree entries (hash(seed_hash) -> delegation_hash -> Unit)
+  // - Cleaning up expired sessions and certificate signatures
+  // 
+  // The authentication flow:
+  // 1. Validates and consumes the SIWE message
+  // 2. Verifies the signature against the message
+  // 3. Creates a new session with delegation
+  // 4. Stores certificate entry for IC authentication (1-minute expiration)
+  // 5. Cleans up expired sessions and certificates
+  // 6. Returns session data and user canister public key
+  // 
+  // Example usage:
+  // ```bash
+  // # First, prepare a login message
+  // dfx canister call mulauth siwe_message '("0x55e7ff3c9c89d27d43a6272ac68609f968550c17")'
+  // 
+  // # User signs the message with MetaMask, then call login
+  // dfx canister call mulauth siwe_login '(
+  // record {
+  // signature = "0x7c67af1eccafdb4e139a6d1b37fa1d1eaac4a15b15e7461e1041ba968d2cebf04f71c719ec25f8a42a862b6b88ba3194aebaf9d452b05135e0f421b16a6d0c781b";
+  // message_id = "abc123def456789...";
+  // session_key = blob "\30\2a\30\05\06\03\2b\65\70\03\21\00\dc\e3\02\81\48\24\2b\dc\60\66\e1\5c\62\a3\72\b6\75\b5\33\0f\db\c5\68\37\7b\f5\4a\b5\23\b5\ab\c4";
+  // }
+  // )'
+  // ```
+  // 
+  // Returns: AuthResult<SIWELoginResponse> - session data or detailed error
+  siwe_login : (LoginRequest) -> (Result_2);
+  // Generate a SIWE message for user authentication
+  // 
+  // Example call:
+  // ```
+  // dfx canister call mulauth siwe_message '("0x742c8ab5ad3d9c3fc3b0f1d4a2a4c8b5f8e7d329")'
+  // ```
+  // 
+  // Returns: MessageResponse with message text and nonce
+  siwe_message : (text) -> (Result_4);
+  // Get the signed delegation for a session
+  // 
+  // This query endpoint retrieves the delegation that was created during login,
+  // along with the IC-certified signature that proves its validity. The frontend
+  // uses this to create a DelegationChain for IC identity authentication.
+  // 
+  // # Example
+  // ```bash
+  // dfx canister call mulauth siwo_delegation '("abc123def456...")'
+  // ```
+  siwo_delegation : (text) -> (Result_1) query;
+  // SIWO login endpoint for IC canister
+  // 
+  // This update function provides the complete SIWO authentication flow.
+  // It's an update function (not query) because it modifies storage by:
+  // - Cleaning up expired sessions and certificate signatures
+  // - Creating session and certificate entries
+  // - Creating IC certificate tree entries (hash(seed_hash) -> delegation_hash -> Unit)
+  // 
+  // The authentication flow:
+  // 1. Cleans up expired sessions and certificates (since no siwo_message endpoint)
+  // 2. Gets the caller principal (authenticated call from Oisy)
+  // 3. Validates the caller is not anonymous
+  // 4. Creates a new session with delegation
+  // 5. Stores certificate entry for IC authentication (1-minute expiration)
+  // 6. Returns session data and user canister public key
+  // 
+  // **KEY DIFFERENCE FROM OTHER PROVIDERS**:
+  // - No message creation or signature verification needed
+  // - Uses ic_cdk::caller() to get authenticated principal
+  // - Leverages ICRC-21 consent message shown by Oisy wallet
+  // - Handles all pruning since there's no message endpoint
+  // 
+  // Example usage:
+  // ```bash
+  // # Called by Oisy wallet after user approves ICRC-21 consent message
+  // dfx canister call mulauth siwo_login '(record {
+  // session_key = blob "session_public_key_bytes";
+  // })'
+  // ```
+  siwo_login : (SIWOLoginRequest) -> (Result_2);
+  // Get the signed delegation for a session
+  // 
+  // This query endpoint retrieves the delegation that was created during login,
+  // along with the IC-certified signature that proves its validity. The frontend
+  // uses this to create a DelegationChain for IC identity authentication.
+  // 
+  // # Example
+  // ```bash
+  // dfx canister call mulauth siws_delegation '("abc123def456...")'
+  // ```
+  siws_delegation : (text) -> (Result_1) query;
+  // SIWS login endpoint for IC canister
+  // 
+  // This update function provides the complete SIWS authentication flow.
+  // It's an update function (not query) because it modifies storage by:
+  // - Consuming the used message
+  // - Creating session and certificate entries
+  // - Creating IC certificate tree entries (hash(seed_hash) -> delegation_hash -> Unit)
+  // - Cleaning up expired sessions and certificate signatures
+  // 
+  // The authentication flow:
+  // 1. Validates and consumes the SIWS message
+  // 2. Verifies the signature against the message (Ed25519 verification)
+  // 3. Creates a new session with delegation
+  // 4. Stores certificate entry for IC authentication (1-minute expiration)
+  // 5. Cleans up expired sessions and certificates
+  // 6. Returns session data and user canister public key
+  // 
+  // **KEY DIFFERENCE FROM ETHEREUM**: Uses Ed25519 signature verification instead of ECDSA recovery
+  // 
+  // Example usage:
+  // ```bash
+  // # First, prepare a login message
+  // dfx canister call mulauth siws_message '("11111111111111111111111111111112")'
+  // 
+  // # Then use the returned message_id and get user to sign the message
+  // # Finally, call login with signature
+  // dfx canister call mulauth siws_login '(record {
+  // signature = "base58_signature_from_wallet";
+  // message_id = "hex_message_id_from_siws_message";
+  // session_key = blob "session_public_key_bytes";
+  // })'
+  // ```
+  siws_login : (SIWSLoginRequest) -> (Result_2);
+  // Generate a SIWS message for user authentication
+  // 
+  // Example call:
+  // ```
+  // dfx canister call mulauth siws_message '("11111111111111111111111111111112")'
+  // ```
+  // 
+  // Returns: MessageResponse with message text and nonce
+  siws_message : (text) -> (Result_5);
+  // Update Arweave authentication settings
+  // Admin-only in production (currently open for development)
+  update_arweave_settings : (ArweaveSettings) -> (Result_6);
+  // Update Ethereum authentication settings
+  // Admin-only in production (currently open for development)
+  update_ethereum_settings : (EthereumSettings) -> (Result_6);
+  // Update Oisy authentication settings
+  // Admin-only in production (currently open for development)
+  update_oisy_settings : (OisySettings) -> (Result_6);
+  // Update Solana authentication settings
+  // Admin-only in production (currently open for development)
+  update_solana_settings : (SolanaSettings) -> (Result_6);
+  whoami : () -> (text);
+}

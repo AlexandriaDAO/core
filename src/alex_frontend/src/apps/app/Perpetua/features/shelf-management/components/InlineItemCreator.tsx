@@ -9,7 +9,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { selectUserShelves, selectSelectedShelf, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { toast } from "sonner";
 import { loadShelves } from "@/apps/app/Perpetua/state";
-import { useIdentity } from "@/hooks/useIdentity";
+import { useIdentity } from "@/lib/ic-use-identity";
 import AppCard from '@/components/AppCard';
 import { findApp } from '@/config/apps';
 import { usePerpetua } from "@/hooks/actors";

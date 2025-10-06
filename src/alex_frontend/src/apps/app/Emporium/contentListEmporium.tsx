@@ -23,7 +23,6 @@ import {
   CardTitle,
 } from "@/lib/components/card";
 import { Card } from "@/lib/components/card";
-import { IcpLedgerActor, Icrc7Actor } from "@/actors";
 
 const truncateMiddle = (str: string, startChars: number = 4, endChars: number = 4) => {
   if (str.length <= startChars + endChars + 3) return str;
@@ -248,16 +247,12 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
             )}
           </DialogContent>
         </Dialog>
-          <Icrc7Actor>
-            <IcpLedgerActor>
-              <CombinedModal
-                type={modalType!}
-                modalData={modalData}
-                onClose={handleCloseModal}
-                handleRenderError={handleRenderError}
-              />
-            </IcpLedgerActor>
-          </Icrc7Actor>
+        <CombinedModal
+          type={modalType!}
+          modalData={modalData}
+          onClose={handleCloseModal}
+          handleRenderError={handleRenderError}
+        />
       </>
     </TooltipProvider>
   );

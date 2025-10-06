@@ -9,7 +9,7 @@ import { Download, RefreshCw } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { fetchUserArweaveAssets } from "@/features/arweave-assets/thunks/fetchUserArweaveAssets";
 import { useAssetManager } from "@/hooks/useAssetManager";
-import { useIdentity } from "@/hooks/useIdentity";
+import { useIdentity } from "@/lib/ic-use-identity";
 import fetch from "@/features/icp-assets/thunks/fetch";
 import { pullAllAssets } from "@/features/arweave-assets/thunks/pullAllAssets";
 

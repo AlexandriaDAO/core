@@ -15,7 +15,6 @@ import { RootState, AppDispatch } from '@/store';
 import { useUsername } from '@/hooks/useUsername';
 import { useFollowStatus } from '../../following/hooks/useFollowStatus';
 import { usePerpetua } from '@/hooks/actors';
-import { NftManagerActor } from '@/actors';
 
 export interface ShelfCardProps {
   shelf: ShelfPublic;
@@ -160,7 +159,6 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
           <AspectRatio ratio={1} className="w-full relative">
             <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 h-full group-hover:bg-gray-100 dark:group-hover:bg-gray-900/80 transition-colors duration-300">
               <div className="relative w-full h-full">
-                <NftManagerActor>
                   <UnifiedCardActions
                     contentId={shelf.shelf_id}
                     contentType="Shelf"
@@ -172,7 +170,6 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
                     showDetails={isFooterExpanded}
                     isOwned={isOwnedByUser}
                   />
-                </NftManagerActor>
                 <div className="text-center p-6 h-full flex flex-col items-center justify-center">
                   <div className="text-xl font-semibold truncate max-w-full mb-1 font-serif">{shelf.title}</div>
                   

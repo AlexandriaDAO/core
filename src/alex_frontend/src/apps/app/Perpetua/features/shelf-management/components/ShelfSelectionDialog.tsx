@@ -27,7 +27,6 @@ import { getUserShelves, getUserPubliclyEditableShelves } from "@/apps/app/Perpe
 import { OffsetPaginationParams, OffsetPaginatedResponse } from "@/apps/app/Perpetua/state/services/serviceTypes"; // Corrected import path
 import { Result } from "@/apps/app/Perpetua/utils"; // Corrected import path
 import { usePerpetua } from "@/hooks/actors";
-import { AlexBackendActor } from "@/actors";
 
 /**
  * Convert a NormalizedShelf back to a Shelf for API calls and components
@@ -582,12 +581,12 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
                   <div className="mb-4">
                     <div style={{ display: !selectedPublicUserPrincipal ? 'block' : 'none' }}>
                       <div className="min-h-[150px]"> {/* Ensure PrincipalSelector has enough space */}
-                        <AlexBackendActor><PrincipalSelector 
+                        <PrincipalSelector 
                           onPrincipalSelected={handleUserPrincipalSelect} 
                           defaultPrincipal="new" // Or any other appropriate default
                           performDefaultActions={false} // CRUCIAL: Set this to false
                           showMostRecentOption={false}
-                        /></AlexBackendActor>
+                        />
                       </div>
                     </div>
                     {selectedPublicUserPrincipal && (

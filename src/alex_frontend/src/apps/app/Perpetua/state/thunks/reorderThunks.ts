@@ -8,7 +8,7 @@ import {
   reorderProfileShelf as reorderProfileShelfService
 } from '../services';
 import { toPrincipal, extractErrorMessage } from '../../utils';
-import { ActorSubclass } from '@dfinity/agent/lib/cjs/actor';
+import { ActorSubclass } from '@dfinity/agent';
 import { _SERVICE } from '../../../../../../../declarations/perpetua/perpetua.did';
 /**
  * Set the absolute order of items within a shelf

@@ -6,7 +6,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { selectUserShelves, selectLoading, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { Principal } from "@dfinity/principal";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
-import { useIdentity } from "@/hooks/useIdentity";
+import { useIdentity } from "@/lib/ic-use-identity";
 import { AddItemResult } from "@/apps/app/Perpetua/state/thunks/itemThunks";
 import { usePerpetua } from "@/hooks/actors";
 
