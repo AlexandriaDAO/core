@@ -188,12 +188,12 @@ impl OisySettings {
 // IC CANISTER FUNCTIONS (dfx canister call)
 //===================================================================================================
 
-/// Get current Oisy authentication settings
-/// Public read access for configuration queries
-#[query]
-pub fn get_oisy_settings() -> OisySettings {
-    OisySettings::get()
-}
+// /// Get current Oisy authentication settings
+// /// Public read access for configuration queries
+// #[query]
+// pub fn get_oisy_settings() -> OisySettings {
+//     OisySettings::get()
+// }
 
 /// Update Oisy authentication settings
 /// Admin-only in production (currently open for development)

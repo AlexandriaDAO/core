@@ -199,12 +199,12 @@ impl SolanaSettings {
 // IC CANISTER FUNCTIONS (dfx canister call)
 //===================================================================================================
 
-/// Get current Solana authentication settings
-/// Public read access for configuration queries
-#[query]
-pub fn get_solana_settings() -> SolanaSettings {
-    SolanaSettings::get()
-}
+// /// Get current Solana authentication settings
+// /// Public read access for configuration queries
+// #[query]
+// pub fn get_solana_settings() -> SolanaSettings {
+//     SolanaSettings::get()
+// }
 
 /// Update Solana authentication settings
 /// Admin-only in production (currently open for development)

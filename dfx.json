@@ -3,12 +3,14 @@
     "authentication": {
 			"type": "rust",
       "package": "authentication",
-			"candid": "src/authentication/authentication.did"
+			"candid": "src/authentication/authentication.did",
+      "specified_id": "w4vlu-paaaa-aaaaj-azxyq-cai"
 		},
     "stripe": {
 			"type": "rust",
 			"package": "stripe",
-			"candid": "src/stripe/stripe.did"
+			"candid": "src/stripe/stripe.did",
+      "specified_id": "w3una-cyaaa-aaaaj-azxya-cai"
 		},
     "vetkd": {
       "type": "rust",

@@ -132,18 +132,6 @@ type SolanaSettings = record {
   cluster : text;
 };
 service : () -> {
-  // Get current Arweave authentication settings
-  // Public read access for configuration queries
-  get_arweave_settings : () -> (ArweaveSettings) query;
-  // Get current Ethereum authentication settings
-  // Public read access for configuration queries
-  get_ethereum_settings : () -> (EthereumSettings) query;
-  // Get current Oisy authentication settings
-  // Public read access for configuration queries
-  get_oisy_settings : () -> (OisySettings) query;
-  // Get current Solana authentication settings
-  // Public read access for configuration queries
-  get_solana_settings : () -> (SolanaSettings) query;
   icrc21_canister_call_consent_message : (Icrc21ConsentMessageRequest) -> (
       Result,
     );
@@ -206,8 +194,6 @@ service : () -> {
   // 
   // Returns: MessageResponse with message text and nonce
   siwa_message : (SIWAMessageRequest) -> (Result_3);
-  // Get all stored SIWA messages (for testing/debugging)
-  siwa_messages : () -> (vec text) query;
   // Get the signed delegation for a session
   // 
   // This query endpoint retrieves the delegation that was created during login,

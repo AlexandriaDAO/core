@@ -20,6 +20,9 @@
   "asset_manager": {
     "ic": "zhcno-qqaaa-aaaap-qpv7a-cai"
   },
+  "authentication": {
+    "ic": "w4vlu-paaaa-aaaaj-azxyq-cai"
+  },
   "emporium": {
     "ic": "zdcg2-dqaaa-aaaap-qpnha-cai"
   },
@@ -41,6 +44,9 @@
   "icp_ledger_canister": {
     "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
   },
+  "ic_siwo": {
+    "ic": "odkrm-viaaa-aaaap-qp2oq-cai"
+  },
   "icp_swap": {
     "ic": "54fqz-5iaaa-aaaap-qkmqa-cai"
   },
@@ -61,6 +67,9 @@
   },
   "perpetua": {
     "ic": "ya6k4-waaaa-aaaap-qkmpq-cai"
+  },
+  "stripe": {
+    "ic": "w3una-cyaaa-aaaaj-azxya-cai"
   },
   "system_api": {
     "ic": "5vg3f-laaaa-aaaap-qkmrq-cai"

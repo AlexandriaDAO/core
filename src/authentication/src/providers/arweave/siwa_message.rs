@@ -79,11 +79,11 @@ pub fn siwa_message(
 // QUERY FUNCTIONS FOR TESTING/DEBUGGING (dfx canister call)
 //===================================================================================================
 
-/// Get all stored SIWA messages (for testing/debugging)
-#[ic_cdk::query]
-pub fn siwa_messages() -> Vec<String> {
-    ARMessage::all_values()
-        .iter()
-        .map(|msg| msg.summary())
-        .collect()
-}
+// /// Get all stored SIWA messages (for testing/debugging)
+// #[ic_cdk::query]
+// pub fn siwa_messages() -> Vec<String> {
+//     ARMessage::all_values()
+//         .iter()
+//         .map(|msg| msg.summary())
+//         .collect()
+// }

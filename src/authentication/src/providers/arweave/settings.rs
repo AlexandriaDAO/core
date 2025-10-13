@@ -199,12 +199,12 @@ impl ArweaveSettings {
 // IC CANISTER FUNCTIONS (dfx canister call)
 //===================================================================================================
 
-/// Get current Arweave authentication settings
-/// Public read access for configuration queries
-#[query]
-pub fn get_arweave_settings() -> ArweaveSettings {
-    ArweaveSettings::get()
-}
+// /// Get current Arweave authentication settings
+// /// Public read access for configuration queries
+// #[query]
+// pub fn get_arweave_settings() -> ArweaveSettings {
+//     ArweaveSettings::get()
+// }
 
 /// Update Arweave authentication settings
 /// Admin-only in production (currently open for development)

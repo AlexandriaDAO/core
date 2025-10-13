@@ -209,12 +209,12 @@ impl EthereumSettings {
 // IC CANISTER FUNCTIONS (dfx canister call)
 //===================================================================================================
 
-/// Get current Ethereum authentication settings
-/// Public read access for configuration queries
-#[query]
-pub fn get_ethereum_settings() -> EthereumSettings {
-    EthereumSettings::get()
-}
+// /// Get current Ethereum authentication settings
+// /// Public read access for configuration queries
+// #[query]
+// pub fn get_ethereum_settings() -> EthereumSettings {
+//     EthereumSettings::get()
+// }
 
 /// Update Ethereum authentication settings
 /// Admin-only in production (currently open for development)

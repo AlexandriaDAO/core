@@ -103,12 +103,12 @@ dfx deploy alex_revshare --specified-id e454q-riaaa-aaaap-qqcyq-cai
 # For Authentication
 cargo build --release --target wasm32-unknown-unknown --package authentication
 candid-extractor target/wasm32-unknown-unknown/release/authentication.wasm > src/authentication/authentication.did
-dfx deploy authentication --specified-id uxrrr-q7777-77774-qaaaq-cai
+dfx deploy authentication --specified-id w4vlu-paaaa-aaaaj-azxyq-cai
 
 # For Stripe
 cargo build --release --target wasm32-unknown-unknown --package stripe
 candid-extractor target/wasm32-unknown-unknown/release/stripe.wasm > src/stripe/stripe.did
-dfx deploy stripe --specified-id uzt4z-lp777-77774-qaabq-cai
+dfx deploy stripe --specified-id w3una-cyaaa-aaaaj-azxya-cai
 
 
 
