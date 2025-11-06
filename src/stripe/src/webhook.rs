@@ -103,7 +103,7 @@ fn handle_stripe_webhook(request: &HttpRequest) -> HttpResponse {
             println!("Stripe event type: {}", event_type);
 
             match event_type {
-                "payment_intent.succeeded" => handle_payment_intent_succeeded(&webhook_data),
+                "checkout.session.completed" => handle_checkout_session_completed(&webhook_data),
                 _ => {
                     println!("Unhandled webhook event type: {}", event_type);
                     create_success_response("Webhook received but not processed", None)
@@ -117,28 +117,27 @@ fn handle_stripe_webhook(request: &HttpRequest) -> HttpResponse {
     }
 }
 
-fn handle_payment_intent_succeeded(webhook_data: &Value) -> HttpResponse {
-    println!("Processing payment_intent.succeeded event");
+fn handle_checkout_session_completed(webhook_data: &Value) -> HttpResponse {
+    println!("Processing checkout.session.completed event");
 
     let data = &webhook_data["data"]["object"];
-    let amount = data["amount"].as_u64().unwrap_or(0);
-    let payment_intent_id = data["id"].as_str().unwrap_or("");
-    let metadata = &data["metadata"];
-    let user_id = metadata["user_id"].as_str().unwrap_or("");
+    let amount_total = data["amount_total"].as_u64().unwrap_or(0);
+    let session_id = data["id"].as_str().unwrap_or("");
+    let client_reference_id = data["client_reference_id"].as_str().unwrap_or("");
 
     println!(
-        "Amount: {} cents, Payment Intent: {}, User: {}",
-        amount, payment_intent_id, user_id
+        "Amount: {} cents, Session ID: {}, Client Reference ID: {}",
+        amount_total, session_id, client_reference_id
     );
 
-    if !user_id.is_empty() {
-        match Principal::from_text(user_id) {
+    if !client_reference_id.is_empty() {
+        match Principal::from_text(client_reference_id) {
             Ok(user_principal) => {
                 println!("Updating balance for user: {}", user_principal.to_text());
 
                 let updated_balance = update_user_balance(&user_principal, |balance| {
-                    balance.balance += amount;
-                    balance.total_deposits += amount;
+                    balance.balance += amount_total;
+                    balance.total_deposits += amount_total;
                     balance.deposit_count += 1;
                 });
 
@@ -148,17 +147,17 @@ fn handle_payment_intent_succeeded(webhook_data: &Value) -> HttpResponse {
                 );
 
                 create_success_response(
-                    "Payment intent processed successfully",
+                    "Checkout session processed successfully",
                     Some(serde_json::json!({
                         "user": user_principal.to_text(),
-                        "payment_intent_id": payment_intent_id,
-                        "amount_deposited": amount,
+                        "session_id": session_id,
+                        "amount_deposited": amount_total,
                         "new_balance": updated_balance.balance,
                     })),
                 )
             }
             Err(e) => {
-                println!("Invalid Principal in user_id: {}", e);
+                println!("Invalid Principal in client_reference_id: {}", e);
                 create_error_response(
                     400,
                     "Invalid user reference",
@@ -167,8 +166,8 @@ fn handle_payment_intent_succeeded(webhook_data: &Value) -> HttpResponse {
             }
         }
     } else {
-        println!("Payment intent succeeded but no user_id in metadata");
-        create_success_response("Payment intent received but not processed", None)
+        println!("Checkout session completed but no client_reference_id");
+        create_success_response("Checkout session received but not processed", None)
     }
 }
 

@@ -45,6 +45,7 @@ import stakeReducer from '@/features/stake/stakeSlice';
 import permasearchReducer from '@/features/permasearch/store/slice';
 import alexandrianReducer from '@/features/alexandrian/alexandrianSlice';
 import nftReducer from '@/features/nft/slice';
+import sonoraReducer from '@/features/sonora/sonoraSlice';
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -94,6 +95,7 @@ const rootReducer = combineReducers({
 	permasearch: permasearchReducer,
 	alexandrian: alexandrianReducer,
 	nft: nftReducer,
+	sonora: sonoraReducer,
 });
 
 export default rootReducer;
