@@ -1,4 +1,6 @@
 import React from "react";
+import Protected from "@/guards/Protected";
+import AuthenticationSettings from "@/features/auth/components/AuthenticationSettings";
 
 function LibrarianPage() {
 	return (
@@ -15,6 +17,11 @@ function LibrarianPage() {
 					</p>
 				</div>
 			</div>
+			<Protected>
+				<div className="mt-6 font-roboto-condensed bg-secondary rounded-lg shadow-md p-6">
+					<AuthenticationSettings />
+				</div>
+			</Protected>
 		</>
 	)
 }
