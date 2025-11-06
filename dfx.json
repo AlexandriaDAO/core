@@ -94,7 +94,6 @@
       "id": "ysy5f-2qaaa-aaaap-qkmmq-cai"
     },
     "alex_frontend": {
-      "dependencies": ["alex_backend"],
       "frontend": {
         "entrypoint": "src/alex_frontend/public/index.html"
       },
