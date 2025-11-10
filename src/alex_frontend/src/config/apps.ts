@@ -23,7 +23,7 @@ export const appsData: App[] = [
 export const thirdPartyAppsData: App[] = [
   { name: 'DAOPad', description: 'launchpad', path: 'https://daopad.org', logo: '/logos/third_party/daopad_logo.png', comingSoon: false, isThirdParty: true },
   { name: 'KongLocker', description: 'token locker', path: 'https://konglocker.com', logo: '/logos/third_party/kong_locker.png', comingSoon: false, isThirdParty: true },
-  { name: 'lbry.fun', description: 'zero token', path: 'https://lbry.fun', logo: '/logos/third_party/lbry_fun.svg', comingSoon: false, isThirdParty: true },
+  { name: 'caffeinelauncher.com', description: 'zero token', path: 'https://caffeinelauncher.com', logo: '/logos/third_party/lbry_fun.svg', comingSoon: false, isThirdParty: true },
   { name: 'fission.bridge', description: 'bridge', path: 'https://fission.bridge', logo: '/logos/fission.svg', comingSoon: true, isThirdParty: true },
 ];
 
