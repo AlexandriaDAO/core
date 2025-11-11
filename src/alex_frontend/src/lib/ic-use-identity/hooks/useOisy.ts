@@ -303,7 +303,7 @@ export function useOisy() {
 				windowOpenerFeatures: "width=400,height=650,left=100,top=100",
 			});
 
-			const signer = new Signer({ transport , derivationOrigin: "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io"});
+			const signer = new Signer({ transport });
 
 			const owner = await connectWallet(signer);
 

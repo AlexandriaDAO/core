@@ -93,144 +93,126 @@ const Login:React.FC<LoginProps> = ({ fullpage = false }) => {
 						<div className="space-y-6 w-full">
 							{/* Native Wallets Section */}
 							<div className="space-y-3">
-								<div className="flex items-center gap-2 text-muted dark:text-primary ">
-									<Wallet className="w-5 h-5" />
-									<h2 className="text-lg font-semibold">
-										Native Wallets
-									</h2>
-								</div>
-
-								{/* Internet Identity Card */}
-								<div
-									className="border border-border rounded-lg p-4 bg-gradient-to-br from-background to-muted/30 hover:border-primary transition-colors cursor-pointer group"
-									onClick={() =>
-										ii.login({
-											derivationOrigin: "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io",
-											identityProvider: process.env.DFX_NETWORK === "local" ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`: "https://id.ai",
-										})
-									}
-								>
-									<div className="flex items-center justify-between mb-3">
-										<div className="flex items-center gap-2">
-											<img
-												src="/images/ic.svg"
-												alt="Internet Identity"
-												className="w-8 h-8"
-											/>
-											<div>
-												<h3 className="font-semibold text-base">
-													Internet Identity
-												</h3>
-												<p className="text-xs text-muted-foreground">
-													Secure authentication
-													powered by DFINITY
-												</p>
-											</div>
-										</div>
-										<ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+								<div className="space-y-1">
+									<div className="flex items-center gap-2 text-muted dark:text-primary ">
+										<Wallet className="w-5 h-5" />
+										<h2 className="text-lg font-semibold">
+											Native Wallets
+										</h2>
 									</div>
-
-									<div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
-										<Shield className="w-3 h-3" />
-										<span>No password required</span>
-									</div>
-
-									{/* Footer with four wallets */}
-									<div className="flex gap-2">
-										<Button
-											onClick={(e) => {
-												e.stopPropagation();
-												nfid.login()
-											}}
-											variant="outline"
-											className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors text-xs"
-										>
-											<img
-												src="/images/nfid-logo.png"
-												alt="NFID"
-												className="w-5 h-5"
-											/>
-											<span className="text-sm font-medium">
-												NFID
-											</span>
-										</Button>
-
-										<Button
-											onClick={(e) => {
-												e.stopPropagation();
-												ii.login({
-													derivationOrigin: "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io",
-													identityProvider: process.env.DFX_NETWORK === "local" ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`: "https://identity.ic0.app",
-												})
-
-											}}
-											variant="outline"
-											className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors text-xs"
-										>
-											<img
-												src="/images/ic.svg"
-												alt="Internet Identity Legacy"
-												className="w-5 h-5"
-											/>
-											<span className="text-sm font-medium">
-												II (Legacy)
-											</span>
-										</Button>
-
-										<Button
-											onClick={(e) => {
-												e.stopPropagation();
-												oisy.login();
-											}}
-											variant="outline"
-											className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors text-xs"
-										>
-											<img
-												src="/images/oisy-logo.svg"
-												alt="OISY"
-												className="w-5 h-5"
-											/>
-											<span className="text-sm font-medium">
-												OISY
-											</span>
-										</Button>
-
-										<Button
-											onClick={(e) => {
-												e.stopPropagation();
-												plug.login();
-											}}
-											variant="outline"
-											className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors text-xs"
-										>
-											<img
-												src="/images/plug-logo.png"
-												alt="Plug"
-												className="dark:bg-white w-5 h-5"
-											/>
-											<span className="text-sm font-medium">
-												Plug
-											</span>
-										</Button>
-									</div>
-								</div>
-							</div>
-
-							{/* Cross-chain Section */}
-							<div className="space-y-3">
-								<div className="text-muted dark:text-primary flex items-center gap-2">
-									<Globe className="w-5 h-5" />
-									<h2 className="text-lg font-semibold">
-										Cross-chain
-									</h2>
+									<p className="text-sm text-muted-foreground">
+										Internet Computer native authentication methods with seamless integration
+									</p>
 								</div>
 
 								<div className="flex gap-3">
 									<Button
-										onClick={(e) =>{
-											e.stopPropagation();
-											ethereum.login()
-										}}
+										onClick={() =>
+											ii.login({
+												derivationOrigin: "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io",
+												identityProvider: process.env.DFX_NETWORK === "local" ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`: "https://id.ai",
+											})
+										}
+										variant="outline"
+										className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors"
+									>
+										<img
+											src="/images/ic.svg"
+											alt="Internet Identity 2.0"
+											className="w-5 h-5"
+										/>
+										<span className="text-sm font-medium">
+											Internet Identity 2.0
+										</span>
+									</Button>
+
+									<Button
+										onClick={() =>
+											ii.login({
+												derivationOrigin: "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io",
+												identityProvider: process.env.DFX_NETWORK === "local" ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`: "https://identity.ic0.app",
+											})
+										}
+										variant="outline"
+										className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors"
+									>
+										<img
+											src="/images/ic.svg"
+											alt="Internet Identity Legacy"
+											className="w-5 h-5"
+										/>
+										<span className="text-sm font-medium">
+											Internet Identity (Legacy)
+										</span>
+									</Button>
+
+									<Button
+										onClick={() => nfid.login()}
+										variant="outline"
+										className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors"
+									>
+										<img
+											src="/images/nfid-logo.png"
+											alt="NFID"
+											className="w-5 h-5"
+										/>
+										<span className="text-sm font-medium">
+											NFID
+										</span>
+									</Button>
+
+									<Button
+										onClick={() => plug.login()}
+										variant="outline"
+										className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors"
+									>
+										<img
+											src="/images/plug-logo.png"
+											alt="Plug"
+											className="dark:bg-white w-5 h-5"
+										/>
+										<span className="text-sm font-medium">
+											Plug
+										</span>
+									</Button>
+								</div>
+							</div>
+
+							{/* External Wallets Section */}
+							<div className="space-y-4">
+								<div className="space-y-1">
+									<div className="text-muted dark:text-primary flex items-center gap-2">
+										<Globe className="w-5 h-5" />
+										<h2 className="text-lg font-semibold">
+											External Wallets
+										</h2>
+									</div>
+									<p className="text-sm text-muted-foreground">
+										Connect with external wallets through secure identity delegation.<br />
+										<span className="text-xs text-muted-foreground/80 italic">
+											Tip: If nothing happens, make sure your wallet extension (e.g. MetaMask, Phantom, or Wander) is installed, unlocked, and allowed to open pop-ups.
+										</span>
+									</p>
+								</div>
+
+								<div className="flex gap-3">
+									<Button
+										onClick={() => oisy.login()}
+										variant="outline"
+										className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors"
+									>
+										<img
+											src="/images/oisy-logo.svg"
+											alt="OISY"
+											className="w-5 h-5"
+										/>
+										<span className="text-sm font-medium">
+											OISY
+										</span>
+									</Button>
+
+									<Button
+										onClick={() => ethereum.login()}
 										variant="outline"
 										className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors"
 									>
@@ -245,10 +227,7 @@ const Login:React.FC<LoginProps> = ({ fullpage = false }) => {
 									</Button>
 
 									<Button
-										onClick={(e) =>{
-											e.stopPropagation()
-											solana.login()
-										}}
+										onClick={() => solana.login()}
 										variant="outline"
 										className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors"
 									>
@@ -278,10 +257,7 @@ const Login:React.FC<LoginProps> = ({ fullpage = false }) => {
 									</Button>
 
 									<Button
-										onClick={(e) =>{
-											e.stopPropagation();
-											arweave.login()
-										}}
+										onClick={() => arweave.login()}
 										variant="outline"
 										className="flex-1 h-12 flex items-center justify-center gap-2 border border-border hover:border-primary transition-colors"
 									>
