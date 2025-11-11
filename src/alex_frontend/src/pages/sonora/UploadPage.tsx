@@ -1,10 +1,13 @@
 import React, { useState, useRef } from "react";
 import { Button } from "@/lib/components/button";
-import { Upload, Mic, X } from "lucide-react";
+import { Upload, Mic, X, LoaderPinwheel } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { playAudio, clearSelected } from "@/features/sonora/sonoraSlice";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { setSelected, clearSelected } from "@/features/sonora/sonoraSlice";
 import { Audio } from "@/features/sonora/types";
+import { AudioCard } from "@/features/sonora/components/AudioCard";
+import { useUploadAndMint } from "@/features/pinax/hooks/useUploadAndMint";
 
 const SonoraUploadPage: React.FC = () => {
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -12,6 +15,8 @@ const SonoraUploadPage: React.FC = () => {
 	const [isDragging, setIsDragging] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const dispatch = useAppDispatch();
+	const { selected } = useAppSelector((state) => state.sonora);
+	const { uploadAndMint, isProcessing, error, success, progress, estimating, uploading, minting, resetUpload } = useUploadAndMint();
 
 	const handleFileSelect = (file: File) => {
 		// Validate audio file
@@ -34,7 +39,7 @@ const SonoraUploadPage: React.FC = () => {
 		};
 		
 		// Set audio in global state for player
-		dispatch(playAudio(audioData));
+		dispatch(setSelected(audioData));
 	};
 
 	const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,13 +73,32 @@ const SonoraUploadPage: React.FC = () => {
 		if (fileInputRef.current) fileInputRef.current.value = "";
 		// Clear audio from global state
 		dispatch(clearSelected());
+		// Reset upload state
+		resetUpload();
 	};
 
-	const handleUpload = () => {
+	const handleUpload = async () => {
 		if (selectedFile) {
-			// TODO: Implement upload logic
-			console.log("Uploading file:", selectedFile.name);
-			alert("Upload functionality coming soon!");
+			try {
+				const transactionId = await uploadAndMint(selectedFile);
+				// Replace blob URL with Arweave transaction URL
+				if (audioUrl) {
+					URL.revokeObjectURL(audioUrl);
+				}
+				const arweaveUrl = `https://arweave.net/${transactionId}`;
+				setAudioUrl(arweaveUrl);
+				
+				// Update the audio data with Arweave URL
+				const audioData: Audio = {
+					id: transactionId, // Use transaction ID as the ID
+					type: selectedFile.type,
+					size: `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB`,
+					timestamp: new Date().toISOString()
+				};
+				dispatch(setSelected(audioData));
+			} catch (error) {
+				// Error handling is done in the hook, keep file for retry
+			}
 		}
 	};
 
@@ -140,22 +164,13 @@ const SonoraUploadPage: React.FC = () => {
 					</div>
 				</div>
 
-				{/* Selected File Info */}
-				{selectedFile && (
-					<div className="bg-muted/50 rounded-lg p-4 space-y-4 border">
+				{/* Audio Preview */}
+				{selectedFile && selected && (
+					<div className="space-y-4">
 						<div className="flex items-center justify-between">
-							<div>
-								<h3 className="font-medium">
-									{selectedFile.name}
-								</h3>
-								<p className="text-sm text-muted-foreground">
-									{(
-										selectedFile.size /
-										(1024 * 1024)
-									).toFixed(2)}{" "}
-									MB • {selectedFile.type}
-								</p>
-							</div>
+							<h3 className="text-lg font-medium">
+								{audioUrl.startsWith('blob:') ? "Preview" : "Uploaded to Arweave"}
+							</h3>
 							<Button
 								variant="ghost"
 								scale="sm"
@@ -163,17 +178,45 @@ const SonoraUploadPage: React.FC = () => {
 								className="text-muted-foreground hover:text-foreground"
 							>
 								<X size={16} />
+								{audioUrl.startsWith('blob:') ? "Remove" : "Clear"}
 							</Button>
 						</div>
+						<AudioCard item={selected} />
+					</div>
+				)}
+
+				{/* Error and Success Messages */}
+				{error && (
+					<div className="text-center p-4 bg-destructive/10 border border-destructive rounded-lg">
+						<p className="text-destructive font-medium">{error}</p>
+					</div>
+				)}
+				
+				{success && (
+					<div className="text-center p-4 bg-green-500/10 border border-green-500 rounded-lg">
+						<p className="text-green-600 font-medium">{success}</p>
 					</div>
 				)}
 
 				{/* Upload Button */}
-				{selectedFile && (
+				{selectedFile && audioUrl.startsWith('blob:') && (
 					<div className="flex justify-center">
-						<Button onClick={handleUpload} className="gap-2">
-							<Upload size={16} />
-							Upload & Mint NFT
+						<Button 
+							onClick={handleUpload} 
+							className="gap-2"
+							disabled={isProcessing}
+						>
+							{isProcessing ? (
+								<>
+									<LoaderPinwheel size={16} className="animate-spin" />
+									{estimating ? "Estimating..." : uploading ? `Uploading ${Math.round(progress)}%` : minting ? "Minting..." : "Processing..."}
+								</>
+							) : (
+								<>
+									<Upload size={16} />
+									Upload & Mint NFT
+								</>
+							)}
 						</Button>
 					</div>
 				)}

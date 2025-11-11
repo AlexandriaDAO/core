@@ -177,24 +177,124 @@ src/layouts/
 src/config/apps.ts             # Add Sonora to apps list with placeholder image
 ```
 
-## Technical Decisions (TO BE MADE)
-- [ ] Audio format support (.mp3, .wav, .ogg)
-- [ ] Streaming vs download approach
-- [ ] File size limitations
-- [ ] Quality options
-- [ ] Offline playback support
+## Technical Decisions (IMPLEMENTED)
+- [x] Audio format support (.mp3, .wav, .ogg, .flac, .m4a, .mpeg, .webm)
+- [x] Streaming approach with HTML5 audio element
+- [x] File size limitations per Pinax file type configuration
+- [x] Direct playback with browser audio controls
+- [x] Arweave permanent storage for audio files
 
-## Implementation Notes
-- Using TanStack Router for routing
-- TanStack Query for data fetching
-- Redux Toolkit with thunks for state management
-- Tailwind CSS + Shadcn components
-- Features pattern for organization
-- Following existing permasearch/pinax patterns
+## Implementation Status
 
-## Discussion Notes
-*This section will be updated with our decisions as we discuss each feature*
+### ✅ COMPLETED FEATURES
+
+#### Core Marketplace Functionality
+- **Archive Page**: User's owned audio NFTs (not listed for sale)
+- **Studio Page**: User's audio NFTs listed for sale (with edit/unlist actions)  
+- **Market Page**: Other users' audio NFTs available for purchase
+- **Working Action Buttons**: Buy, Sell, Edit Price, Unlist with dialog modals
+- **ICRC-2 Integration**: Proper approval flow for secure NFT purchases
+
+#### State Management & Data Flow
+- **Redux Store**: Separate slices for archive, studio, and market
+- **Pagination**: Load More functionality with page size of 8
+- **Loading States**: Smart loading that preserves existing content while loading new pages
+- **Error Handling**: Comprehensive error states with retry functionality
+
+#### User Experience
+- **Audio Player**: Integrated playback with visual progress indicators
+- **Price Display**: Show NFT prices in ICP format
+- **Owner Information**: Display NFT owner (truncated principal) on market page only
+- **Filtering**: Market page excludes current user's listings automatically
+
+#### Integration with Existing System
+- **Emporium**: Marketplace transactions and listings
+- **ICP Ledger**: ICRC-2 token approval and transfers
+- **ICRC7**: NFT ownership verification and transfers
+- **Arweave**: Audio metadata and content fetching via GraphQL
+
+#### Browse/Discovery (Main Page)
+- **Arweave Integration**: Fetches audio files from Arweave network via GraphQL
+- **Minting**: Full integration with existing Permasearch minting system
+- **UI**: Complete card-based interface with Load More pagination
+- **Audio Playback**: Integrated audio player with progress indicators
+
+#### Upload/Record Pages
+- **Upload Flow**: Complete file selection with Pinax integration for upload and mint
+- **Recording**: Full browser-based audio recording with MediaRecorder API
+- **Audio Preview**: Real-time playback of recorded/uploaded content with AudioCard
+- **Processing States**: Complete upload/mint workflow with error handling
+
+### 📋 IMPLEMENTATION DETAILS
+
+#### File Structure (COMPLETED)
+```
+src/features/sonora/
+├── archiveSlice.ts              # User's owned NFTs state
+├── marketSlice.ts               # Marketplace state  
+├── studioSlice.ts              # User's listed NFTs state
+├── sonoraSlice.ts              # Global audio player state
+├── types.ts                    # TypeScript interfaces
+├── components/
+│   ├── AudioCard.tsx           # NFT display with player controls
+│   ├── BuyButton.tsx          # Purchase dialog with approval flow
+│   ├── SellButton.tsx         # List for sale dialog
+│   ├── EditButton.tsx         # Edit price dialog
+│   ├── UnlistButton.tsx       # Remove from marketplace dialog
+│   ├── MintButton.tsx         # Mint from Arweave (browse page)
+│   └── PlayPauseButton.tsx    # Audio player controls
+├── hooks/
+│   ├── useUserAudioNFTs.ts    # Archive page data
+│   ├── useStudioAudioNFTs.ts  # Studio page data
+│   ├── useMarketAudioNFTs.ts  # Market page data
+│   ├── useBuyAudio.ts         # Purchase workflow with ICRC-2
+│   ├── useSellAudio.ts        # Listing workflow
+│   ├── useUpdateAudio.ts      # Price editing
+│   ├── useUnlistAudio.ts      # Marketplace removal
+│   └── useArweaveAudios.ts    # Browse page data
+├── api/
+│   ├── fetchUserAudioNFTs.ts  # User's NFTs from multiple sources
+│   ├── fetchStudioAudioNFTs.ts # User's marketplace listings
+│   ├── fetchMarketAudioNFTs.ts # All marketplace listings (filtered)
+│   └── fetchArweaveAudios.ts   # Arweave audio discovery
+└── utils/
+    └── audioHelpers.ts         # Audio format validation & utilities
+```
+
+#### Pages Structure (COMPLETED)
+```
+src/pages/sonora/
+├── index.tsx                   # Browse page (Arweave discovery)
+├── ArchivePage.tsx            # User's collection
+├── StudioPage.tsx             # User's listings
+├── MarketPage.tsx             # Global marketplace
+├── UploadPage.tsx             # File upload + mint
+└── RecordPage.tsx             # Audio recording + mint
+```
+
+#### Navigation & Layout (COMPLETED)
+- **SonoraLayout.tsx**: Horizontal tab navigation following Exchange/Emporium pattern
+- **Active Route Highlighting**: Visual indication of current page
+- **Responsive Design**: Works across different screen sizes
+
+## Technical Specifications
+
+### Audio Formats Supported
+- MP3, WAV, OGG, FLAC, M4A, MPEG, WebM
+- File size limits per Pinax configuration (100MB for media)
+
+### Blockchain Integration
+- **ICP Ledger**: ICRC-2 token standard for payments
+- **ICRC7**: NFT ownership and transfers
+- **Emporium**: Marketplace contract for listings
+- **Arweave**: Permanent storage via GraphQL queries
+
+### State Management Architecture
+- **Modular Redux Slices**: Separate state management for each page type
+- **Async Thunks**: Handle API calls and error states
+- **Pagination**: Append mode to preserve existing content during loading
+- **Loading States**: Separate loading indicators for initial load vs. load more
 
 ---
-**Last Updated:** 2025-10-26  
-**Status:** Detailed specification with code structure
+**Last Updated:** 2025-11-11  
+**Status:** ✅ **FULLY COMPLETED** - Complete Sonora audio NFT marketplace with all 6 pages, working marketplace actions, ICRC-2 integration, pagination, and full blockchain integration

@@ -6,23 +6,11 @@ import {
 	DialogTitle,
 	DialogDescription,
 } from "@/lib/components/dialog";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Upload, XIcon, LoaderPinwheel } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Alert } from "@/components/Alert";
 import Processing from "@/components/Processing";
-import { getFileTypeInfo } from "./constants";
-import { formatFileSize } from "./utils";
-import estimateCost from "./thunks/estimateCost";
-import processPayment from "./thunks/processPayment";
-import uploadFile from "./thunks/uploadFile";
-import mint from "../nft/thunks/mint";
-import fetchWallets from "./thunks/fetchWallets";
-import selectWallet from "./thunks/selectWallet";
-import { reset } from "./pinaxSlice";
-import useAlexWallet from "@/hooks/actors/useAlexWallet";
-import useNftManager from "@/hooks/actors/useNftManager";
+import { useUploadAndMint } from "./hooks/useUploadAndMint";
 
 // DialogContent will be loaded when it can be loaded, not blocking the ui
 const DialogContent = lazy(() =>
@@ -31,93 +19,28 @@ const DialogContent = lazy(() =>
 	}))
 );
 
-const validateFileType = (file: File) => {
-	const typeInfo = getFileTypeInfo(file.type);
-	if (!typeInfo) {
-		throw new Error(`File type ${file.type} is not supported.`);
-	}
-};
-
-const validateFileSize = (file: File) => {
-	const typeInfo = getFileTypeInfo(file.type);
-	if (!typeInfo) throw new Error("Invalid file type");
-
-	if (file.size > typeInfo.maxSize) {
-		throw new Error(
-			`File size ${formatFileSize(file.size)} exceeds ${formatFileSize(typeInfo.maxSize)} limit for ${typeInfo.label.toLowerCase()}.`
-		);
-	}
-};
-
 const Pinax: React.FC = () => {
-	const dispatch = useAppDispatch();
-	const { uploading, minting, estimating, progress } = useAppSelector(
-		(state) => state.pinax
-	);
-	const { actor: walletActor } = useAlexWallet();
-	const { actor: nftActor } = useNftManager();
+	const { uploadAndMint, isProcessing, error, success, progress, estimating, uploading, minting, resetUpload } = useUploadAndMint();
 
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
-	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState<string | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
-	const [loading, setLoading] = useState(false);
 	const [open, setOpen] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleCreate = async (file: File) => {
-		setError(null);
-		setSuccess(null);
-		setLoading(true);
-
 		try {
-			// Step 1: Validate file type
-			validateFileType(file);
-
-			// Step 2: Validate file size
-			validateFileSize(file);
-
-			// Step 3: Estimate cost
-			await dispatch(estimateCost({ file })).unwrap();
-
-			// Step 4: Fetch wallets
-			if (!walletActor) throw new Error("No wallet connection available");
-			await dispatch(fetchWallets(walletActor)).unwrap();
-
-			// Step 5: Select suitable wallet
-			await dispatch(selectWallet()).unwrap();
-
-			// Step 6: Process payment
-			if (!nftActor)
-				throw new Error("No NFT manager connection available");
-			await dispatch(
-				processPayment({ fileSizeBytes: file.size, actor: nftActor })
-			).unwrap();
-
-			// Step 7: Upload file
-			const transaction = await dispatch(
-				uploadFile({ file, actor: walletActor })
-			).unwrap();
-
-			// Step 8: Mint NFT
-			await dispatch(mint({ transaction, actor: nftActor })).unwrap();
-
-			setSuccess(
-				`File uploaded successfully! Transaction ID: ${transaction}`
-			);
+			await uploadAndMint(file);
+			// Only clear file on successful upload
 			setSelectedFile(null);
 			if (fileInputRef.current) fileInputRef.current.value = '';
-		} catch (err: any) {
-			setError(err.message || err || "An unknown error occurred");
-		} finally {
-			setLoading(false);
+		} catch (error) {
+			// Error handling is done in the hook, keep file selected for retry
 		}
 	};
 
 	const handleFileSelect = (file: File) => {
 		setSelectedFile(file);
-		setError(null);
-		setSuccess(null);
+		resetUpload(); // Clear any previous errors/success
 		handleCreate(file);
 	};
 
@@ -143,20 +66,15 @@ const Pinax: React.FC = () => {
 		if (file) handleFileSelect(file);
 	};
 
-	const isProcessing = uploading || minting || estimating;
-
 	const resetState = () => {
 		setSelectedFile(null);
-		setError(null);
-		setSuccess(null);
-		setLoading(false);
 		if (fileInputRef.current) fileInputRef.current.value = '';
-		dispatch(reset());
+		resetUpload();
 	};
 
 	const handleOpenChange = (newOpen: boolean) => {
 		// Prevent closing if currently processing
-		if (!newOpen && loading) {
+		if (!newOpen && isProcessing) {
 			return;
 		}
 		setOpen(newOpen);
@@ -214,7 +132,7 @@ const Pinax: React.FC = () => {
 						)}
 
 						<div className="relative space-y-6">
-							{loading && (
+							{isProcessing && (
 								<div className="absolute inset-0 bg-black z-10 flex items-center justify-center rounded-lg">
 									<div className="text-center space-y-3">
 										<LoaderPinwheel className="w-8 h-8 text-white animate-spin mx-auto" />

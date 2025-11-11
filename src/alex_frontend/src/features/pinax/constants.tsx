@@ -29,7 +29,8 @@ export const FILE_TYPES = {
         "video/webm",
         "audio/mpeg", // or mp3. There is also a video/mpeg which is not included
         "audio/wav",
-        "audio/ogg"
+        "audio/ogg",
+        "audio/webm" // Support for recorded audio from MediaRecorder
     ],
     icon: <Video className="w-7 h-7 text-muted-foreground" strokeWidth={1.5} />,
     label: "Media",

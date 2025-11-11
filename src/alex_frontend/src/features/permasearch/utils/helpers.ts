@@ -11,6 +11,8 @@ import type { ActorSubclass } from "@dfinity/agent";
 import type { _SERVICE } from "../../../../../declarations/nft_manager/nft_manager.did";
 import { estimateBlockHeight, fetchBlockHeightForTimestamp, getBlockHeightForTimestamp, getCurrentBlockHeight } from "./blocks";
 
+export { getCurrentBlockHeight };
+
 export const ARWEAVE_GRAPHQL_ENDPOINT = "https://arweave.net/graphql";
 
 export async function filterAvailableAssets(

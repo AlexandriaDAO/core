@@ -1,11 +1,26 @@
 type Account = record { owner : principal; subaccount : opt blob };
+type BTreeMap = vec record {
+  text;
+  variant {
+    Int : int;
+    Map : BTreeMap;
+    Nat : nat;
+    Nat64 : nat64;
+    Blob : blob;
+    Text : text;
+    Array : vec Value;
+  };
+};
 type Result = variant { Ok : nat; Err : text };
 type Result_1 = variant { Ok : text; Err : text };
 type Result_10 = variant { Ok : vec opt Account; Err : text };
 type Result_11 = variant { Ok : record { opt nat; opt nat }; Err : text };
 type Result_2 = variant { Ok; Err : text };
 type Result_3 = variant { Ok : vec opt text; Err : text };
-type Result_4 = variant { Ok : vec opt vec record { text; Value }; Err : text };
+type Result_4 = variant {
+  Ok : vec opt vec record { text; Value_1 };
+  Err : text;
+};
 type Result_5 = variant { Ok : vec record { nat; TokenBalances }; Err : text };
 type Result_6 = variant { Ok : vec TokenBalances; Err : text };
 type Result_7 = variant { Ok : vec nat; Err : text };
@@ -13,6 +28,15 @@ type Result_8 = variant { Ok : vec record { nat; opt text }; Err : text };
 type Result_9 = variant { Ok : vec bool; Err : text };
 type TokenBalances = record { alex : nat; lbry : nat };
 type Value = variant {
+  Int : int;
+  Map : BTreeMap;
+  Nat : nat;
+  Nat64 : nat64;
+  Blob : blob;
+  Text : text;
+  Array : vec Value;
+};
+type Value_1 = variant {
   Int : int;
   Map : vec record { text; Value };
   Nat : nat;

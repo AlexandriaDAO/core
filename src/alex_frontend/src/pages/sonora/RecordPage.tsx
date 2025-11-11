@@ -1,26 +1,31 @@
 import React, { useState, useRef } from "react";
 import { Button } from "@/lib/components/button";
-import { Mic, Square, Play, Upload, Trash2 } from "lucide-react";
+import { Mic, Square, Upload, Trash2, LoaderPinwheel } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { playAudio, clearSelected } from "@/features/sonora/sonoraSlice";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { clearSelected, setSelected } from "@/features/sonora/sonoraSlice";
 import { Audio } from "@/features/sonora/types";
+import { AudioCard } from "@/features/sonora/components/AudioCard";
+import { useUploadAndMint } from "@/features/pinax/hooks/useUploadAndMint";
 
 const SonoraRecordPage: React.FC = () => {
 	const [isRecording, setIsRecording] = useState(false);
 	const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
 	const [recordedUrl, setRecordedUrl] = useState<string>("");
 	const [recordingTime, setRecordingTime] = useState(0);
-	const [error, setError] = useState<string>("");
+	const [recordingError, setRecordingError] = useState<string>("");
+	const { uploadAndMint, isProcessing, error: uploadError, success, progress, estimating, uploading, minting, resetUpload } = useUploadAndMint();
 	
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	const dispatch = useAppDispatch();
+	const { selected } = useAppSelector((state) => state.sonora);
 
 	const startRecording = async () => {
 		try {
-			setError("");
+			setRecordingError("");
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 			streamRef.current = stream;
 			
@@ -40,6 +45,15 @@ const SonoraRecordPage: React.FC = () => {
 				setRecordedBlob(blob);
 				const url = URL.createObjectURL(blob);
 				setRecordedUrl(url);
+				
+				// Automatically create audio data for preview
+				const audioData: Audio = {
+					id: url,
+					type: 'audio/webm',
+					size: `${(blob.size / (1024 * 1024)).toFixed(2)} MB`,
+					timestamp: new Date().toISOString()
+				};
+				dispatch(setSelected(audioData));
 			};
 			
 			mediaRecorder.start();
@@ -52,7 +66,7 @@ const SonoraRecordPage: React.FC = () => {
 			}, 1000);
 			
 		} catch (err) {
-			setError("Failed to access microphone. Please check permissions.");
+			setRecordingError("Failed to access microphone. Please check permissions.");
 		}
 	};
 
@@ -71,19 +85,6 @@ const SonoraRecordPage: React.FC = () => {
 		}
 	};
 
-	const playRecording = () => {
-		if (recordedUrl && recordedBlob) {
-			// Create Audio object for Redux
-			const audioData: Audio = {
-				id: recordedUrl, // Use object URL as ID for recorded files
-				type: 'audio/webm',
-				size: `${(recordedBlob.size / (1024 * 1024)).toFixed(2)} MB`,
-				timestamp: new Date().toISOString()
-			};
-			
-			dispatch(playAudio(audioData));
-		}
-	};
 
 	const deleteRecording = () => {
 		if (recordedUrl) {
@@ -93,13 +94,40 @@ const SonoraRecordPage: React.FC = () => {
 		setRecordedUrl("");
 		setRecordingTime(0);
 		dispatch(clearSelected());
+		// Reset upload state
+		resetUpload();
 	};
 
-	const handleUpload = () => {
+	const handleUpload = async () => {
 		if (recordedBlob) {
-			// TODO: Implement upload logic
-			console.log("Uploading recorded audio");
-			alert("Upload functionality coming soon!");
+			try {
+				// Convert blob to File object
+				const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+				const fileName = `sonora-recording-${timestamp}.webm`;
+				const file = new File([recordedBlob], fileName, { type: 'audio/webm' });
+				
+				const transactionId = await uploadAndMint(file);
+				// Replace blob URL with Arweave transaction URL
+				if (recordedUrl) {
+					URL.revokeObjectURL(recordedUrl);
+				}
+				const arweaveUrl = `https://arweave.net/${transactionId}`;
+				setRecordedUrl(arweaveUrl);
+				
+				// Update the audio data with Arweave URL
+				const audioData: Audio = {
+					id: transactionId, // Use transaction ID as the ID
+					type: 'audio/webm',
+					size: `${(recordedBlob.size / (1024 * 1024)).toFixed(2)} MB`,
+					timestamp: new Date().toISOString()
+				};
+				dispatch(setSelected(audioData));
+				
+				// Clear the blob reference but keep the UI showing the uploaded file
+				setRecordedBlob(null);
+			} catch (error) {
+				// Error handling is done in the hook, keep recording for retry
+			}
 		}
 	};
 
@@ -119,87 +147,136 @@ const SonoraRecordPage: React.FC = () => {
 				</div>
 
 				{/* Recording Interface */}
-				<div className="bg-card rounded-lg border p-8 text-center space-y-6">
-					{/* Recording Status */}
-					<div className="space-y-2">
-						<div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center ${
-							isRecording 
-								? 'bg-red-500 animate-pulse' 
-								: recordedBlob 
-								? 'bg-green-500' 
-								: 'bg-muted'
-						}`}>
-							<Mic size={32} className="text-white" />
+				<div>
+					<div className="bg-card rounded-lg border p-8 text-center space-y-6">
+						{/* Recording Status */}
+						<div className="space-y-2">
+							<div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center ${
+								isRecording 
+									? 'bg-red-500 animate-pulse' 
+									: recordedBlob 
+									? 'bg-green-500' 
+									: 'bg-muted'
+							}`}>
+								<Mic size={32} className="text-white" />
+							</div>
+							
+							<div className="text-2xl font-mono">
+								{formatTime(recordingTime)}
+							</div>
+							
+							{isRecording && (
+								<p className="text-sm text-red-500 animate-pulse">
+									Recording in progress...
+								</p>
+							)}
+							
+							{recordedBlob && !isRecording && (
+								<p className="text-sm text-green-600">
+									Recording completed
+								</p>
+							)}
 						</div>
-						
-						<div className="text-2xl font-mono">
-							{formatTime(recordingTime)}
+
+						{/* Error Message */}
+						{recordingError && (
+							<div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+								<p className="text-destructive text-sm">{recordingError}</p>
+							</div>
+						)}
+
+						{/* Control Buttons */}
+						<div className="flex justify-center gap-4">
+							{!isRecording && !recordedBlob && (
+								<Button onClick={startRecording} scale="lg" className="gap-2">
+									<Mic size={20} />
+									Start Recording
+								</Button>
+							)}
+							
+							{isRecording && (
+								<Button onClick={stopRecording} variant="destructive" scale="lg" className="gap-2">
+									<Square size={20} />
+									Stop Recording
+								</Button>
+							)}
 						</div>
-						
-						{isRecording && (
-							<p className="text-sm text-red-500 animate-pulse">
-								Recording in progress...
-							</p>
-						)}
-						
-						{recordedBlob && !isRecording && (
-							<p className="text-sm text-green-600">
-								Recording completed
-							</p>
-						)}
 					</div>
 
-					{/* Error Message */}
-					{error && (
-						<div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-							<p className="text-destructive text-sm">{error}</p>
-						</div>
-					)}
+					{/* Upload option below recording box */}
+					<div className="text-center mt-1">
+						<p className="text-sm text-muted-foreground">
+							<Link to="/app/sonora/upload">
+								<Button
+									variant="muted"
+									scale="sm"
+									className="gap-1 py-0 px-1 my-0"
+								>
+									or
+									<Upload size={16} className="p-0"/>
+									upload an existing audio file
+								</Button>
+							</Link>
+						</p>
+					</div>
+				</div>
 
-					{/* Control Buttons */}
-					<div className="flex justify-center gap-4">
-						{!isRecording && !recordedBlob && (
-							<Button onClick={startRecording} scale="lg" className="gap-2">
-								<Mic size={20} />
-								Start Recording
+				{/* Audio Preview */}
+				{(recordedBlob || recordedUrl) && selected && !isRecording && (
+					<div className="space-y-4">
+						<div className="flex items-center justify-between">
+							<h3 className="text-lg font-medium">
+								{recordedBlob ? "Preview" : "Uploaded to Arweave"}
+							</h3>
+							<Button
+								variant="ghost"
+								scale="sm"
+								onClick={deleteRecording}
+								className="text-muted-foreground hover:text-foreground"
+							>
+								<Trash2 size={16} />
+								{recordedBlob ? "Delete" : "Clear"}
 							</Button>
-						)}
-						
-						{isRecording && (
-							<Button onClick={stopRecording} variant="destructive" scale="lg" className="gap-2">
-								<Square size={20} />
-								Stop Recording
-							</Button>
-						)}
-						
-						{recordedBlob && !isRecording && (
-							<>
-								<Button onClick={playRecording} variant="outline" className="gap-2">
-									<Play size={16} />
-									Preview
-								</Button>
-								<Button onClick={deleteRecording} variant="outline" className="gap-2">
-									<Trash2 size={16} />
-									Delete
-								</Button>
-								<Button onClick={handleUpload} className="gap-2">
+						</div>
+						<AudioCard item={selected} />
+					</div>
+				)}
+
+				{/* Upload Error and Success Messages */}
+				{uploadError && (
+					<div className="text-center p-4 bg-destructive/10 border border-destructive rounded-lg">
+						<p className="text-destructive font-medium">{uploadError}</p>
+					</div>
+				)}
+				
+				{success && (
+					<div className="text-center p-4 bg-green-500/10 border border-green-500 rounded-lg">
+						<p className="text-green-600 font-medium">{success}</p>
+					</div>
+				)}
+
+				{/* Upload Button */}
+				{recordedBlob && (
+					<div className="flex justify-center">
+						<Button 
+							onClick={handleUpload} 
+							className="gap-2"
+							disabled={isProcessing || isRecording}
+						>
+							{isProcessing ? (
+								<>
+									<LoaderPinwheel size={16} className="animate-spin" />
+									{estimating ? "Estimating..." : uploading ? `Uploading ${Math.round(progress)}%` : minting ? "Minting..." : "Processing..."}
+								</>
+							) : (
+								<>
 									<Upload size={16} />
 									Upload & Mint NFT
-								</Button>
-							</>
-						)}
+								</>
+							)}
+						</Button>
 					</div>
-				</div>
-
-				{/* Upload option */}
-				<div className="text-center">
-					<p className="text-sm text-muted-foreground">
-						or{" "}
-						<Link to="/app/sonora/upload" className="text-muted-foreground hover:text-foreground underline underline-offset-4">
-							upload an existing audio file
-						</Link>
-					</p>
-				</div>
+				)}
 			</div>
 		</div>
 	);

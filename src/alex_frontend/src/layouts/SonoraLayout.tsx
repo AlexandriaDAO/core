@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
-import AudioPlayer from "@/components/AudioPlayer";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { clearSelected } from "@/features/sonora/sonoraSlice";
 
@@ -14,7 +13,7 @@ function SonoraLayout() {
 	}, [location.pathname, dispatch]);
 
 	return (
-		<div className="flex-grow bg-background p-4 grid grid-rows-[auto_auto_1fr_auto] gap-8 min-h-0">
+		<div className="flex-grow bg-background p-4 grid grid-rows-[auto_auto_1fr] gap-8 min-h-0">
 			<div className="flex flex-col">
 				<h1 className="text-xxltabsheading font-syne font-bold text-center text-primary">
 					Sonora
@@ -125,8 +124,6 @@ function SonoraLayout() {
 			</div>
 
 			<Outlet />
-
-			<AudioPlayer />
 		</div>
 	);
 }
