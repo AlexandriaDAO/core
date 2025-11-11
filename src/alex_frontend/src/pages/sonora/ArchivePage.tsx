@@ -1,16 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/lib/components/button";
-import { Archive, User, FileAudio, Download, ArrowDown } from "lucide-react";
-import { mockAudio } from "@/features/sonora/data";
+import { Archive, User, FileAudio, Download, ArrowDown, LoaderPinwheel } from "lucide-react";
 import { AudioCard } from "@/features/sonora/components/AudioCard";
-import { PlayPauseButton } from "@/features/sonora/components/PlayPauseButton";
 import { SellButton } from "@/features/sonora/components/SellButton";
+import { useUserAudioNFTs } from "@/features/sonora/hooks/useUserAudioNFTs";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 const SonoraArchivePage: React.FC = () => {
+	const { user } = useAppSelector((state) => state.auth);
+	const { audios, loading, loadingMore, error, pagination, refreshAudioNFTs } = useUserAudioNFTs();
+
+	// Fetch user's audio NFTs when component mounts or user changes
+	useEffect(() => {
+		if (user?.principal) {
+			refreshAudioNFTs(user.principal, 1, false); // First page, not append mode
+		}
+	}, [user?.principal, refreshAudioNFTs]);
+
+	// Load More handler
+	const handleLoadMore = () => {
+		if (user?.principal && !loadingMore && pagination.hasMore) {
+			refreshAudioNFTs(user.principal, pagination.page + 1, true); // Next page, append mode
+		}
+	};
+
 	return (
-		<div className="h-[62vh] grid grid-cols-5 grid-rows-1">
+		<div className="grid grid-cols-5 min-h-full">
 			{/* Left Sidebar */}
-			<div className="col-span-1 flex flex-col gap-4 items-center">
+			<div className="col-span-1 flex flex-col gap-4 items-center sticky top-0 h-fit">
 				<div className="w-full bg-card rounded-lg border p-5">
 					<div className="space-y-4">
 						<div className="flex items-center gap-2">
@@ -58,33 +75,72 @@ const SonoraArchivePage: React.FC = () => {
 						</div>
 						<div className="pt-2 border-t">
 							<p className="text-xs text-muted-foreground">
-								<span className="font-medium">{mockAudio.length}</span> items in collection
+								<span className="font-medium">{audios.length}</span> of <span className="font-medium">{pagination.totalCount}</span> items
 							</p>
 						</div>
 					</div>
 				</div>
 
 				{/* Load More */}
-				<Button variant="outline" className="gap-2">
-					<ArrowDown size={16} />
-					Load More
-				</Button>
+				{pagination.hasMore && (
+					<Button 
+						variant="outline" 
+						className="gap-2" 
+						onClick={handleLoadMore}
+						disabled={loadingMore}
+					>
+						{loadingMore ? (
+							<LoaderPinwheel size={16} className="animate-spin" />
+						) : (
+							<ArrowDown size={16} />
+						)}
+						{loadingMore ? "Loading..." : "Load More"}
+					</Button>
+				)}
 			</div>
 
 			{/* Audio Grid */}
 			<div className="col-span-4 space-y-4 overflow-y-auto px-6">
-				{mockAudio.map((item) => (
-					<AudioCard 
-						key={item.id} 
-						item={item}
-						actions={
-							<>
-								<SellButton item={item} />
-								<PlayPauseButton item={item} />
-							</>
-						}
-					/>
-				))}
+				{loading ? (
+					<div className="flex items-center justify-center py-12">
+						<div className="text-center">
+							<LoaderPinwheel className="w-8 h-8 animate-spin mx-auto mb-4" />
+							<p className="text-muted-foreground">Loading your audio NFTs...</p>
+						</div>
+					</div>
+				) : error ? (
+					<div className="flex items-center justify-center py-12">
+						<div className="text-center">
+							<p className="text-destructive font-medium">Error loading NFTs</p>
+							<p className="text-muted-foreground text-sm mt-1">{error}</p>
+							<Button 
+								onClick={() => user?.principal && refreshAudioNFTs(user.principal, 1, false)}
+								className="mt-4"
+								variant="outline"
+							>
+								Try Again
+							</Button>
+						</div>
+					</div>
+				) : audios.length === 0 ? (
+					<div className="flex items-center justify-center py-12">
+						<div className="text-center">
+							<FileAudio className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+							<h3 className="text-lg font-medium mb-2">No Audio NFTs Found</h3>
+							<p className="text-muted-foreground">You haven't minted any audio NFTs yet.</p>
+						</div>
+					</div>
+				) : (
+					audios.map((item) => (
+						<AudioCard 
+							key={item.id} 
+							item={item}
+							actions={
+								<SellButton item={item} tokenId={item.token_id} />
+							}
+						/>
+					))
+				)}
 			</div>
 		</div>
 	);
