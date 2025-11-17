@@ -48,7 +48,7 @@ const getAllLogs = createAsyncThunk<
     const [logsResult, icpRatio, alexPoolData, scalingFactor] = await Promise.all([
       logs.get_all_logs(),
       icp_swap.get_current_LBRY_ratio().catch(() => BigInt(0)),
-      icp_swap_factory.getPoolsForToken('ysy5f-2qaaa-aaaap-qkmmq-cai').catch(() => []),
+      icp_swap_factory?.getPoolsForToken('ysy5f-2qaaa-aaaap-qkmmq-cai').catch(() => []) || Promise.resolve([]),
       icp_swap.get_scaling_factor().catch(() => BigInt(1000000000000))
     ]);
 

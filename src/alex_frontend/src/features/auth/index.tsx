@@ -121,10 +121,10 @@ const Auth = () => {
                 </div>
                 
                     <DropdownMenuGroup>
-                        <Link to='/exchange'>
+                        <Link to='/swap'>
                             <DropdownMenuItem className="cursor-pointer">
                                 <Shell />
-                                <span>Exchange</span>
+                                <span>Legacy Swap</span>
                             </DropdownMenuItem>
                         </Link>
                         <Link to='/dashboard'>
