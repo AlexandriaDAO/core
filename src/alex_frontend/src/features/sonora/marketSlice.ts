@@ -34,7 +34,7 @@ export const fetchMarketAudioNFTs = createAsyncThunk<
   { page?: number; pageSize?: number; appendMode?: boolean; currentUserPrincipal?: string },
   { rejectValue: string }
 >(
-  "market/fetchMarketAudioNFTs",
+  "sonora/market/fetchMarketAudioNFTs",
   async ({ page = 1, pageSize = 8, appendMode = false, currentUserPrincipal }, { rejectWithValue, signal }) => {
     try {
       console.log("Market: Fetching marketplace audio NFTs, page:", page, "pageSize:", pageSize, "excluding user:", currentUserPrincipal);
@@ -56,7 +56,7 @@ export const fetchMarketAudioNFTs = createAsyncThunk<
 );
 
 const marketSlice = createSlice({
-  name: "market",
+  name: "sonora/market",
   initialState,
   reducers: {
     setPage: (state, action) => {

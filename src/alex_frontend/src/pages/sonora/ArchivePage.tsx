@@ -5,6 +5,7 @@ import { AudioCard } from "@/features/sonora/components/AudioCard";
 import { SellButton } from "@/features/sonora/components/SellButton";
 import { useUserAudioNFTs } from "@/features/sonora/hooks/useUserAudioNFTs";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { ArchiveAudio } from "@/features/sonora/types";
 
 const SonoraArchivePage: React.FC = () => {
 	const { user } = useAppSelector((state) => state.auth);
@@ -131,7 +132,7 @@ const SonoraArchivePage: React.FC = () => {
 						</div>
 					</div>
 				) : (
-					audios.map((item) => (
+					audios.map((item: ArchiveAudio) => (
 						<AudioCard 
 							key={item.id} 
 							item={item}

@@ -4,6 +4,7 @@ import { Store, TrendingUp, Search, Filter, ArrowDown, FileAudio, LoaderPinwheel
 import { AudioCard } from "@/features/sonora/components/AudioCard";
 import { BuyButton } from "@/features/sonora/components/BuyButton";
 import { useMarketAudioNFTs } from "@/features/sonora/hooks/useMarketAudioNFTs";
+import { MarketAudio } from "@/features/sonora/types";
 
 const SonoraMarketPage: React.FC = () => {
 	const { audios, loading, loadingMore, error, pagination, refreshMarketAudioNFTs } = useMarketAudioNFTs();
@@ -127,7 +128,7 @@ const SonoraMarketPage: React.FC = () => {
 						</div>
 					</div>
 				) : (
-					audios.map((audio) => (
+					audios.map((audio: MarketAudio) => (
 						<AudioCard 
 							key={audio.id} 
 							item={audio}

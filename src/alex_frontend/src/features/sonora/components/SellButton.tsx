@@ -26,7 +26,7 @@ interface SellButtonProps {
 
 export const SellButton: React.FC<SellButtonProps> = ({ item, tokenId }) => {
     const dispatch = useAppDispatch();
-    const selling = useAppSelector((state) => state.archive.selling);
+    const selling = useAppSelector((state) => state.sonora.archive.selling);
     const isOpen = !!(selling && selling === item.id);
     
     const [price, setPrice] = useState("");

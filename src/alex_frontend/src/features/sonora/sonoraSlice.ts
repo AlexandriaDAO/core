@@ -1,5 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import browseReducer from "./browse/browseSlice";
+import archiveReducer from "./archiveSlice";
+import studioReducer from "./studioSlice";
+import marketReducer from "./marketSlice";
 import { Audio } from "./types";
 
 // Keep minimal state for AudioPlayer component compatibility
@@ -31,7 +34,7 @@ const sonoraReducer = (state: any = {}, action: any) => {
     const isInitialState = Object.keys(state).length === 0;
     
     // Extract the main state properties (excluding nested reducers)
-    const { browse, ...mainStateProps } = state;
+    const { browse, archive, studio, market, ...mainStateProps } = state;
     
     // For initial state, pass undefined to get proper initial values
     // Otherwise, pass the current main state props
@@ -40,13 +43,19 @@ const sonoraReducer = (state: any = {}, action: any) => {
         action
     );
 
-    // Then get state from the browse sub-slice
+    // Then get state from the sub-slices
     const browseState = browseReducer(state?.browse, action);
+    const archiveState = archiveReducer(state?.archive, action);
+    const studioState = studioReducer(state?.studio, action);
+    const marketState = marketReducer(state?.market, action);
 
     // Return combined state with main properties at root level
     return {
         ...mainState,
         browse: browseState,
+        archive: archiveState,
+        studio: studioState,
+        market: marketState,
     };
 };
 

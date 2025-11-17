@@ -6,6 +6,7 @@ import { EditButton } from "@/features/sonora/components/EditButton";
 import { UnlistButton } from "@/features/sonora/components/UnlistButton";
 import { useStudioAudioNFTs } from "@/features/sonora/hooks/useStudioAudioNFTs";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { StudioAudio } from "@/features/sonora/types";
 
 const SonoraStudioPage: React.FC = () => {
 	const { user } = useAppSelector((state) => state.auth);
@@ -132,7 +133,7 @@ const SonoraStudioPage: React.FC = () => {
 						</div>
 					</div>
 				) : (
-					audios.map((item) => (
+					audios.map((item: StudioAudio) => (
 						<AudioCard 
 							key={item.id} 
 							item={item}

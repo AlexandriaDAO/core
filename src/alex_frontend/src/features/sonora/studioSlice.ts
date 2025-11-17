@@ -36,7 +36,7 @@ export const fetchStudioAudioNFTs = createAsyncThunk<
   { userPrincipal: string; page?: number; pageSize?: number; appendMode?: boolean },
   { rejectValue: string }
 >(
-  "studio/fetchStudioAudioNFTs",
+  "sonora/studio/fetchStudioAudioNFTs",
   async ({ userPrincipal, page = 1, pageSize = 8, appendMode = false }, { rejectWithValue, signal }) => {
     try {
       console.log("Studio: Fetching user's listed audio NFTs, user:", userPrincipal, "page:", page, "pageSize:", pageSize);
@@ -58,7 +58,7 @@ export const fetchStudioAudioNFTs = createAsyncThunk<
 );
 
 const studioSlice = createSlice({
-  name: "studio",
+  name: "sonora/studio",
   initialState,
   reducers: {
     setPage: (state, action) => {

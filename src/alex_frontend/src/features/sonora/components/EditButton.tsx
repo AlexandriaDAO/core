@@ -27,7 +27,7 @@ interface EditButtonProps {
 
 export const EditButton: React.FC<EditButtonProps> = ({ item, currentPrice, tokenId }) => {
     const dispatch = useAppDispatch();
-    const editing = useAppSelector((state) => state.studio.editing);
+    const editing = useAppSelector((state) => state.sonora.studio.editing);
     const isOpen = !!(editing && editing === item.id);
     
     const [price, setPrice] = useState(currentPrice);

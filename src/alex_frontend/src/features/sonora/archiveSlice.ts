@@ -36,7 +36,7 @@ export const fetchUserAudioNFTs = createAsyncThunk<
   { userPrincipal: string; page?: number; pageSize?: number; appendMode?: boolean },
   { rejectValue: string }
 >(
-  "archive/fetchUserAudioNFTs",
+  "sonora/archive/fetchUserAudioNFTs",
   async ({ userPrincipal, page = 1, pageSize = 8, appendMode = false }, { rejectWithValue, signal }) => {
     try {
       console.log("Fetching audio NFTs for user:", userPrincipal);
@@ -59,7 +59,7 @@ export const fetchUserAudioNFTs = createAsyncThunk<
 );
 
 const archiveSlice = createSlice({
-  name: "archive",
+  name: "sonora/archive",
   initialState,
   reducers: {
     setSelling: (state, action) => {

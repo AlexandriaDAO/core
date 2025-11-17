@@ -23,7 +23,7 @@ interface UnlistButtonProps {
 
 export const UnlistButton: React.FC<UnlistButtonProps> = ({ item, tokenId }) => {
     const dispatch = useAppDispatch();
-    const unlisting = useAppSelector((state) => state.studio.unlisting);
+    const unlisting = useAppSelector((state) => state.sonora.studio.unlisting);
     const isOpen = !!(unlisting && unlisting === item.id);
 
     const { unlistAudio, isLoading, error } = useUnlistAudio();

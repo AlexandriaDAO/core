@@ -7,7 +7,7 @@ import { fetchUserAudioNFTs } from "../archiveSlice";
 export const useUserAudioNFTs = () => {
   const dispatch = useAppDispatch();
   const { audios, loading, loadingMore, error, pagination } = useAppSelector(
-    (state) => state.archive
+    (state) => state.sonora.archive
   );
 
   const refreshAudioNFTs = useCallback((userPrincipal: string, page = 1, appendMode = false) => {

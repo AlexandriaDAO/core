@@ -2,7 +2,9 @@ import DDC from "@/data/categories";
 import React, { useState } from "react";
 import { useAnnotation, useCardList, useReader } from "../lib/hooks/useReaderContext";
 import { BookCardItem } from "@/features/search/components/Card";
-import { Book, ChevronDown, ChevronUp, Minus } from "lucide-react";
+import { Book, ChevronDown, ChevronUp, Minus, Coins, LoaderPinwheel, Check } from "lucide-react";
+import { useUploadAndMint } from "@/features/pinax/hooks/useUploadAndMint";
+import { Button } from "@/lib/components/button";
 
 // Assuming the structure of your item includes `id`, `title`, and `description`
 interface Item {
@@ -27,6 +29,9 @@ const Card: React.FC<Props> = ({ item }) => {
 	const { removeAnnotation } = useAnnotation();
 	const { setShowCardList } = useCardList();
 	const [expanded, setExpanded] = useState(false);
+	const [isMinting, setIsMinting] = useState(false);
+	const [mintSuccess, setMintSuccess] = useState<string | null>(null);
+	const { uploadAndMint } = useUploadAndMint();
 
 	// Toggle expanded state
 	const toggleExpand = () => {
@@ -51,6 +56,32 @@ const Card: React.FC<Props> = ({ item }) => {
 		rendition.current && rendition.current.annotations.remove(item.cfi, "highlight");
 		removeAnnotation(item.cfi);
 	}
+
+	const handleMintText = async () => {
+		// Check if already minting or already minted
+		if (isMinting || mintSuccess) return;
+
+		setIsMinting(true);
+
+		try {
+			// Create a file from the text content
+			const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+			const fileName = `annotation-${timestamp}.txt`;
+			const blob = new Blob([item.text], { type: 'text/plain' });
+			const file = new File([blob], fileName, { type: 'text/plain' });
+
+			// Upload and mint the text file
+			const transactionId = await uploadAndMint(file);
+			
+			// Store success state
+			setMintSuccess(transactionId);
+
+		} catch (error) {
+			console.error('Minting failed for annotation:', item.id, error);
+		} finally {
+			setIsMinting(false);
+		}
+	};
 
 	return (
 		<div className="p-3 text-black shadow-xl border border-solid rounded-lg bg-white transition-all duration-500 flex gap-1 flex-col justify-center items-stretch">
@@ -80,6 +111,29 @@ const Card: React.FC<Props> = ({ item }) => {
 							onClick={handleNavigateCard}
 							className="p-2 text-white border border-solid bg-black rounded-full cursor-pointer duration-300 transition-all hover:bg-white hover:border-black hover:text-black "
 						/>
+						<Button
+							variant={mintSuccess ? "constructive" : isMinting ? "secondary" : "inverted"}
+							scale="icon"
+							rounded="full"
+							className="py-2"
+							onClick={handleMintText}
+							disabled={isMinting || !!mintSuccess}
+							title={
+								mintSuccess
+									? `Minted! TX: ${mintSuccess}`
+									: isMinting
+									? 'Minting...'
+									: 'Mint Text'
+							}
+						>
+							{isMinting ? (
+								<LoaderPinwheel size={20} className="animate-spin" />
+							) : mintSuccess ? (
+								<Check size={20} />
+							) : (
+								<Coins size={20} />
+							)}
+						</Button>
 						<Minus
 							onClick={handleRemoveCard}
 							size={36}

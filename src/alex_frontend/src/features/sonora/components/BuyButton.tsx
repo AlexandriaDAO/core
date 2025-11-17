@@ -24,7 +24,7 @@ interface BuyButtonProps {
 
 export const BuyButton: React.FC<BuyButtonProps> = ({ item, price, tokenId }) => {
     const dispatch = useAppDispatch();
-    const purchasing = useAppSelector((state) => state.market.purchasing);
+    const purchasing = useAppSelector((state) => state.sonora.market.purchasing);
     const isOpen = !!(purchasing && purchasing === item.id);
 
     const { buyAudio, isLoading, error } = useBuyAudio();

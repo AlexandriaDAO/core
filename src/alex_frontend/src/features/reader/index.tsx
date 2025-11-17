@@ -148,9 +148,9 @@ export const Reader: React.FC<IReaderProps> = ({
                     )}
                     <FontSizeButton />
                 </div>
-                <ContentList />
+                {/* <ContentList /> */}
 
-                <div className="flex-grow max-w-96 flex flex-col gap-1">
+                {/* <div className="flex-grow max-w-96 flex flex-col gap-1">
                     <div className="flex justify-between">
                         <div className="font-roboto-condensed text-base text-[#C1C1C1]">
                             Pages
@@ -168,7 +168,7 @@ export const Reader: React.FC<IReaderProps> = ({
                             style={{ width: percentage + "%" }}
                         ></div>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="flex items-center justify-between gap-4">
                     <SpreadToggle />

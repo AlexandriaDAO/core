@@ -46,9 +46,7 @@ import permasearchReducer from '@/features/permasearch/store/slice';
 import alexandrianReducer from '@/features/alexandrian/alexandrianSlice';
 import nftReducer from '@/features/nft/slice';
 import sonoraReducer from '@/features/sonora/sonoraSlice';
-import archiveReducer from '@/features/sonora/archiveSlice';
-import studioReducer from '@/features/sonora/studioSlice';
-import marketReducer from '@/features/sonora/marketSlice';
+import bibliothecaReducer from '@/features/bibliotheca/bibliothecaSlice';
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -99,9 +97,7 @@ const rootReducer = combineReducers({
 	alexandrian: alexandrianReducer,
 	nft: nftReducer,
 	sonora: sonoraReducer,
-	archive: archiveReducer,
-	studio: studioReducer,
-	market: marketReducer,
+	bibliotheca: bibliothecaReducer,
 });
 
 export default rootReducer;
