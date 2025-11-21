@@ -23,7 +23,10 @@ fn setup_timer() {
         Duration::from_secs(CHECK_INTERVAL),
         || {
             ic_cdk::spawn(async {
-                let _ = process::process_revenue().await;
+                match process::process_revenue().await {
+                    Ok(msg) => ic_cdk::print(&msg),
+                    Err(e) => ic_cdk::print(&format!("Error: {}", e)),
+                }
             });
         }
     );

@@ -12,29 +12,33 @@ const LBRY_CANISTER: &str = "y33wz-myaaa-aaaap-qkmna-cai";
 const CORE_ICP_SWAP: &str = "54fqz-5iaaa-aaaap-qkmqa-cai";
 const LBRY_BURN_ADDRESS: &str = "54fqz-5iaaa-aaaap-qkmqa-cai"; // Minting account = burn
 
-// Internal function - only called by timer, not exposed publicly
+// Internal function - only called by timer
 pub async fn process_revenue() -> Result<String, String> {
+    // Always check and burn LBRY first, regardless of ICP balance
+    let lbry_burned = burn_all_lbry().await?;
+
     let balance = get_icp_balance().await?;
-    
+
     if balance < MIN_ICP_BALANCE {
-        return Ok(format!("Balance {} below minimum {}", balance, MIN_ICP_BALANCE));
+        return if lbry_burned > 0 {
+            Ok(format!("Burned {} LBRY. ICP balance below minimum, skipping swap", lbry_burned))
+        } else {
+            Ok("ICP balance below minimum".to_string())
+        };
     }
-    
-    // Calculate swap amount (matching lbryfun's reserve calculation)
-    // Need to account for approval fee (10_000) and transfer fee (10_000)
+
+    // Calculate swap amount (reserve 0.1 ICP for fees)
     let swap_amount = balance.saturating_sub(ICP_RESERVE + 20_000);
-    
-    // Sanity check - should never happen with MIN_ICP_BALANCE check
-    if swap_amount < 10_000_000 { // Less than 0.1 ICP
+
+    if swap_amount < 10_000_000 {
         return Ok("Swap amount too small after fees".to_string());
     }
-    
+
     swap_icp_for_lbry(swap_amount).await?;
-    
-    // Burn all LBRY
-    let burned = burn_all_lbry().await?;
-    
-    Ok(format!("Swapped {} ICP and burned {} LBRY", swap_amount / 100_000_000, burned))
+    let newly_burned = burn_all_lbry().await?;
+
+    Ok(format!("Swapped {} ICP and burned {} LBRY",
+        swap_amount / 100_000_000, lbry_burned + newly_burned))
 }
 
 // Get current ICP balance
@@ -44,17 +48,17 @@ async fn get_icp_balance() -> Result<u64, String> {
         owner: ic_cdk::id(),
         subaccount: None,
     };
-    
+
     let result: Result<(Nat,), _> = ic_cdk::call(
         ledger,
         "icrc1_balance_of",
         (account,)
     ).await;
-    
+
     match result {
         Ok((balance,)) => {
-            let balance_str = balance.to_string();
-            Ok(balance_str.parse::<u64>().unwrap_or(0))
+            balance.0.try_into()
+                .map_err(|_| "Balance too large for u64".to_string())
         }
         Err(e) => Err(format!("Failed to get balance: {:?}", e))
     }
@@ -93,16 +97,17 @@ async fn swap_icp_for_lbry(amount: u64) -> Result<(), String> {
         Err(e) => return Err(format!("Approval call failed: {:?}", e)),
     }
     
-    // Call swap function on the core project's ICP_SWAP canister
-    let swap_result: Result<(String,), _> = ic_cdk::call(
+    // Call swap function
+    let swap_result: Result<(Result<String, String>,), _> = ic_cdk::call(
         swap_canister,
         "swap",
         (amount, None::<[u8; 32]>)
     ).await;
-    
+
     match swap_result {
-        Ok(_) => Ok(()),
-        Err(e) => Err(format!("Swap failed: {:?}", e))
+        Ok((Ok(_),)) => Ok(()),
+        Ok((Err(e),)) => Err(format!("Swap rejected: {}", e)),
+        Err(e) => Err(format!("Swap call failed: {:?}", e))
     }
 }
 
@@ -122,8 +127,10 @@ async fn get_lbry_balance() -> Result<u64, String> {
     
     match result {
         Ok((balance,)) => {
-            let balance_str = balance.to_string();
-            Ok(balance_str.parse::<u64>().unwrap_or(0))
+            // Convert Nat to u64 using TryInto
+            let parsed: u64 = balance.0.try_into()
+                .map_err(|_| "LBRY balance too large for u64".to_string())?;
+            Ok(parsed)
         }
         Err(e) => Err(format!("Failed to get LBRY balance: {:?}", e))
     }
