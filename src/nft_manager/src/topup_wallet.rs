@@ -5,7 +5,7 @@ use icrc_ledger_types::icrc1::transfer::{TransferArg, TransferError};
 
 use crate::guard::not_anon;
 use crate::id_converter::principal_to_subaccount;
-use crate::lbry_principal;
+use crate::{lbry_principal, kairos_principal};
 
 #[ic_cdk::update(guard = "not_anon")]
 pub async fn withdraw_topup() -> Result<String, String> {
@@ -56,7 +56,7 @@ pub async fn withdraw_topup() -> Result<String, String> {
     }
 }
 
-async fn get_topup_balance(principal: Principal) -> Result<Nat, String> {
+pub async fn get_topup_balance(principal: Principal) -> Result<Nat, String> {
     let account = Account {
         owner: ic_cdk::id(),
         subaccount: Some(principal_to_subaccount(principal)),

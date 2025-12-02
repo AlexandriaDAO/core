@@ -1,0 +1,14 @@
+[package]
+name = "dialectica"
+version = "0.0.1"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = "0.10.10"
+ic-cdk = "0.17.0"
+ic-cdk-macros = "0.17.0"
+ic-stable-structures = "0.6.4"
+serde = { version = "1.0", features = ["derive"] }

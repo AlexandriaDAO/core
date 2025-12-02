@@ -12,11 +12,13 @@ members = [
     "src/logs",
     "src/xrc",
     "src/user",
+    "src/dialectica",
     "src/alex_wallet",
     "src/emporium",
     "src/logs",
     "src/asset_manager",
     "src/feed",
     "src/alex_revshare",
+    "src/kairos",
 ]
 resolver = "2"

@@ -1,0 +1,2782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alexandria</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@100;300;500;800&display=swap">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <button class="exit-tutorial">Exit tutorial</button>
+        <canvas id="ripple-canvas"></canvas>
+        <canvas id="particles-canvas"></canvas>
+        <svg id="animation" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="5" result="blur"/>
+                    <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                </filter>
+            </defs>
+            
+            <!-- Background -->
+            <rect x="0" y="0" width="100%" height="100%" fill="#171717" opacity="0"/>
+            
+            <!-- Decorative grid container -->
+            <g id="grid-container">
+                <!-- Decorative grid -->
+                <g id="grid" opacity="0.15"></g>
+            </g>
+            
+            <!-- Main content -->
+            <g id="content" transform="translate(400, 300)">
+                <!-- Alexandria title -->
+                <text id="title" class="title-text" x="0" y="-120">Alexandria</text>
+                <text id="subtitle" class="subtitle-text" x="0" y="-80">A Universal Content Protocol</text>
+                
+                <!-- Alexandria main node (center) with click group -->
+                <g id="clickable-node" style="cursor: pointer;">
+                    <circle id="main-node" class="main-node" cx="0" cy="0" r="70" fill="#ffffff" opacity="0" filter="url(#glow)"/>
+                    <circle id="pulse-circle" cx="0" cy="0" r="70" fill="#ffffff" opacity="0" class="pulse"/>
+                    <text id="circle-text" class="circle-text" x="0" y="0">Click to explore</text>
+                </g>
+
+                <!-- Замінюємо блок alexandria-info з елементами -->
+                <g id="alexandria-info" style="opacity: 0; pointer-events: none;">
+                    <text id="top-typewriter" class="typewriter-text" x="0" y="-100" text-anchor="middle">
+                        <tspan x="0" dy="0" text-anchor="middle">Alexandria is the 100% Blockchain-Powered Library</tspan>
+                    </text>
+                    
+                    <text id="bottom-typewriter" class="typewriter-text" x="0" y="100" opacity="0" text-anchor="middle">
+                        <tspan x="0" dy="0" text-anchor="middle">It does for files what Bitcoin did for money.</tspan>
+                    </text>
+                </g>
+
+                <!-- Network graph container -->
+                <g id="network-graph" style="display: none;"></g>
+            </g>
+
+            <!-- Додати typewriter текст для мережевого графа -->
+            <text id="network-typewriter" class="typewriter-text" x="400" y="30" text-anchor="middle" opacity="0">
+                <tspan x="400" dy="0" text-anchor="middle">All content types (books, video, text, image, audio...) One format. Stored forever.</tspan>
+                <tspan x="400" dy="25" text-anchor="middle">Every Alexandria Post is its own:</tspan>
+                <tspan x="400" dy="1.8em" text-anchor="middle" style="font-size: 0.9em;">"Asset" : It is owned by someone.</tspan>
+                <tspan x="400" dy="1.5em" text-anchor="middle" style="font-size: 0.9em;">"Business" : Earns money whenever re-used.</tspan>
+                <tspan x="400" dy="1.5em" text-anchor="middle" style="font-size: 0.9em;">"Bank" : Holds money on behalf of its creator.</tspan>
+                <tspan x="400" dy="1.5em" text-anchor="middle" style="font-size: 0.9em;">"NFT" : Permanent and tradable.</tspan>
+            </text>
+        </svg>
+        
+        <!-- Додаємо нову кнопку Previous зліва -->
+        <div class="previous-button-wrapper">
+            <button class="previous-button">Previous</button>
+        </div>
+        
+        <!-- Існуюча кнопка Next залишається справа -->
+        <div class="next-button-wrapper">
+            <button class="next-button">Next</button>
+        </div>
+    </div>
+
+
+    <script>
+        // Функція для створення сітки фону
+        function createGrid() {
+            const grid = document.getElementById('grid');
+            const svgNS = "http://www.w3.org/2000/svg";
+            
+            // Створюємо групи для крапок та ліній
+            const dotsGroup = document.createElementNS(svgNS, "g");
+            const linesGroup = document.createElementNS(svgNS, "g");
+            
+            // Створюємо крапки
+            for (let i = 0; i < 15; i++) {
+                for (let j = 0; j < 20; j++) {
+                    const dot = document.createElementNS(svgNS, "circle");
+                    dot.setAttribute('cx', i * 60);
+                    dot.setAttribute('cy', j * 40);
+                    dot.setAttribute('r', 1);
+                    dot.setAttribute('fill', '#f5f5f5');
+                    dotsGroup.appendChild(dot);
+                    
+                    // Анімуємо крапки за допомогою GSAP
+                    gsap.to(dot, {
+                        attr: { cx: i * 60 + 60 },
+                        duration: 8 + Math.random() * 5, // Зменшено з 15+10 до 8+5
+                        repeat: -1,
+                        yoyo: false,
+                        ease: "none",
+                        onComplete: function() {
+                            // При завершенні анімації повертаємо крапку на початкову позицію
+                            gsap.set(dot, { attr: { cx: i * 60 - 60 } });
+                            // І знову запускаємо анімацію
+                            gsap.to(dot, {
+                                attr: { cx: i * 60 + 60 },
+                                duration: 12 + Math.random() * 5, // Також тут зменшено
+                                repeat: -1,
+                                yoyo: false,
+                                ease: "none"
+                            });
+                        }
+                    });
+                }
+            }
+            
+            // Створюємо горизонтальні лінії
+            for (let j = 0; j < 20; j++) {
+                const line = document.createElementNS(svgNS, "line");
+                line.setAttribute('x1', 0);
+                line.setAttribute('y1', j * 800);
+                line.setAttribute('x2', 1400);
+                line.setAttribute('y2', j * 800);
+                line.setAttribute('stroke', '#94A3B8');
+                line.setAttribute('stroke-width', '0.5');
+                line.setAttribute('opacity', '0.1');
+                linesGroup.appendChild(line);
+            }
+            
+            // Створюємо вертикальні лінії
+            for (let i = 0; i < 15; i++) {
+                const line = document.createElementNS(svgNS, "line");
+                line.setAttribute('x1', i * 100);
+                line.setAttribute('y1', 0);
+                line.setAttribute('x2', i * 100);
+                line.setAttribute('y2', 1080);
+                line.setAttribute('stroke', '#94A3B8');
+                line.setAttribute('stroke-width', '0.5');
+                line.setAttribute('opacity', '0.1');
+                linesGroup.appendChild(line);
+            }
+            
+            // Додаємо групи до сітки
+            grid.appendChild(linesGroup);
+            grid.appendChild(dotsGroup);
+        }
+        
+        // Оголосіть змінну для частинок на глобальному рівні
+        let particlesController = null;
+
+        // Оновлена функція initKnowledgeParticles з додаванням слів
+        function initKnowledgeParticles() {
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let words = []; // Масив для слів
+            let animationFrameId;
+            let mouseX = 0;
+            let mouseY = 0;
+            let hoveredParticle = null;
+            
+            // Налаштування canvas
+            function setupCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                canvas.style.position = 'fixed';
+                canvas.style.top = '0';
+                canvas.style.left = '0';
+                canvas.style.pointerEvents = 'none';
+                canvas.style.zIndex = '5';
+                canvas.style.opacity = '0'; // Спочатку невидимий
+            }
+            
+            // Клас для частинок знань
+            class Particle {
+                constructor(x, y) {
+                    // Позиція з урахуванням центрального кола
+                    this.placeAwayFromCenter(x, y);
+                    
+                    this.size = Math.random() * 3 + 1;
+                    this.originalSize = this.size;
+                    this.speed = Math.random() * 1 + 0.2;
+                    this.vx = Math.random() * 2 - 1;
+                    this.vy = Math.random() * 2 - 1;
+                    this.alpha = Math.random() * 0.6 + 0.2;
+                    this.hue = Math.random() > 0.7 ? 45 : 210; // 70% синій, 30% жовтий
+                    this.saturation = 80 + Math.random() * 20;
+                    this.lightness = 50 + Math.random() * 30;
+                    this.glowing = false;
+                }
+                
+                // Новий метод для розташування частинок поза центральним колом
+                placeAwayFromCenter(providedX, providedY) {
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    const safeRadius = 80; // Трохи менший радіус для частинок
+                    
+                    if (providedX !== undefined && providedY !== undefined) {
+                        this.x = providedX;
+                        this.y = providedY;
+                        
+                        // Перевіряємо, чи не в безпечній зоні
+                        const dx = this.x - centerX;
+                        const dy = this.y - centerY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < safeRadius) {
+                            // Нормалізуємо вектор від центру до частинки
+                            const nx = dx / distance;
+                            const ny = dy / distance;
+                            
+                            // Розташовуємо за межами безпечної зони
+                            this.x = centerX + nx * (safeRadius + 10);
+                            this.y = centerY + ny * (safeRadius + 10);
+                        }
+                    } else {
+                        // Генеруємо випадкову позицію поза безпечною зоною
+                        let validPosition = false;
+                        while (!validPosition) {
+                            this.x = Math.random() * window.innerWidth;
+                            this.y = Math.random() * window.innerHeight;
+                            
+                            const dx = this.x - centerX;
+                            const dy = this.y - centerY;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (distance > safeRadius) {
+                                validPosition = true;
+                            }
+                        }
+                    }
+                }
+                
+                update() {
+                    if (this.glowing) {
+                        this.size = this.originalSize * 2.5;
+                        this.alpha = 0.8;
+                        // Прискорення руху при наведенні
+                        this.x += this.vx * this.speed * 3;
+                        this.y += this.vy * this.speed * 3;
+                    } else {
+                        this.size = this.originalSize;
+                        this.alpha = Math.random() * 0.6 + 0.2;
+                        this.x += this.vx * this.speed;
+                        this.y += this.vy * this.speed;
+                    }
+                    
+                    // Відбиття від меж екрану
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                    
+                    // Перевірка наближення до центрального кола
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    const safeRadius = 80;
+                    
+                    const dx = this.x - centerX;
+                    const dy = this.y - centerY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // Якщо частинка наближається до кола, відбиваємо її
+                    if (distance < safeRadius) {
+                        // Нормалізуємо вектор від центру до частинки
+                        const nx = dx / distance;
+                        const ny = dy / distance;
+                        
+                        // Встановлюємо нову позицію за межами безпечної зони
+                        this.x = centerX + nx * (safeRadius + 5);
+                        this.y = centerY + ny * (safeRadius + 5);
+                        
+                        // Змінюємо напрямок руху
+                        this.vx = nx * this.speed;
+                        this.vy = ny * this.speed;
+                    }
+                    
+                    // Випадкова зміна напрямку
+                    if (Math.random() < 0.01) {
+                        this.vx = Math.random() * 2 - 1;
+                        this.vy = Math.random() * 2 - 1;
+                    }
+                }
+                
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha})`;
+                    ctx.fill();
+                    
+                    if (this.glowing) {
+                        // Додаємо світіння для частинок при наведенні
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+                        ctx.fillStyle = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha * 0.3})`;
+                        ctx.fill();
+                    }
+                }
+                
+                isMouseOver(x, y) {
+                    const distance = Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
+                    return distance < this.size * 3;
+                }
+            }
+            
+            // Оновлений клас Word з коригованим розміром шрифту та логікою розташування
+            class Word {
+                constructor() {
+                    // Розширений список слів
+                    const wordsList = [
+                        "eBooks", 
+                        "Documents", 
+                        "Images", 
+                        "Music", 
+                        "Audio", 
+                        "Songs", 
+                        "Movies" 
+                        
+                    ];
+                    this.text = wordsList[Math.floor(Math.random() * wordsList.length)];
+                    
+                    // Позиція з урахуванням центрального кола
+                    this.placeAwayFromCenter();
+                    
+                    // Швидкість руху
+                    this.speed = Math.random() * 0.5 + 0.2;
+                    this.vx = Math.random() * 1 - 0.5;
+                    this.vy = Math.random() * 1 - 0.5;
+                    
+                    // Властивості відображення
+                    this.opacity = 0;
+                    this.targetOpacity = 0.3;
+                    // Коригований розмір шрифту - від 8 до 12px
+                    this.fontSize = Math.random() * 4 + 8;
+                    
+                    // Стани
+                    this.state = 'appearing';
+                    this.timeVisible = 0;
+                    this.maxVisibleTime = Math.random() * 5000 + 3000;
+                }
+                
+                // Новий метод для розташування слів поза центральним колом
+                placeAwayFromCenter() {
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    const safeRadius = 100; // Безпечна відстань від центру
+                    
+                    let validPosition = false;
+                    while (!validPosition) {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        
+                        // Обчислюємо відстань до центру
+                        const dx = this.x - centerX;
+                        const dy = this.y - centerY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        // Якщо відстань більша за безпечний радіус, позиція валідна
+                        if (distance > safeRadius) {
+                            validPosition = true;
+                        }
+                    }
+                }
+                
+                update(deltaTime) {
+                    // Рух слова
+                    this.x += this.vx * this.speed;
+                    this.y += this.vy * this.speed;
+                    
+                    // Відбиття від меж екрану
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                    
+                    // Перевірка наближення до центрального кола
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    const safeRadius = 100;
+                    
+                    const dx = this.x - centerX;
+                    const dy = this.y - centerY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // Якщо слово наближається до кола, відбиваємо його в протилежному напрямку
+                    if (distance < safeRadius) {
+                        // Нормалізуємо вектор від центру до слова
+                        const nx = dx / distance;
+                        const ny = dy / distance;
+                        
+                        // Встановлюємо нову позицію за межами безпечної зони
+                        this.x = centerX + nx * (safeRadius + 10);
+                        this.y = centerY + ny * (safeRadius + 10);
+                        
+                        // Змінюємо напрямок руху
+                        this.vx = nx * this.speed;
+                        this.vy = ny * this.speed;
+                    }
+                    
+                    // Керування станами та прозорістю
+                    if (this.state === 'appearing') {
+                        this.opacity += 0.01;
+                        if (this.opacity >= this.targetOpacity) {
+                            this.opacity = this.targetOpacity;
+                            this.state = 'visible';
+                        }
+                    } else if (this.state === 'visible') {
+                        this.timeVisible += deltaTime;
+                        if (this.timeVisible >= this.maxVisibleTime) {
+                            this.state = 'disappearing';
+                        }
+                    } else if (this.state === 'disappearing') {
+                        this.opacity -= 0.01;
+                        if (this.opacity <= 0) {
+                            this.opacity = 0;
+                            return true; // Готово для видалення і створення нового слова
+                        }
+                    }
+                    
+                    return false; // Слово все ще активне
+                }
+                
+                draw() {
+                    ctx.font = `${this.fontSize}px Syne, sans-serif`;
+                    ctx.fillStyle = `rgba(245, 245, 245, ${this.opacity})`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText(this.text, this.x, this.y);
+                }
+            }
+            
+            // Створюємо частинки
+            function createParticles(count) {
+                particles = [];
+                // Додаємо випадкові частинки
+                for (let i = 0; i < count; i++) {
+                    particles.push(new Particle());
+                }
+            }
+            
+            // Створюємо слова
+            function createWords(count) {
+                words = [];
+                for (let i = 0; i < count; i++) {
+                    words.push(new Word());
+                }
+            }
+            
+            // Анімація частинок та слів
+            function animate() {
+                const now = Date.now();
+                const deltaTime = now - (lastTime || now);
+                lastTime = now;
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                hoveredParticle = null;
+                
+                // Малюємо та оновлюємо частинки
+                particles.forEach(particle => {
+                    // Перевіряємо наведення миші
+                    if (particle.isMouseOver(mouseX, mouseY)) {
+                        particle.glowing = true;
+                        hoveredParticle = particle;
+                    } else {
+                        particle.glowing = false;
+                    }
+                    
+                    particle.update();
+                    particle.draw();
+                });
+                
+                // Малюємо та оновлюємо слова
+                for (let i = words.length - 1; i >= 0; i--) {
+                    const shouldRemove = words[i].update(deltaTime);
+                    words[i].draw();
+                    
+                    // Якщо слово повністю зникло, замінюємо його новим
+                    if (shouldRemove) {
+                        words.splice(i, 1);
+                        words.push(new Word());
+                    }
+                }
+                
+                // Змінюємо курсор, якщо навели на частинку
+                canvas.style.cursor = hoveredParticle ? 'pointer' : 'default';
+                
+                animationFrameId = requestAnimationFrame(animate);
+            }
+            
+            let lastTime;
+            
+            // Обробники подій
+            function addEventListeners() {
+                window.addEventListener('resize', () => {
+                    setupCanvas();
+                    createParticles(Math.floor(window.innerWidth * window.innerHeight / 10000));
+                });
+                
+                canvas.addEventListener('mousemove', e => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                    canvas.style.pointerEvents = 'auto';
+                });
+                
+                canvas.addEventListener('mouseout', () => {
+                    canvas.style.pointerEvents = 'none';
+                });
+                
+                // При кліку частинка "відлітає"
+                canvas.addEventListener('click', () => {
+                    if (hoveredParticle) {
+                        hoveredParticle.vx *= 5;
+                        hoveredParticle.vy *= 5;
+                        hoveredParticle.glowing = false;
+                    }
+                });
+            }
+            
+            // Ініціалізація
+            function init() {
+                setupCanvas();
+                const particleCount = Math.floor(window.innerWidth * window.innerHeight / 10000);
+                createParticles(particleCount);
+                createWords(Math.floor(particleCount / 10)); // Кількість слів - приблизно 1/10 від кількості частинок
+                addEventListeners();
+                lastTime = Date.now();
+                animate();
+                
+                // Додаємо посилання на масив частинок до canvas елемента для доступу ззовні
+                canvas.__particles = particles;
+            }
+            
+            init();
+            
+            // Контролер для частинок і слів
+            return {
+                show: () => {
+                    gsap.to(canvas, {
+                        opacity: 1,
+                        duration: 1,
+                        ease: "power2.out"
+                    });
+                },
+                hide: () => {
+                    gsap.to(canvas, {
+                        opacity: 0,
+                        duration: 0.5,
+                        ease: "power2.out"
+                    });
+                },
+                start: () => {
+                    if (!animationFrameId) {
+                        lastTime = Date.now();
+                        animate();
+                    }
+                },
+                stop: () => {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = null;
+                    }
+                },
+                // Додаємо метод для отримання випадкової частинки
+                getRandomParticle: () => {
+                    if (particles && particles.length > 0) {
+                        return particles[Math.floor(Math.random() * particles.length)];
+                    }
+                    return null;
+                },
+                // Додаємо метод для зуму випадкової частинки
+                zoomRandomParticle: (callback) => {
+                    if (particles && particles.length > 0) {
+                        const randomParticle = particles[Math.floor(Math.random() * particles.length)];
+                        if (randomParticle) {
+                            randomParticle.glowing = true;
+                            randomParticle.size = randomParticle.originalSize * 8; // Збільшуємо розмір у 8 разів
+                            randomParticle.alpha = 1; // Робимо повністю непрозорою
+                            
+                            // Викликаємо callback, якщо він переданий
+                            if (typeof callback === 'function') {
+                                setTimeout(callback, 500);
+                            }
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            };
+        }
+        
+        // Ініціалізація анімації при завантаженні сторінки
+        window.onload = function() {
+            localStorage.setItem("IntroductionShown", Date.now())
+            // Створюємо сітку на фоні
+            createGrid();
+            
+            // Ініціалізуємо контролер частинок (але не показуємо їх)
+            particlesController = initKnowledgeParticles();
+            
+            const mainNode = document.getElementById('main-node');
+            const pulseCircle = document.getElementById('pulse-circle');
+            const nodes = document.querySelectorAll('.node');
+            console.log('nodes', nodes);
+            const branches = document.querySelectorAll('.branch-line');
+            console.log('branches', branches);
+            const title = document.getElementById('title');
+            const subtitle = document.getElementById('subtitle');
+            const circleText = document.getElementById('circle-text');
+            const clickableNode = document.getElementById('clickable-node');
+            
+            // Створюємо таймлайн для початкової анімації
+            const initialTimeline = gsap.timeline();
+            
+            initialTimeline
+                .to(mainNode, {
+                    opacity: 1,
+                    duration: 1.5,
+                    ease: "power2.out"
+                })
+                .to(pulseCircle, {
+                    opacity: 0.6,
+                    duration: 1.2,
+                    ease: "power2.out"
+                }, "-=0.5")
+                .to([title, subtitle], {
+                    opacity: 1,
+                    y: -40,
+                    duration: 1.4,
+                    ease: "circ.out",
+                    stagger: 0.15
+                }, "-=0.5")
+                .to(circleText, {
+                    opacity: 1,
+                    duration: 1,
+                    ease: "power2.out"
+                }, "-=0.5");
+            
+            // Обробник кліку на коло
+            clickableNode.addEventListener('click', () => {
+                // Створюємо новий таймлайн для анімації кліку
+                const clickTimeline = gsap.timeline();
+                
+                // Отримуємо елементи тексту
+                const alexandriaInfo = document.getElementById('alexandria-info');
+                const topTypewriter = document.getElementById('top-typewriter');
+                const bottomTypewriter = document.getElementById('bottom-typewriter');
+                
+                // Приховуємо кнопку Next, оскільки перехід буде автоматичним
+                const nextButtonWrapper = document.querySelector('.next-button-wrapper');
+                if (nextButtonWrapper) {
+                    nextButtonWrapper.style.display = 'none';
+                }
+                
+                // Анімуємо головний вузол
+                clickTimeline
+                    .to(mainNode, {
+                        fill: "#efbf04",
+                        duration: 0.3,
+                        ease: "power2.out",
+                        attr: { r: 42 },
+                        onComplete: function() {
+                            mainNode.classList.add('glowing-circle');
+                        }
+                    });
+                
+                // Зупиняємо пульсацію
+                pulseCircle.style.animation = 'none';
+                pulseCircle.style.opacity = 0;
+                
+                // Приховуємо початковий текст
+                clickTimeline
+                    .to([title, subtitle, circleText], {
+                        opacity: 0,
+                        duration: 0.5,
+                        ease: "power2.out"
+                    }, "-=0.3")
+                    .to(alexandriaInfo, {
+                        opacity: 1,
+                        duration: 0.4,
+                        ease: "power2.out",
+                        onComplete: function() {
+                            console.log('Показуємо текст Alexandria');
+                            setTimeout(function() {
+                                startTypewriterAnimation();
+                            }, 300);
+                        }
+                    }, "-=0.3");
+                
+                // Анімуємо гілки та вузли
+                branches.forEach((branch, index) => {
+                    clickTimeline.to(branch, {
+                        strokeDashoffset: 0,
+                        opacity: 0.8,
+                        duration: 1,
+                        ease: "power2.out"
+                    }, "-=0.8");
+                    
+                    if (nodes[index]) {
+                        clickTimeline.to(nodes[index], {
+                            scale: 1,
+                            opacity: 1,
+                            duration: 0.8,
+                            ease: "back.out(1.7)"
+                        }, "-=0.5");
+                    }
+                });
+                
+                // Додаємо показ кнопки Previous (на першому кроці вона не потрібна)
+                clickTimeline.to(document.querySelector('.previous-button-wrapper'), {
+                    opacity: 0, // Залишаємо невидимою на першому кроці
+                    pointerEvents: 'none',
+                    duration: 0.1,
+                    ease: "power2.out"
+                }, "-=0.3");
+                
+                // Показуємо кнопку Next
+                clickTimeline.to(document.querySelector('.next-button-wrapper'), {
+                    opacity: 1,
+                    pointerEvents: 'auto',
+                    duration: 0.1,
+                    ease: "power2.out",
+                    display: 'block'
+                }, "-=0.3");
+
+                // Після закінчення анімації показуємо кнопку Previous і Next
+                clickTimeline.add(function() {
+                    updateButtonsVisibility();
+                });
+            });
+            
+            // Додаємо обробник для кнопки "Exit Tutorial"
+            const exitButton = document.querySelector('.exit-tutorial');
+            exitButton.addEventListener('click', () => {
+                window.location.href = 'https://lbry.app/';
+            });
+
+            // Додаємо обробник для кнопки Previous
+            const previousButton = document.querySelector('.previous-button');
+            if (previousButton) {
+                previousButton.onclick = function(e) {
+                    console.log('onclick спрацював на кнопці Previous');
+                    goToPreviousStage();
+                    return false; // Запобігаємо стандартній поведінці
+                };
+                console.log('onclick встановлено для кнопки Previous');
+            } else {
+                console.error('Кнопка Previous не знайдена!');
+            }
+
+            // Додаємо обробник кліку до батьківського елемента
+            const buttonWrapper = document.querySelector('.next-button-wrapper');
+            if (buttonWrapper) {
+                buttonWrapper.addEventListener('click', function(e) {
+                    console.log('Клік на .next-button-wrapper');
+                    if (e.target.classList.contains('next-button')) {
+                        console.log('Клік на кнопку Next через делегування');
+                        createNewBranches();
+                    }
+                });
+                console.log('Делегований обробник додано до .next-button-wrapper');
+            }
+        };
+
+        let clickCount = 0;
+        let simulation = null;
+        let nodes = [];
+        let links = [];
+
+        // Оновлена функція для запуску typewriter анімації
+        function startTypewriterAnimation() {
+            console.log('startTypewriterAnimation викликана');
+            const topTypewriter = document.getElementById('top-typewriter');
+            const bottomTypewriter = document.getElementById('bottom-typewriter');
+            
+            // Приховуємо кнопку Next
+            const nextButtonWrapper = document.querySelector('.next-button-wrapper');
+            if (nextButtonWrapper) {
+                nextButtonWrapper.style.display = 'none';
+                nextButtonWrapper.style.opacity = '0';
+                nextButtonWrapper.style.pointerEvents = 'none';
+            }
+            
+            // Показуємо тексти (але символи ще приховані)
+            topTypewriter.style.opacity = '1';
+            
+            // Отримуємо всі tspan елементи верхнього тексту
+            const topTspans = topTypewriter.querySelectorAll('tspan');
+            
+            console.log('Запуск анімації тексту, знайдено', topTspans.length, 'tspan елементів');
+            
+            // Анімуємо поступову появу символів верхнього тексту
+            animateText(topTspans, 0, 25, function() {
+                // Після завершення верхнього тексту, показуємо і анімуємо нижній
+                bottomTypewriter.style.opacity = '1';
+                const bottomTspans = bottomTypewriter.querySelectorAll('tspan');
+                
+                // Анімуємо нижній текст і після завершення показуємо сцену з частинками
+                animateText(bottomTspans, 0, 25, function() {
+                    // Затримка перед показом частинок
+                    setTimeout(function() {
+                        console.log('Анімація тексту завершена, показуємо сцену з частинками');
+                        // Автоматично показуємо сцену з частинками
+                        showParticlesScene();
+                    }, 500); // Даємо користувачу 0.5 секунди, щоб прочитати текст
+                });
+            });
+        }
+
+        // Функція для показу сцени з частинками
+        function showParticlesScene() {
+            console.log('Автоматичний показ сцени з частинками');
+            
+            const mainNode = document.getElementById('main-node');
+            const networkGraph = document.getElementById('network-graph');
+            const alexandriaInfo = document.getElementById('alexandria-info');
+            
+            // Приховуємо текст Alexandria
+            gsap.to(alexandriaInfo, {
+                opacity: 0,
+                duration: 0.5,
+                ease: "power2.out"
+            });
+            
+            // Також приховуємо елементи typewriter тексту
+            const topTypewriter = document.getElementById('top-typewriter');
+            const bottomTypewriter = document.getElementById('bottom-typewriter');
+            
+            if (topTypewriter) {
+                gsap.to(topTypewriter, {
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            }
+            
+            if (bottomTypewriter) {
+                gsap.to(bottomTypewriter, {
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            }
+            
+            // Показуємо частинки
+            if (particlesController) {
+                particlesController.show();
+                console.log('Частинки та слова показано автоматично');
+            }
+            
+            // Переконуємося, що мережевий граф прихований
+            networkGraph.style.display = 'none';
+            
+            // Анімуємо центральний вузол (тільки жовте коло)
+            gsap.to(mainNode, {
+                fill: "#efbf04",
+                stroke: "#efbf04",
+                strokeWidth: 0, // Без обводки
+                duration: 0.5,
+                ease: "power2.out",
+                onComplete: function() {
+                    mainNode.classList.add('glowing-circle');
+                }
+            });
+            
+            // Ініціалізуємо вузли для наступного етапу
+            try {
+                console.log('Ініціалізація початкових вузлів');
+                nodes = [
+                    { id: "Asset", x: 280, y: -130, fixed: true },
+                    { id: "Business", x: 120, y: 240, fixed: true },
+                    { id: "Bank", x: -280, y: -130, fixed: true },
+                    { id: "NFT", x: -240, y: 240, fixed: true }
+                ];
+                console.log('Початкові вузли ініціалізовані успішно');
+            } catch (error) {
+                console.error('Помилка під час ініціалізації вузлів:', error);
+            }
+            
+            // Показуємо кнопку Next для можливості переходу до мережевого графа
+            const nextButtonWrapper = document.querySelector('.next-button-wrapper');
+            if (nextButtonWrapper) {
+                nextButtonWrapper.style.display = 'block';
+                nextButtonWrapper.style.opacity = '1';
+                nextButtonWrapper.style.pointerEvents = 'auto';
+            }
+        }
+
+        // Функція createNewBranches для переходу до наступної сцени
+        function createNewBranches() {
+            console.log('createNewBranches викликана');
+            console.log('Поточне значення clickCount:', clickCount);
+            
+            // Отримуємо елемент з текстом Alexandria
+            const alexandriaInfo = document.getElementById('alexandria-info');
+            
+            // Спочатку приховуємо текст Alexandria незалежно від clickCount
+            gsap.to(alexandriaInfo, {
+                opacity: 0,
+                duration: 0.5,
+                ease: "power2.out",
+                onComplete: function() {
+                    // Після приховання тексту починаємо основну логіку
+                    processNextButtonClick();
+                }
+            });
+            
+            function processNextButtonClick() {
+                // Інкрементуємо clickCount
+                clickCount++;
+                console.log('Значення clickCount після інкременту:', clickCount);
+                
+                // Додаємо виклик функції оновлення кнопок
+                updateButtonsVisibility();
+                
+                const branchGroups = document.querySelectorAll('.branch-group');
+                const mainNode = document.getElementById('main-node');
+                const networkGraph = document.getElementById('network-graph');
+                
+                // Спочатку сховаємо всі елементи для чистого старту
+                branchGroups.forEach(group => group.style.display = 'none');
+                networkGraph.style.display = 'none';
+                
+                // Чітко розділяємо логіку для кожного кліку
+                if (clickCount === 1) {
+                    console.log('ПЕРШИЙ КЛІК - Створюємо мережевий граф');
+                    
+                    // Знаходимо випадкову частинку для зум-ефекту перед показом мережевого графа
+                    if (particlesController) {
+                        // Використовуємо новий метод для зуму випадкової частинки
+                        const success = particlesController.zoomRandomParticle(() => {
+                            // Це буде викликано через 0.5 секунди після зуму
+                            particlesController.hide();
+                            console.log('Частинки та слова приховано після зуму');
+                            showNetworkGraph();
+                        });
+                        
+                        // Якщо не вдалося знайти/збільшити частинку
+                        if (!success) {
+                            console.error('Не вдалося збільшити випадкову частинку');
+                            particlesController.hide();
+                            showNetworkGraph();
+                        }
+                    } else {
+                        // Якщо контролер частинок недоступний, одразу показуємо мережевий граф
+                        showNetworkGraph();
+                    }
+                } 
+                else if (clickCount === 2) {
+                    console.log('ДРУГИЙ КЛІК - Створюємо новий мережевий граф сервісів Alexandria');
+                    
+                    // Переконуємося, що частинки приховані
+                    if (particlesController) {
+                        particlesController.hide();
+                    }
+                    
+                    // Викликаємо нову функцію для створення графа сервісів Alexandria
+                    showAlexandriaServicesGraph();
+                }
+            }
+        }
+
+        function ticked() {
+            const svg = d3.select("#network-graph");
+            const centerX = 0;
+            const centerY = 0;
+            const centerRadius = 50;
+            
+            // Додаємо мінімальну допустиму координату Y для вузлів, щоб вони не перекривали текст
+            const minY = -120; // Обмеження, щоб вузли не виходили за цю межу вгору
+            
+            // Застосовуємо обмеження до вузлів
+            nodes.forEach(node => {
+                if (node.y < minY) node.y = minY;
+            });
+            
+            // Функція для створення кривої Безьє, яка обходить центральний вузол
+            function getBezierPath(d) {
+                const sourceX = d.source.x;
+                const sourceY = d.source.y;
+                const targetX = d.target.x;
+                const targetY = d.target.y;
+                
+                // Перевіряємо, чи перетинає лінія центр
+                const dx = targetX - sourceX;
+                const dy = targetY - sourceY;
+                const lineLength = Math.sqrt(dx * dx + dy * dy);
+                
+                // Відстань від центру до лінії
+                const centerToDist = Math.abs((dy * centerX - dx * centerY + sourceX * targetY - targetX * sourceY) / lineLength);
+                
+                // Якщо лінія проходить близько до центру, додаємо кривизну
+                if (centerToDist < centerRadius * 1.5) {
+                    // Знаходимо середину лінії
+                    const midX = (sourceX + targetX) / 2;
+                    const midY = (sourceY + targetY) / 2;
+                    
+                    // Вектор від центру до середини лінії
+                    const vectX = midX - centerX;
+                    const vectY = midY - centerY;
+                    const vectLength = Math.sqrt(vectX * vectX + vectY * vectY);
+                    
+                    // Нормалізований вектор, помножений на відстань уникнення
+                    const offsetDistance = centerRadius * 1.5;
+                    const offsetX = centerX + (vectX / vectLength) * offsetDistance;
+                    const offsetY = centerY + (vectY / vectLength) * offsetDistance;
+                    
+                    // Контрольні точки для кривої Безьє
+                    return `M ${sourceX},${sourceY} Q ${offsetX},${offsetY} ${targetX},${targetY}`;
+                } else {
+                    // Якщо лінія не проходить через центр, використовуємо пряму лінію
+                    return `M ${sourceX},${sourceY} L ${targetX},${targetY}`;
+                }
+            }
+            
+            // Оновлюємо позиції ліній (кривих Безьє)
+            svg.selectAll(".network-link")
+                .attr("d", getBezierPath);
+            
+            // Оновлюємо позиції вузлів
+            svg.selectAll(".network-node")
+                .attr("cx", d => d.x)
+                .attr("cy", d => Math.max(d.y, minY)); // Додаємо обмеження на мінімальну Y
+            
+            // Оновлюємо позиції міток
+            svg.selectAll(".network-label")
+                .attr("x", d => d.x)
+                .attr("y", d => {
+                    const baseY = Math.max(d.y, minY); // Застосовуємо обмеження
+                    if (d.center) return baseY + 5;
+                    if (["Asset", "Business", "Bank", "NFT"].includes(d.id)) {
+                        return baseY - 35;
+                    }
+                    return baseY - 20;
+                });
+        }
+
+        // Додаємо ripple-ефект
+        (function() {
+            const canvas = document.getElementById('ripple-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let lastX = 0;
+            let lastY = 0;
+            let ripples = [];
+            
+            // Клас для створення ripple-ефекту
+            class Ripple {
+                constructor(x, y, velocity = 2) {
+                    this.x = x;
+                    this.y = y;
+                    this.radius = 0;
+                    this.maxRadius = Math.max(width, height) * 0.15; // Максимальний радіус хвилі
+                    this.lineWidth = 1.5;
+                    this.velocity = velocity;
+                    this.opacity = 0.4;
+                    this.alive = true;
+                }
+                
+                update() {
+                    this.radius += this.velocity;
+                    this.opacity -= 0.007; // Поступово зменшуємо прозорість
+                    
+                    if (this.radius > this.maxRadius || this.opacity <= 0) {
+                        this.alive = false;
+                    }
+                }
+                
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.lineWidth = this.lineWidth;
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+            }
+            
+            // Функція для налаштування розміру canvas
+            function setupCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Додаємо градієнт для фону
+                let gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/2);
+                gradient.addColorStop(0, '#171717');
+                gradient.addColorStop(1, '#0f0f0f');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+            }
+            
+            // Обробник для руху миші
+            function mouseMoveHandler(e) {
+                let currentX = e.clientX;
+                let currentY = e.clientY;
+                
+                // Створюємо хвилю тільки якщо миша рухається досить швидко
+                let distance = Math.sqrt(Math.pow(currentX - lastX, 2) + Math.pow(currentY - lastY, 2));
+                
+                if (distance > 30) { // Збільшуємо поріг з 20 до 30
+                    // Створюємо нову хвилю з різною швидкістю залежно від відстані
+                    let velocity = Math.min(3, Math.max(0.8, distance / 40)); // Зменшуємо швидкість
+                    ripples.push(new Ripple(currentX, currentY, velocity));
+                    
+                    lastX = currentX;
+                    lastY = currentY;
+                }
+            }
+            
+            // Функція анімації
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Очищаємо canvas прозорим фоном для ефекту затухання
+                ctx.fillStyle = 'rgba(23, 23, 23, 0.05)';
+                ctx.fillRect(0, 0, width, height);
+                
+                // Оновлюємо та малюємо всі хвилі
+                ripples.forEach((ripple, index) => {
+                    ripple.update();
+                    ripple.draw();
+                    
+                    // Видаляємо хвилі, які закінчили своє життя
+                    if (!ripple.alive) {
+                        ripples.splice(index, 1);
+                    }
+                });
+            }
+            
+            // Ініціалізація
+            function init() {
+                setupCanvas();
+                window.addEventListener('resize', setupCanvas);
+                document.addEventListener('mousemove', mouseMoveHandler);
+                animate();
+            }
+            
+            init();
+        })();
+
+        // Функція для анімації Glassmorphism та послідовного тексту
+        function animateGlassmorphism(containers, paragraphs) {
+            // Спочатку показуємо перший скляний контейнер
+            containers[0].classList.add('visible');
+            
+            // Потім послідовно показуємо параграфи в першому контейнері
+            const firstContainerParagraphs = [paragraphs[0], paragraphs[1], paragraphs[2]];
+            firstContainerParagraphs.forEach((paragraph, index) => {
+                setTimeout(() => {
+                    paragraph.classList.add('visible');
+                }, 600 * (index + 1)); // Починаємо з затримкою 600мс
+            });
+            
+            // Через певний час показуємо другий скляний контейнер
+            setTimeout(() => {
+                containers[1].classList.add('visible');
+                
+                // І послідовно показуємо параграфи в другому контейнері
+                const secondContainerParagraphs = [paragraphs[3], paragraphs[4], paragraphs[5]];
+                secondContainerParagraphs.forEach((paragraph, index) => {
+                    setTimeout(() => {
+                        paragraph.classList.add('visible');
+                    }, 600 * (index + 1)); // Також з інтервалом 600мс
+                });
+            }, 2500); // Показуємо другий контейнер через 2.5 секунди після першого
+        }
+
+        // Оновлена функція goToPreviousStage для правильного переходу між етапами
+        function goToPreviousStage() {
+            console.log('goToPreviousStage викликана');
+            console.log('Поточне значення clickCount перед зменшенням:', clickCount);
+            
+            // Отримуємо необхідні елементи
+            const branchGroups = document.querySelectorAll('.branch-group');
+            const mainNode = document.getElementById('main-node');
+            const networkGraph = document.getElementById('network-graph');
+            const alexandriaInfo = document.getElementById('alexandria-info');
+            
+            // Якщо ми в стані alexandria-info, повертаємось до початкового стану
+            if (clickCount === 0) {
+                returnToStartState();
+            } 
+            // Якщо ми вже пройшли вперед, зменшуємо лічильник і повертаємось назад
+            else if (clickCount > 0) {
+                clickCount--; // Зменшуємо лічильник
+                console.log('Зменшено clickCount, нове значення:', clickCount);
+                
+                // Спочатку сховаємо всі елементи для чистого старту
+                branchGroups.forEach(group => group.style.display = 'none');
+                networkGraph.style.display = 'none';
+                
+                // Приховуємо typewriter текст для мережевого графа
+                const networkTypewriter = document.getElementById('network-typewriter');
+                if (networkTypewriter) {
+                    networkTypewriter.style.opacity = '0';
+                    networkTypewriter.querySelectorAll('tspan').forEach(tspan => {
+                        tspan.textContent = '';
+                    });
+                }
+                
+                // В залежності від значення clickCount відновлюємо відповідний стан
+                if (clickCount === 0) {
+                    // Приховуємо частинки при поверненні до alexandria-info
+                    if (particlesController) {
+                        particlesController.hide();
+                        console.log('Частинки та слова приховано при поверненні до alexandria-info');
+                    }
+                    
+                    returnToAlexandriaInfo();
+                } 
+                else if (clickCount === 1) {
+                    // Етап 1 - частинки і жовте коло без вузлів
+                    // Приховуємо вузли і показуємо частинки
+                    networkGraph.style.display = 'none';
+                    
+                    // Показуємо основне жовте коло без обводки
+                    gsap.to(mainNode, {
+                        fill: "#efbf04",
+                        stroke: "#efbf04",
+                        strokeWidth: 0,  // Без обводки для першої сцени з частинками
+                        duration: 0.5,
+                        ease: "power2.out",
+                        onComplete: function() {
+                            mainNode.classList.add('glowing-circle');
+                        }
+                    });
+                    
+                    // Показуємо частинки
+                    if (particlesController) {
+                        particlesController.show();
+                        console.log('Частинки та слова показано при поверненні до етапу 1');
+                    }
+                } 
+                else if (clickCount === 2) {
+                    // Етап 2 - основні вузли з гілками
+                    // Приховуємо мережевий граф і показуємо основні вузли
+                    networkGraph.style.display = 'none';
+                    branchGroups.forEach(group => group.style.display = 'block');
+                    
+                    // Приховуємо частинки
+                    if (particlesController) {
+                    if (node && node.nodes && link && link.nodes && label && label.nodes) {
+                    appearTimeline
+                        .to(node.nodes(), {
+                            opacity: 1,
+                                duration: 0.8,
+                            ease: "power2.out",
+                                stagger: 0.1
+                        }, 0)
+                        .to(link.nodes(), {
+                            opacity: 1,
+                                duration: 1.2,
+                            ease: "power2.out",
+                                stagger: 0.08
+                            }, 0.3);
+                        
+                        // Анімуємо мітки
+                        appearTimeline.to(label.nodes(), {
+                            opacity: 0.7,
+                            duration: 0.8,
+                            ease: "power2.out",
+                            stagger: 0.1
+                        }, 0.5);
+                } else {
+                        console.error('Деякі елементи для анімації не знайдені');
+                    }
+
+                    // Масив з описами для жовтих вузлів
+                        particlesController.hide();
+                    }
+                    
+                    // Анімуємо центральний вузол з обводкою
+                    gsap.to(mainNode, {
+                        fill: "#efbf04",
+                        stroke: "#efbf04",
+                        strokeWidth: 2,
+                        duration: 0.5,
+                        ease: "power2.out"
+                    });
+                    
+                    // Переконуємося, що текст мережевого графа приховано
+                    const networkTypewriter = document.getElementById('network-typewriter');
+                    if (networkTypewriter) {
+                        networkTypewriter.style.opacity = '0';
+                    }
+                    
+                    // Анімуємо кожну гілку та її елементи
+                    branchGroups.forEach((group, index) => {
+                        const branch = group.querySelector('.branch-line');
+                        const node = group.querySelector('.node');
+                        const label = group.querySelector('.node-label');
+                        const description = group.querySelector('.node-description');
+                        
+                        gsap.to(branch, {
+                            strokeDashoffset: 0,
+                            opacity: 0.8,
+                            duration: 1,
+                            ease: "power2.out"
+                        });
+                        
+                        gsap.to(node, {
+                            scale: 1,
+                            opacity: 1,
+                            duration: 0.8,
+                            ease: "back.out(1.7)"
+                        });
+                        
+                        gsap.to([label, description], {
+                            opacity: 1,
+                            duration: 0.5,
+                            ease: "power2.out"
+                        });
+                    });
+                }
+                else if (clickCount === 3) {
+                    // Повертаємось до стандартного мережевого графа
+                    showNetworkGraph();
+                    
+                    // Змінюємо кольори вузлів для відновлення стану етапу 3
+                    try {
+                        d3.select("#network-graph")
+                          .selectAll(".network-node")
+                          .style("fill", d => {
+                              if (d.center) return "#efbf04";
+                              if (["Asset", "Business", "Bank", "NFT"].includes(d.id)) {
+                                  const colors = ["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6"];
+                                  return colors[0]; // Перший колір для clickCount === 3
+                              }
+                              return "rgba(255, 255, 255, 0.2)";
+                          });
+                        
+                        // Відновлюємо попередню силу відштовхування
+                        if (simulation) {
+                            simulation.force("charge").strength(-400); // -300 - (3-2) * 100 = -400
+                            simulation.alpha(0.3).restart();
+                        }
+                    } catch (error) {
+                        console.error('Помилка при відновленні мережевого графа:', error);
+                    }
+                }
+            }
+            
+            // Оновлюємо стан кнопок
+            updateButtonsVisibility();
+        }
+
+        // Функція для повернення до початкового стану з текстом Alexandria
+        function returnToAlexandriaInfo() {
+            console.log('Повертаємось до стану alexandria-info');
+            
+            const mainNode = document.getElementById('main-node');
+            const alexandriaInfo = document.getElementById('alexandria-info');
+            const branchGroups = document.querySelectorAll('.branch-group');
+            const networkGraph = document.getElementById('network-graph');
+            
+            // Приховуємо мережу та вузли
+            networkGraph.style.display = 'none';
+            branchGroups.forEach(group => group.style.display = 'none');
+            
+            // Повертаємо жовте коло та текст Alexandria
+            gsap.to(mainNode, {
+                fill: "#efbf04",
+                stroke: "",
+                strokeWidth: 0,
+                attr: { r: 42 },
+                duration: 0.5,
+                ease: "power2.out",
+                onComplete: function() {
+                    mainNode.classList.add('glowing-circle');
+                }
+            });
+            
+            // Показуємо інформацію Alexandria з typewriter ефектом
+            gsap.to(alexandriaInfo, {
+                opacity: 1,
+                duration: 0.8,
+                ease: "power2.out",
+                onComplete: function() {
+                    startTypewriterAnimation();
+                }
+            });
+        }
+
+        // Функція для повернення до стартового стану (перед кліком на коло)
+        function returnToStartState() {
+            console.log('Повертаємось до початкового стану');
+            
+            const mainNode = document.getElementById('main-node');
+            const pulseCircle = document.getElementById('pulse-circle');
+            const alexandriaInfo = document.getElementById('alexandria-info');
+            const title = document.getElementById('title');
+            const subtitle = document.getElementById('subtitle');
+            const circleText = document.getElementById('circle-text');
+            
+            // Очищаємо промені та частинки
+            const raysContainer = document.getElementById('knowledge-rays');
+            const particlesContainer = document.getElementById('knowledge-particles');
+            
+            if (raysContainer) {
+                while (raysContainer.firstChild) {
+                    raysContainer.removeChild(raysContainer.firstChild);
+                }
+            }
+            
+            if (particlesContainer) {
+                while (particlesContainer.firstChild) {
+                    particlesContainer.removeChild(particlesContainer.firstChild);
+                }
+            }
+            
+            // Приховуємо інформацію Alexandria
+            gsap.to(alexandriaInfo, {
+                opacity: 0,
+                duration: 0.5,
+                ease: "power2.out"
+            });
+            
+            // Видаляємо клас для пульсації
+            mainNode.classList.remove('glowing-circle');
+            
+            // Повертаємо вихідний стан кола
+            gsap.to(mainNode, {
+                fill: "#ffffff",
+                attr: { r: 70 },
+                duration: 0.5,
+                ease: "power2.out"
+            });
+            
+            // Відновлюємо пульсацію
+            pulseCircle.style.animation = 'pulse 2s infinite';
+            pulseCircle.style.opacity = 0.6;
+            
+            // Показуємо початковий текст
+            gsap.to([title, subtitle, circleText], {
+                opacity: 1,
+                duration: 0.8,
+                ease: "power2.out"
+            });
+            
+            // Оновлюємо clickCount до -2, щоб при наступному кліці почати з -1 (який стане 0 після інкременту)
+            clickCount = -2;
+        }
+
+        // Функція для оновлення видимості кнопок в залежності від стану
+        function updateButtonsVisibility() {
+            const previousButtonWrapper = document.querySelector('.previous-button-wrapper');
+            const nextButtonWrapper = document.querySelector('.next-button-wrapper');
+            
+            console.log('updateButtonsVisibility викликана, clickCount =', clickCount);
+            
+            // ВАЖЛИВО: Чітко встановлюємо видимість кнопки Previous
+            if (clickCount > 0) {  // Змінили умову з >= 0 на > 0
+                console.log('Показуємо кнопку Previous');
+                
+                // Задаємо значення display перед анімацією, щоб елемент був у DOM
+                previousButtonWrapper.style.display = 'block';
+                
+                // Потім анімуємо його
+                gsap.to(previousButtonWrapper, {
+                    opacity: 1,
+                    pointerEvents: 'auto',
+                    duration: 0.3
+                });
+            } else {
+                console.log('Приховуємо кнопку Previous');
+                gsap.to(previousButtonWrapper, {
+                    opacity: 0,
+                    pointerEvents: 'none',
+                    duration: 0.3,
+                    onComplete: function() {
+                        previousButtonWrapper.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Логіка для кнопки Next - показуємо тільки для clickCount від 0 до 4
+            if (clickCount >= 0 && clickCount <= 4) {
+                nextButtonWrapper.style.display = 'block';
+                gsap.to(nextButtonWrapper, {
+                    opacity: 1,
+                    pointerEvents: 'auto',
+                    duration: 0.3
+                });
+            } else {
+                gsap.to(nextButtonWrapper, {
+                    opacity: 0,
+                    pointerEvents: 'none',
+                    duration: 0.3,
+                    onComplete: function() {
+                        nextButtonWrapper.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        // Функція для показу мережевого графа (виносимо цю логіку в окрему функцію)
+        function showNetworkGraph() {
+            console.log('Показуємо networkGraph');
+            const networkGraph = document.getElementById('network-graph');
+            networkGraph.style.display = 'block';
+            
+            // Додаємо центральний вузол
+            const centerNode = { 
+                id: "Alexandria", 
+                x: 0, 
+                y: 0, 
+                fixed: true, 
+                center: true 
+            };
+            
+            // Очищуємо попередні зв'язки та ініціалізуємо їх заново
+            links = [];
+
+            // Генеруємо нові вузли
+            const newNodeNames = ["Books", "Images", "Audios", "Videos", "Songs", "Movies", "Essays", "Documents"];
+            let newNodeIndex = 0;
+            const mainNodes = nodes.filter(n => ["Asset", "Business", "Bank", "NFT"].includes(n.id));
+
+            // Розташовуємо основні вузли по колу
+            const radius1 = 120; // Змінено з 180 на 120 - Радіус для головних вузлів
+            mainNodes.forEach((mainNode, idx) => {
+                const angle = (idx * 2 * Math.PI / mainNodes.length);
+                mainNode.x = Math.cos(angle) * radius1;
+                mainNode.y = Math.sin(angle) * radius1;
+                mainNode.fixed = true;
+            });
+
+            // Фільтруємо існуючі вторинні вузли
+            nodes = nodes.filter(n => ["Asset", "Business", "Bank", "NFT"].includes(n.id));
+
+            // Розташовуємо вторинні вузли по зовнішньому колу
+            const radius2 = 200; // Змінено з 300 на 200 - Радіус для вторинних вузлів
+            mainNodes.forEach(mainNode => {
+                for (let i = 0; i < 2; i++) {
+                    if (newNodeIndex < newNodeNames.length) {
+                        const baseAngle = Math.atan2(mainNode.y, mainNode.x);
+                        const offset = (i === 0) ? -0.2 : 0.2;
+                        const angle = baseAngle + offset;
+                        
+                        const newNode = {
+                            id: newNodeNames[newNodeIndex],
+                            x: Math.cos(angle) * radius2,
+                            y: Math.sin(angle) * radius2
+                        };
+                        nodes.push(newNode);
+                        links.push({ 
+                            source: mainNode.id, 
+                            target: newNode.id,
+                            value: 1
+                        });
+                        newNodeIndex++;
+                    }
+                }
+            });
+
+            // Додаємо центральний вузол в масив вузлів
+            nodes.push(centerNode);
+
+            // Створюємо випадкові зв'язки між новими вузлами
+            const newNodes = nodes.filter(n => !["Asset", "Business", "Bank", "NFT", "Alexandria"].includes(n.id));
+            for (let i = 0; i < newNodes.length; i++) {
+                const node1 = newNodes[i];
+                for (let j = i + 1; j < newNodes.length; j++) {
+                    if (Math.random() < 0.3) {
+                        links.push({ 
+                            source: node1.id, 
+                            target: newNodes[j].id,
+                            value: 1
+                        });
+                    }
+                }
+            }
+
+            // Зупиняємо попередню симуляцію, якщо вона існує
+            if (simulation) simulation.stop();
+            
+            // Створюємо нову симуляцію
+            simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(100))
+                .force("charge", d3.forceManyBody().strength(-300))
+                .force("center", d3.forceCenter(0, 30)) // Змінюємо з (0, 0) на (0, 30) - зсув графа вниз на 30px
+                .force("collision", d3.forceCollide().radius(40))
+                .force("radial", d3.forceRadial(d => {
+                    if (d.center) return 0;
+                    if (["Asset", "Business", "Bank", "NFT"].includes(d.id)) return radius1;
+                    return radius2;
+                }).strength(0.6))
+                .force("y", d3.forceY().strength(0.1).y(d => { 
+                    // Додаємо силу, яка відштовхує вузли від верху екрану
+                    if (d.y < 0) return Math.min(30, d.y + 80); // Не дозволяє вузлам підніматися вище 80px від центру
+                    return d.y;
+                }))
+                .alphaDecay(0.01)
+                .velocityDecay(0.3)
+                .on("tick", ticked);
+
+            // Фіксуємо позицію центрального вузла
+            simulation.nodes().forEach(node => {
+                if (node.center) {
+                    node.fx = 0;
+                    node.fy = 0;
+                }
+            });
+
+            // Очищаємо і створюємо SVG елементи заново
+            const svg = d3.select("#network-graph");
+            svg.selectAll("*").remove();
+
+            // Створюємо криві лінії Безьє
+            const link = svg.append("g")
+                .selectAll("path")
+                .data(links)
+                .enter()
+                .append("path")
+                .attr("class", "network-link")
+                .style("stroke", "rgba(255, 255, 255, 0.3)")
+                .style("stroke-width", 1)
+                .style("fill", "none")
+                .style("opacity", 0);
+
+            // Створюємо вузли
+            const node = svg.append("g")
+                .selectAll("circle")
+                .data(nodes)
+                .enter()
+                .append("circle")
+                .attr("class", "network-node")
+                .attr("r", d => {
+                    if (d.center) return 42; // Повернуто з 32 на 42
+                    return ["Asset", "Business", "Bank", "NFT"].includes(d.id) ? 18 : 12 // Змінено з 25 на 18 і з 15 на 12
+                })
+                .style("fill", d => {
+                    if (d.center) return "#efbf04";
+                    return ["Asset", "Business", "Bank", "NFT"].includes(d.id) ? "#efbf04" : "rgba(255, 255, 255, 0.2)"
+                })
+                .style("stroke", "rgba(255, 255, 255, 0.8)")
+                .style("stroke-width", 1.5)
+                .style("opacity", 0);
+
+            // Додаємо мітки
+            const label = svg.append("g")
+                .selectAll("text")
+                .data(nodes)
+                .enter()
+                .append("text")
+                .attr("class", "network-label")
+                .text(d => {
+                    // Не показуємо текст для другорядних сервісів або Beacon
+                    if (d.secondaryService || d.id === "Beacon") return "";
+                    return d.id;
+                })
+                .style("fill", "white")
+                .style("font-size", d => {
+                    if (d.center) return "14px";
+                    if (d.mainService) return "12px";
+                    if (d.secondaryService) return "10px";
+                    return "8px";
+                })
+                .style("text-anchor", "middle")
+                .style("opacity", 0);
+
+            // Анімуємо появу всіх елементів
+            const appearTimeline = gsap.timeline({
+                onComplete: function() {
+                    console.log('Анімація графа завершена');
+                }
+            });
+
+            // Переконаємося, що всі потрібні елементи існують перед анімацією
+            if (node && node.nodes && link && link.nodes && label && label.nodes) {
+            appearTimeline
+                .to(node.nodes(), {
+                    opacity: 1,
+                        duration: 0.8,
+                    ease: "power2.out",
+                        stagger: 0.1
+                }, 0)
+                .to(link.nodes(), {
+                    opacity: 1,
+                        duration: 1.2,
+                    ease: "power2.out",
+                        stagger: 0.08
+                    }, 0.3);
+                
+                // Анімуємо мітки
+                appearTimeline.to(label.nodes(), {
+                    opacity: d => {
+                        if (d.secondaryService || d.id === "Beacon") return 0; // Не показуємо приховані мітки взагалі
+                        if (d.center) return 1;
+                        if (d.mainService) return 0.9;
+                        return 0.7;
+                    },
+                    duration: 0.8,
+                    ease: "power2.out",
+                    stagger: 0.05
+                }, 0.5);
+            } else {
+                console.error('Деякі елементи для анімації не знайдені');
+            }
+
+            // Масив з описами для жовтих вузлів
+            const nodeDescriptions = {
+                "Asset": "Owned by someone",
+                "Business": "Earns money whenever it is re-used",
+                "Bank": "Holds money on behalf of its creator",
+                "NFT": "Self-rendering permanent asset with dynamic metadata attribute"
+            };
+
+            // Створюємо контейнер для опису при ховері
+            const tooltipContainer = svg.append("g")
+                .attr("class", "tooltip-container")
+                .style("opacity", 0);
+
+            // Додаємо спочатку текст, щоб потім визначити його розміри
+            const tooltipText = tooltipContainer.append("text")
+                .attr("y", 15) // Початкова позиція для вимірювання 
+                .attr("text-anchor", "middle")
+                .attr("fill", "white")
+                .style("font-family", "'Syne', sans-serif")
+                .style("font-size", "12px");
+
+            // Горизонтальний та вертикальний падінги
+            const horizontalPadding = 8;
+            const verticalPadding = 6;
+
+            // Додаємо обробники подій ховеру для жовтих вузлів
+            node.filter(d => ["Asset", "Business", "Bank", "NFT"].includes(d.id))
+                .style("cursor", "pointer")
+                .on("mouseover", function(event, d) {
+                    // Змінюємо вигляд вузла при наведенні
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr("r", function(d) {
+                            return ["Asset", "Business", "Bank", "NFT"].includes(d.id) ? 22 : this.getAttribute("r"); // Змінено з 30 на 22
+                        })
+                        .style("fill", "#ffdf5e") // Світліший жовтий при наведенні
+                        .style("filter", "drop-shadow(0 0 8px rgba(239, 191, 4, 0.8))");
+                        
+                    // Встановлюємо текст опису
+                    const description = nodeDescriptions[d.id] || "";
+                    tooltipText.text(description);
+                    
+                    // Визначаємо розміри тексту для адаптивного розміру тултіпа
+                    const textBBox = tooltipText.node().getBBox();
+                    const tooltipWidth = textBBox.width + horizontalPadding * 2;
+                    const tooltipHeight = textBBox.height + verticalPadding * 2;
+                    
+                    // Видаляємо старий прямокутник якщо він є
+                    tooltipContainer.select("rect").remove();
+                    
+                    // Створюємо новий прямокутник з розміром під текст
+                    const tooltipRect = tooltipContainer.insert("rect", "text")
+                        .attr("rx", 5)
+                        .attr("ry", 5)
+                        .attr("width", tooltipWidth)
+                        .attr("height", tooltipHeight)
+                        .attr("fill", "rgba(0, 0, 0, 0.7)")
+                        .attr("stroke", "#efbf04")
+                        .attr("stroke-width", 1);
+                    
+                    // Коректуємо позицію тексту відносно нового прямокутника
+                    tooltipText
+                        .attr("x", tooltipWidth / 2)
+                        .attr("y", tooltipHeight / 2 + 4); // +4 для кращого вертикального центрування
+                    
+                    // Позиціонуємо тултіп нижче вузла
+                    const tooltipX = d.x - tooltipWidth / 2; // центруємо відносно вузла
+                    const tooltipY = d.y + 40; // трохи нижче вузла
+                    
+                    // Показуємо тултіп
+                    tooltipContainer
+                        .attr("transform", `translate(${tooltipX}, ${tooltipY})`)
+                        .style("opacity", 1);
+                })
+                .on("mouseout", function() {
+                    // Повертаємо вихідний вигляд вузла
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr("r", function(d) {
+                            return ["Asset", "Business", "Bank", "NFT"].includes(d.id) ? 18 : this.getAttribute("r"); // Змінено з 25 на 18
+                        })
+                        .style("fill", "#efbf04") // Повертаємо початковий колір
+                        .style("filter", "none");
+                        
+                    // Ховаємо опис
+                    tooltipContainer.style("opacity", 0);
+                });
+
+            // Додаємо typewriter текст зверху екрану
+            const networkTypewriter = document.getElementById('network-typewriter');
+            if (networkTypewriter) {
+                // Показуємо елемент
+                networkTypewriter.style.opacity = '1';
+                
+                // Отримуємо всі tspan елементи
+                const networkTspans = networkTypewriter.querySelectorAll('tspan');
+                
+                // Запускаємо typewriter анімацію
+                console.log('Запуск анімації тексту для мережевого графа');
+                animateText(networkTspans, 0, 25, null);
+            }
+
+            // Створюємо групу для текстових міток зв'язків
+            const linkLabels = svg.append("g")
+                .attr("class", "link-labels");
+
+            // Після створення всіх зв'язків, знаходимо зв'язок між Trade та Earn
+            link.each(function(d) {
+                if (d.tokenomicsLink) {
+                    // Створюємо текстову мітку "Tokenomics" для цього зв'язку
+                    // Використовуємо textPath для розміщення тексту вздовж шляху
+                    
+                    // Спочатку створюємо унікальний ID для шляху
+                    const pathId = "tokenomics-path";
+                    
+                    // Клонуємо шлях для текстової мітки
+                    const textPath = svg.append("defs")
+                        .append("path")
+                        .attr("id", pathId)
+                        .attr("d", d3.select(this).attr("d"));
+                    
+                    // Додаємо текст, який слідує вздовж шляху
+                    linkLabels.append("text")
+                        .attr("dy", -5) // Зміщення тексту від лінії
+                        .attr("class", "tokenomics-text")
+                        .style("fill", "white")
+                        .style("font-family", "'Syne', sans-serif")
+                        .style("font-size", "8px")
+                        .style("font-weight", "500")
+                        .style("text-transform", "uppercase")
+                        .style("letter-spacing", "1px")
+                        .style("opacity", 0) // Початково прихований для анімації
+                        .append("textPath")
+                        .attr("xlink:href", "#" + pathId)
+                        .attr("startOffset", "50%") // Починати від середини шляху
+                        .attr("text-anchor", "middle") // Центрувати відносно startOffset
+                        .text("Tokenomics");
+                    
+                    // Додаємо анімацію появи тексту
+                    appearTimeline.to(".tokenomics-text", {
+                        opacity: 1,
+                        duration: 0.8,
+                        ease: "power2.out"
+                    }, 1.0); // Показуємо після анімації вузлів і ліній
+                }
+            });
+
+            // Оновлюємо функцію ticked для коректного розміщення тексту відповідно до оновлення позицій вузлів
+            const originalTicked = ticked;
+            ticked = function() {
+                originalTicked();
+                
+                // Оновлюємо шлях для тексту Tokenomics при русі вузлів
+                link.each(function(d) {
+                    if (d.tokenomicsLink) {
+                        // Оновлюємо шлях для текстової мітки
+                        svg.select("#tokenomics-path")
+                            .attr("d", d3.select(this).attr("d"));
+                    }
+                });
+            };
+        }
+
+        // Додаємо нову функцію для створення Alexandria Services мережевого графа
+        function showAlexandriaServicesGraph() {
+            console.log('Показуємо Alexandria Services граф');
+            const networkGraph = document.getElementById('network-graph');
+            networkGraph.style.display = 'block';
+            
+            // Змінюємо текст і стиль кнопки Next на Start Exploring!
+            const nextButton = document.querySelector('.next-button');
+            if (nextButton) {
+                // Змінюємо текст
+                nextButton.textContent = 'Start Exploring!';
+                
+                // Додаємо жирний шрифт
+                nextButton.style.fontWeight = 'bold';
+                
+                // Видаляємо стрілку
+                nextButton.classList.add('no-arrow');
+                
+                // Змінюємо обробник кліку для кнопки Start Exploring
+                nextButton.onclick = function(e) {
+                    // Викликаємо функцію ефекту вибуху
+                    createExplosionEffect();
+                    
+                    // Блокуємо всплиття події для делегованих обробників
+                    e.stopPropagation();
+                    e.preventDefault();
+                    return false;
+                };
+            }
+            
+            // Додаємо CSS для прибирання стрілки у кнопки Next через клас no-arrow
+            const style = document.createElement('style');
+            style.textContent = `
+                .next-button.no-arrow::after {
+                    content: none !important;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Оновлюємо текст для мережевого графа на новий
+            const networkTypewriter = document.getElementById('network-typewriter');
+            if (networkTypewriter) {
+                // Очистимо існуючий текст
+                networkTypewriter.innerHTML = '';
+                
+                // Додаємо новий текст
+                const newText1 = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+                newText1.setAttribute("x", "400");
+                newText1.setAttribute("dy", "0");
+                newText1.setAttribute("text-anchor", "middle");
+                newText1.textContent = "Different apps, one protocol — a single source powering diverse digital experiences.";
+                
+                networkTypewriter.appendChild(newText1);
+                
+                // Показуємо елемент
+                networkTypewriter.style.opacity = '1';
+                
+                // Запускаємо typewriter анімацію
+                console.log('Запуск анімації тексту для Alexandria Services графа');
+                const networkTspans = networkTypewriter.querySelectorAll('tspan');
+                animateText(networkTspans, 0, 25, null);
+            }
+            
+            // Додаємо центральний вузол
+            const centerNode = { 
+                id: "Alexandria", 
+                x: 0, 
+                y: 0, 
+                fixed: true, 
+                center: true 
+            };
+            
+            // Очищуємо попередні зв'язки та ініціалізуємо їх заново
+            links = [];
+            
+            // Основні сервіси Alexandria з жовтим кольором
+            const mainServices = [
+                "Permasearch", 
+                "Emporium", 
+                "Alexandrian", 
+                "Pinax", 
+                "Perpetua", 
+            ];
+            
+            // Другорядні сервіси (менші, але теж жовті)
+            const secondaryServices = [
+                "Audion", 
+                "Lumen", 
+                "Panacea", 
+                "Nexus", 
+                "Genesis"
+            ];
+            
+            // Замінюємо визначення третього рівня сервісів та їх зв'язків
+            // Створюємо об'єкт зі структурою зв'язків від основних сервісів
+            const tertiaryStructure = {
+                "Permasearch": ["Search", "Mint", "Explore"],
+                "Alexandrian": ["Search", "Earn", "Explore"],
+                "Emporium": ["Earn", "Trade"],
+                "Pinax": ["Upload", "Mint"],
+                "Perpetua": ["Explore", "Communicate"]
+            };
+
+            // Оновлений масив для третього рівня
+            const tertiaryServices = [];
+
+            // Заповнюємо масив третього рівня і створюємо властивість для відстеження батьківського сервісу
+            Object.keys(tertiaryStructure).forEach(mainService => {
+                tertiaryStructure[mainService].forEach(service => {
+                    if (!tertiaryServices.includes(service)) {
+                        tertiaryServices.push(service);
+                    }
+                });
+            });
+
+            // Очищаємо попередні вузли та ініціалізуємо їх заново
+            nodes = [];
+
+            // Створюємо об'єкт з вручну розрахованими позиціями для основних сервісів
+            // на колі з радіусом 120 (використовуючи Math.cos і Math.sin)
+            const radius1 = 120; // Радіус для головних сервісів
+            const manualPositions = {
+                "Permasearch": { 
+                    x: Math.cos(0) * radius1,         // 0° -> 120
+                    y: Math.sin(0) * radius1          // 0° -> 0
+                },
+                "Alexandrian": { 
+                    x: Math.cos(Math.PI * 2/5) * radius1,     // 72° -> ~37
+                    y: Math.sin(Math.PI * 2/5) * radius1      // 72° -> ~114
+                },
+                "Emporium": { 
+                    x: -280,     // Фіксована координата X
+                    y: 120       // Фіксована координата Y
+                },
+                "Pinax": { 
+                    x: -120,
+                    y: 120
+                },
+                "Perpetua": { 
+                    x: Math.cos(Math.PI * 8/5) * radius1,     // 288° -> ~37
+                    y: Math.sin(Math.PI * 8/5) * radius1      // 288° -> ~-114
+                }
+            };
+
+            // Додаємо вузли з фіксованими координатами
+            mainServices.forEach(service => {
+                const node = {
+                    id: service,
+                    x: manualPositions[service].x,
+                    y: manualPositions[service].y,
+                    fixed: true,
+                    mainService: true
+                };
+                nodes.push(node);
+                
+                // Додаємо зв'язок з центром
+                links.push({ 
+                    source: "Alexandria", 
+                    target: service,
+                    value: 2 // Товстіший зв'язок для основних сервісів
+                });
+            });
+
+            // Створюємо об'єкт з фіксованими координатами для другорядних сервісів
+            const radius2 = 200; // Радіус для другорядних сервісів
+            const secondaryPositions = {
+                "Audion": { 
+                    x: Math.cos(Math.PI * 1/5) * radius2,     // 36° -> ~162
+                    y: Math.sin(Math.PI * 1/5) * radius2      // 36° -> ~118
+                },
+                "Lumen": { 
+                    x: Math.cos(Math.PI * 3/5) * radius2,     // 108° -> ~-64
+                    y: Math.sin(Math.PI * 3/5) * radius2      // 108° -> ~190
+                },
+                "Panacea": { 
+                    x: Math.cos(Math.PI * 5/5) * radius2,     // 180° -> ~-200
+                    y: Math.sin(Math.PI * 5/5) * radius2      // 180° -> ~0
+                },
+                "Nexus": { 
+                    x: Math.cos(Math.PI * 7/5) * radius2,     // 252° -> ~-64
+                    y: Math.sin(Math.PI * 7/5) * radius2      // 252° -> ~-190
+                },
+                "Genesis": { 
+                    x: Math.cos(Math.PI * 9/5) * radius2,     // 324° -> ~162
+                    y: Math.sin(Math.PI * 9/5) * radius2      // 324° -> ~-118
+                }
+            };
+
+            // Додаємо вузли з фіксованими координатами для другорядних сервісів
+            secondaryServices.forEach(service => {
+                const node = {
+                    id: service,
+                    x: secondaryPositions[service].x,
+                    y: secondaryPositions[service].y,
+                    fixed: true, // Фіксуємо позицію
+                    secondaryService: true
+                };
+                nodes.push(node);
+                
+                // З'єднуємо з центральним вузлом Alexandria
+                links.push({ 
+                    source: "Alexandria", 
+                    target: service,
+                    value: 1.5 // Товщина зв'язку для другорядних сервісів
+                });
+            });
+
+            // Додаємо третього рівня сервіси відповідно до нової структури
+            const radius3 = 280; // Радіус для сервісів третього рівня
+
+            // Створюємо об'єкт зі зв'язками між сервісами третього рівня
+            const tertiaryConnections = {};
+
+            // Функція для знаходження спільних батьківських сервісів
+            function findCommonParents(service1, service2) {
+                const parents1 = [];
+                const parents2 = [];
+                
+                Object.keys(tertiaryStructure).forEach(parent => {
+                    if (tertiaryStructure[parent].includes(service1)) {
+                        parents1.push(parent);
+                    }
+                    if (tertiaryStructure[parent].includes(service2)) {
+                        parents2.push(parent);
+                    }
+                });
+                
+                return parents1.filter(parent => parents2.includes(parent));
+            }
+
+            // Створюємо вузли для третього рівня
+            tertiaryServices.forEach((service, idx) => {
+                const angle = (idx * 2 * Math.PI / tertiaryServices.length);
+                const node = {
+                    id: service,
+                    x: Math.cos(angle) * radius3,
+                    y: Math.sin(angle) * radius3
+                };
+                nodes.push(node);
+            });
+
+            // Створюємо зв'язки від основних сервісів до третього рівня
+            Object.keys(tertiaryStructure).forEach(mainService => {
+                tertiaryStructure[mainService].forEach(service => {
+                    links.push({ 
+                        source: mainService, 
+                        target: service,
+                        value: 0.5
+                    });
+                });
+            });
+
+            // Спеціальний зв'язок для Tokenomics між Trade та Earn
+            const tradeEarnLink = {
+                source: "Trade",
+                target: "Earn",
+                value: 0.7, // Трохи товстіший для виділення
+                tokenomicsLink: true // Спеціальна позначка для ідентифікації цього зв'язку
+            };
+            links.push(tradeEarnLink);
+
+            // Створюємо зв'язки між вузлами третього рівня, які мають спільний батьківський сервіс
+            // Перевіряємо кожну пару сервісів третього рівня
+            for (let i = 0; i < tertiaryServices.length; i++) {
+                for (let j = i + 1; j < tertiaryServices.length; j++) {
+                    const service1 = tertiaryServices[i];
+                    const service2 = tertiaryServices[j];
+                    
+                    // Перевіряємо, чи мають вони спільного батька
+                    const commonParents = findCommonParents(service1, service2);
+                    
+                    if (commonParents.length > 0) {
+                        // Якщо є спільний батько, створюємо зв'язок
+                        links.push({ 
+                            source: service1, 
+                            target: service2,
+                            value: 0.3
+                        });
+                    }
+                }
+            }
+
+            // Додаємо центральний вузол в масив вузлів
+            nodes.push(centerNode);
+            
+            // Зупиняємо попередню симуляцію, якщо вона існує
+            if (simulation) simulation.stop();
+            
+            // Створюємо нову симуляцію
+            simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(d => {
+                    if (d.source.id === "Alexandria" || d.target.id === "Alexandria") return 120;
+                    if (d.source.mainService || d.target.mainService) return 100;
+                    if (d.source.secondaryService || d.target.secondaryService) return 80;
+                    return 60;
+                }))
+                .force("charge", d3.forceManyBody().strength(-300))
+                .force("center", d3.forceCenter(0, 30)) // Зсув графа вниз на 30px
+                .force("collision", d3.forceCollide().radius(d => {
+                    if (d.center) return 50;
+                    if (d.mainService) return 35;
+                    if (d.secondaryService) return 25;
+                    return 15;
+                }))
+                .force("radial", d3.forceRadial(d => {
+                    if (d.center) return 0;
+                    if (d.mainService) return radius1;
+                    if (d.secondaryService) return radius2;
+                    return radius3;
+                }).strength(0.8))
+                .force("y", d3.forceY().strength(0.1).y(d => { 
+                    // Додаємо силу, яка відштовхує вузли від верху екрану
+                    if (d.y < 0) return Math.min(30, d.y + 80);
+                    return d.y;
+                }))
+                .alphaDecay(0.01)
+                .velocityDecay(0.3)
+                .on("tick", ticked);
+            
+            // Фіксуємо позицію центрального вузла
+            simulation.nodes().forEach(node => {
+                if (node.center) {
+                    node.fx = 0;
+                    node.fy = 0;
+                }
+            });
+            
+            // Очищаємо і створюємо SVG елементи заново
+            const svg = d3.select("#network-graph");
+            svg.selectAll("*").remove();
+            
+            // Створюємо криві лінії Безьє
+            const link = svg.append("g")
+                .selectAll("path")
+                .data(links)
+                .enter()
+                .append("path")
+                .attr("class", "network-link")
+                .style("stroke", "rgba(255, 255, 255, 0.3)")
+                .style("stroke-width", d => d.value)
+                .style("fill", "none")
+                .style("opacity", 0);
+            
+            // Створюємо вузли
+            const node = svg.append("g")
+                .selectAll("circle")
+                .data(nodes)
+                .enter()
+                .append("circle")
+                .attr("class", "network-node")
+                .attr("r", d => {
+                    if (d.center) return 42; // Центральний вузол
+                    if (d.mainService) return 20; // Основні сервіси
+                    if (d.secondaryService) return 15; // Другорядні сервіси
+                    return 10; // Третього рівня сервіси
+                })
+                .style("fill", d => {
+                    if (d.center) return "#efbf04";
+                    if (d.mainService || d.secondaryService) return "#efbf04"; // Обидва рівні сервісів жовті
+                    return "rgba(255, 255, 255, 0.2)"; // Решта білі напівпрозорі
+                })
+                .style("stroke", "rgba(255, 255, 255, 0.8)")
+                .style("stroke-width", 1.5)
+                .style("opacity", 0);
+            
+            // Додаємо мітки
+            const label = svg.append("g")
+                .selectAll("text")
+                .data(nodes)
+                .enter()
+                .append("text")
+                .attr("class", "network-label")
+                .text(d => {
+                    // Не показуємо текст для другорядних сервісів або Beacon
+                    if (d.secondaryService || d.id === "Beacon") return "";
+                    return d.id;
+                })
+                .style("fill", "white")
+                .style("font-size", d => {
+                    if (d.center) return "14px";
+                    if (d.mainService) return "12px";
+                    if (d.secondaryService) return "10px";
+                    return "8px";
+                })
+                .style("text-anchor", "middle")
+                .style("opacity", 0);
+            
+            // Анімуємо появу всіх елементів
+            const appearTimeline = gsap.timeline({
+                onComplete: function() {
+                    console.log('Анімація графа Alexandria Services завершена');
+                }
+            });
+            
+            // Переконаємося, що всі потрібні елементи існують перед анімацією
+            if (node && node.nodes && link && link.nodes && label && label.nodes) {
+                appearTimeline
+                    .to(node.nodes(), {
+                        opacity: 1,
+                        duration: 0.8,
+                        ease: "power2.out",
+                        stagger: 0.05
+                    }, 0)
+                    .to(link.nodes(), {
+                        opacity: 0.7,
+                        duration: 1.2,
+                        ease: "power2.out",
+                        stagger: 0.04
+                    }, 0.3);
+                
+                // Анімуємо мітки
+                appearTimeline.to(label.nodes(), {
+                    opacity: d => {
+                        if (d.secondaryService || d.id === "Beacon") return 0; // Не показуємо приховані мітки взагалі
+                        if (d.center) return 1;
+                        if (d.mainService) return 0.9;
+                        return 0.7;
+                    },
+                    duration: 0.8,
+                    ease: "power2.out",
+                    stagger: 0.05
+                }, 0.5);
+            } else {
+                console.error('Деякі елементи для анімації не знайдені');
+            }
+            
+            // Масив з описами для сервісів Alexandria
+            const serviceDescriptions = {
+                "Permasearch": "Децентралізований пошуковий сервіс для Alexandria",
+                "Emporium": "Торговельна платформа для цифрових активів",
+                "Alexandrian": "Ідентифікація користувачів та спільнот",
+                "Pinax": "Інструмент для категоризації та організації контенту",
+                "Perpetua": "Система довготривалого зберігання даних",
+                "Beacon": "Аналітична платформа для відстеження трендів"
+            };
+            
+            // Створюємо контейнер для опису при ховері
+            const tooltipContainer = svg.append("g")
+                .attr("class", "tooltip-container")
+                .style("opacity", 0);
+            
+            // Додаємо спочатку текст, щоб потім визначити його розміри
+            const tooltipText = tooltipContainer.append("text")
+                .attr("y", 15)
+                .attr("text-anchor", "middle")
+                .attr("fill", "white")
+                .style("font-family", "'Syne', sans-serif")
+                .style("font-size", "12px");
+            
+            // Горизонтальний та вертикальний падінги
+            const horizontalPadding = 8;
+            const verticalPadding = 6;
+            
+            // Додаємо обробники подій ховеру для основних сервісів
+            node.filter(d => d.mainService && d.id !== "Beacon")
+                .style("cursor", "pointer")
+                .on("mouseover", function(event, d) {
+                    // Змінюємо вигляд вузла при наведенні - тільки підсвічування кола
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr("r", function(d) {
+                            if (d.mainService) return 24;
+                            return this.getAttribute("r");
+                        })
+                        .style("fill", "#ffdf5e") // Світліший жовтий при наведенні
+                        .style("filter", "drop-shadow(0 0 8px rgba(239, 191, 4, 0.8))");
+                    
+                    // Не показуємо тултіп з описом
+                })
+                .on("mouseout", function() {
+                    // Повертаємо вихідний вигляд вузла
+                    d3.select(this)
+                        .transition()
+                        .duration(200)
+                        .attr("r", function(d) {
+                            if (d.mainService) return 20;
+                            return this.getAttribute("r");
+                        })
+                        .style("fill", "#efbf04") // Повертаємо початковий колір
+                        .style("filter", "none");
+                });
+            
+            // Переконуємося, що для другорядних сервісів немає курсору-вказівника
+            node.filter(d => d.secondaryService || d.id === "Beacon")
+                .style("cursor", "default");
+
+            // Видаляємо стандартну мітку для центрального вузла Alexandria
+            label.filter(d => d.center).remove();
+
+            // Додаємо новий текст для центрального вузла Alexandria Protocol у два рядки
+            svg.append("text")
+                .attr("class", "alexandria-protocol-text")
+                .attr("x", 0)     // Центр кола
+                .attr("y", -5)    // Зміщення вгору для першого рядка
+                .attr("text-anchor", "middle")
+                .attr("fill", "white")
+                .attr("font-family", "'Syne', sans-serif")
+                .attr("font-size", "11px")  // Менший шрифт, щоб помістилось в коло
+                .attr("font-weight", "500")
+                .style("opacity", 0)        // Початково прихований для анімації
+                .text("Alexandria");        // Перший рядок
+
+            // Додаємо другий рядок тексту "Protocol"
+            svg.append("text")
+                .attr("class", "alexandria-protocol-text")
+                .attr("x", 0)     // Центр кола
+                .attr("y", 9)     // Зміщення вниз для другого рядка
+                .attr("text-anchor", "middle")
+                .attr("fill", "white")
+                .attr("font-family", "'Syne', sans-serif")
+                .attr("font-size", "11px")  // Менший шрифт, щоб помістилось в коло
+                .attr("font-weight", "500")
+                .style("opacity", 0)        // Початково прихований для анімації
+                .text("Protocol");          // Другий рядок
+
+            // Додаємо анімацію появи тексту Alexandria Protocol
+            appearTimeline.to(".alexandria-protocol-text", {
+                opacity: 1,
+                duration: 0.8,
+                ease: "power2.out",
+                stagger: 0.1
+            }, 0.7);  // Показуємо після анімації вузлів
+            
+            // Додаємо код для тексту "Tokenomics" на лінії між Trade та Earn
+            // Створюємо групу для текстових міток зв'язків
+            const linkLabels = svg.append("g")
+                .attr("class", "link-labels");
+
+            // Знаходимо шлях для зв'язку між Trade та Earn
+            link.each(function(d) {
+                if (d.tokenomicsLink) {
+                    const tokenomicsPath = d3.select(this);
+                    const tokenomicsPathNode = tokenomicsPath.node();
+                    
+                    // Створюємо унікальний ID для шляху
+                    const pathId = "tokenomics-path";
+                    
+                    // Клонуємо шлях для текстової мітки в defs
+                    svg.append("defs")
+                        .append("path")
+                        .attr("id", pathId)
+                        .attr("d", tokenomicsPathNode.getAttribute("d"));
+                    
+                    // Додаємо текст, який слідує вздовж шляху
+                    const tokenomicsText = linkLabels.append("text")
+                        .attr("class", "tokenomics-text")
+                        .style("fill", "white")
+                        .style("font-family", "'Syne', sans-serif")
+                        .style("font-size", "6px")
+                        .style("font-weight", "500")
+                        .style("text-transform", "uppercase")
+                        .style("letter-spacing", "0.5px")
+                        .style("opacity", 0); // Початково прихований для анімації
+                    
+                    tokenomicsText.append("textPath")
+                        .attr("xlink:href", "#" + pathId)
+                        .attr("startOffset", "50%") // Починати від середини шляху
+                        .attr("text-anchor", "middle") // Центрувати відносно startOffset
+                        .text("Tokenomics");
+                    
+                    // Додаємо анімацію появи тексту
+                    appearTimeline.to(".tokenomics-text", {
+                        opacity: 1,
+                        duration: 0.8,
+                        ease: "power2.out"
+                    }, 1.0); // Показуємо після анімації вузлів і ліній
+                    
+                    // Додаємо функцію до ticked для оновлення шляху під час руху вузлів
+                    const originalTicked = simulation.on("tick");
+                    simulation.on("tick", function() {
+                        // Викликаємо оригінальну функцію ticked
+                        originalTicked();
+                        
+                        // Оновлюємо шлях для тексту Tokenomics
+                        svg.select("#" + pathId)
+                            .attr("d", tokenomicsPathNode.getAttribute("d"));
+                    });
+                }
+            });
+        }
+
+        // Функція для створення ефекту вибуху
+        function createExplosionEffect() {
+            console.log('Запускаємо ефект вибуху');
+            
+            // Отримуємо всі необхідні елементи
+            const networkGraph = document.getElementById('network-graph');
+            const nextButtonWrapper = document.querySelector('.next-button-wrapper');
+            const previousButtonWrapper = document.querySelector('.previous-button-wrapper');
+            const networkTypewriter = document.getElementById('network-typewriter');
+            
+            // Приховуємо кнопки
+            gsap.to([nextButtonWrapper, previousButtonWrapper], {
+                opacity: 0,
+                duration: 0.3,
+                ease: "power2.out",
+                onComplete: function() {
+                    nextButtonWrapper.style.display = 'none';
+                    previousButtonWrapper.style.display = 'none';
+                }
+            });
+            
+            // Приховуємо typewriter текст
+            gsap.to(networkTypewriter, {
+                opacity: 0,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+            
+            // Знаходимо центральний вузол Alexandria за атрибутом r. У нашому випадку це єдиний вузол з r="42"
+            const centerNodeCircle = networkGraph.querySelector('circle[r="42"]');
+            
+            // Знаходимо тексти Alexandria Protocol в центральному вузлі
+            const protocolTexts = document.querySelectorAll('.alexandria-protocol-text');
+            
+            console.log('Центральний вузол знайдено?', centerNodeCircle !== null);
+            
+            if (centerNodeCircle) {
+                console.log('Знайдено центральний вузол Alexandria');
+                
+                // Приховуємо тексти Alexandria Protocol
+                gsap.to(protocolTexts, {
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+                
+                // Запускаємо анімацію збільшення і пульсації центрального вузла
+                gsap.to(centerNodeCircle, {
+                    attr: { r: 70 }, // Збільшуємо розмір
+                    fill: "#ffdf5e", // Світліший жовтий для ефекту енергії
+                    filter: "drop-shadow(0 0 10px rgba(239, 191, 4, 0.9))", // Додаємо світіння
+                    duration: 0.8,
+                    ease: "power2.inOut",
+                    onComplete: function() {
+                        // Додаємо пульсацію перед вибухом
+                        gsap.to(centerNodeCircle, {
+                            attr: { r: 90 }, // Ще більше збільшуємо
+                            filter: "drop-shadow(0 0 20px rgba(255, 223, 94, 1))",
+                            duration: 0.7,
+                            repeat: 2,
+                            yoyo: true,
+                            ease: "power2.inOut",
+                            onComplete: function() {
+                                explodeCircle();
+                            }
+                        });
+                    }
+                });
+            } else {
+                console.log('Центральний вузол не знайдено, створюємо вибух без нього');
+                setTimeout(explodeCircle, 500);
+            }
+            
+            // Функція для вибуху центрального кола
+            function explodeCircle() {
+                console.log('Початок вибуху центрального кола');
+                
+                // Якщо центральний вузол існує, завершуємо його анімацію
+                if (centerNodeCircle) {
+                    // Фінальне різке збільшення перед вибухом
+                    gsap.to(centerNodeCircle, {
+                        attr: { r: 150 },
+                        opacity: 0.8,
+                        filter: "drop-shadow(0 0 30px rgba(255, 223, 94, 1))",
+                        duration: 0.2,
+                        ease: "power4.in",
+                        onComplete: function() {
+                            // Починаємо створення частинок
+                            createExplosionElements();
+                            
+                            // Повністю приховуємо центральний вузол
+                            gsap.to(centerNodeCircle, {
+                                opacity: 0,
+                                duration: 0.1
+                            });
+                        }
+                    });
+                } else {
+                    createExplosionElements();
+                }
+            }
+            
+            // Функція для створення елементів вибуху
+            function createExplosionElements() {
+                console.log('Створення елементів вибуху');
+                
+                // Отримуємо SVG контейнер
+                const svg = d3.select(networkGraph);
+                
+                // Приховуємо інші елементи графа для кращого ефекту
+                const otherNodes = networkGraph.querySelectorAll('circle:not([r="42"]), circle:not([r="70"]), circle:not([r="90"]), circle:not([r="150"])');
+                const links = networkGraph.querySelectorAll('.network-link');
+                const labels = networkGraph.querySelectorAll('.network-label');
+                const tokenomicsLabel = networkGraph.querySelectorAll('.tokenomics-text');
+                
+                // Приховуємо інші елементи
+                gsap.to([otherNodes, links, labels, tokenomicsLabel], {
+                    opacity: 0.2,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+                
+                // Створюємо групу для частинок вибуху
+                const explosionGroup = svg.append("g").attr("class", "explosion-particles");
+                
+                // Координати центру для вибуху
+                const centerX = 0;
+                const centerY = 0;
+                
+                // Створюємо перший шар великих фрагментів
+                for (let i = 0; i < 15; i++) {
+                    const angle = (i / 15) * Math.PI * 2;
+                    const size = Math.random() * 20 + 15;
+                    
+                    // Розраховуємо координати для фрагмента
+                    const x = centerX;
+                    const y = centerY;
+                    
+                    // Створюємо фрагмент
+                    const fragment = explosionGroup.append("path")
+                        .attr("d", function() {
+                            // Створюємо неправильну фігуру для фрагмента
+                            const startAngle = Math.random() * 40;
+                            const endAngle = startAngle + 30 + Math.random() * 30;
+                            
+                            const innerRadius = size * 0.4;
+                            const outerRadius = size;
+                            
+                            // Створюємо арку
+                            let path = `M ${Math.cos(startAngle * Math.PI / 180) * outerRadius} ${Math.sin(startAngle * Math.PI / 180) * outerRadius}`;
+                            
+                            // Зовнішня арка
+                            const segments = 5;
+                            for (let i = 1; i <= segments; i++) {
+                                const angle = startAngle + (endAngle - startAngle) * (i / segments);
+                                const rad = outerRadius * (0.8 + Math.random() * 0.4);
+                                path += ` L ${Math.cos(angle * Math.PI / 180) * rad} ${Math.sin(angle * Math.PI / 180) * rad}`;
+                            }
+                            
+                            // Внутрішня арка
+                            for (let i = segments; i >= 0; i--) {
+                                const angle = startAngle + (endAngle - startAngle) * (i / segments);
+                                const rad = innerRadius * (0.8 + Math.random() * 0.4);
+                                path += ` L ${Math.cos(angle * Math.PI / 180) * rad} ${Math.sin(angle * Math.PI / 180) * rad}`;
+                            }
+                            
+                            path += " Z";
+                            return path;
+                        })
+                        .attr("transform", `translate(${x}, ${y}) rotate(${angle * 180 / Math.PI})`)
+                        .attr("fill", "#efbf04")
+                        .attr("stroke", "#ffdf5e")
+                        .attr("stroke-width", 1)
+                        .attr("opacity", 1);
+                    
+                    // Анімуємо розліт фрагментів
+                    const distance = Math.random() * 150 + 50;
+                    const targetX = x + Math.cos(angle) * distance;
+                    const targetY = y + Math.sin(angle) * distance;
+                    const rotation = angle * 180 / Math.PI + Math.random() * 180;
+                    
+                    gsap.to(fragment.node(), {
+                        transform: `translate(${targetX}, ${targetY}) rotate(${rotation})`,
+                        opacity: 0,
+                        duration: 1.5,
+                        ease: "power3.out",
+                        delay: Math.random() * 0.2
+                    });
+                }
+                
+                // Додаємо ефект спалаху в центрі
+                const flash = explosionGroup.append("circle")
+                    .attr("cx", centerX)
+                    .attr("cy", centerY)
+                    .attr("r", 0)
+                    .attr("fill", "white")
+                    .attr("opacity", 1);
+                
+                // Анімуємо спалах
+                gsap.to(flash.node(), {
+                    attr: { r: 150 },
+                    opacity: 0,
+                    duration: 0.5,
+                    ease: "power2.out"
+                });
+                
+                // Створюємо багато маленьких частинок
+                setTimeout(createManyParticles, 200);
+                
+                // Функція для створення багатьох маленьких частинок
+                function createManyParticles() {
+                    // Приховуємо всі елементи графа повністю
+                    gsap.to([otherNodes, links, labels, tokenomicsLabel], {
+                        opacity: 0,
+                        duration: 0.5,
+                        ease: "power2.out"
+                    });
+                    
+                    // Створюємо багато маленьких частинок
+                    for (let i = 0; i < 80; i++) {
+                        // Випадковий кут для розльоту
+                        const angle = Math.random() * Math.PI * 2;
+                        // Випадковий розмір частинки
+                        const size = Math.random() * 8 + 2;
+                        
+                        // Створюємо частинку
+                        const particle = explosionGroup.append("circle")
+                            .attr("cx", centerX)
+                            .attr("cy", centerY)
+                            .attr("r", size)
+                            .attr("fill", function() {
+                                // Створюємо частинки різних відтінків жовтого і білого
+                                const colors = ["#efbf04", "#ffdf5e", "#fff9c4", "#ffffff"];
+                                return colors[Math.floor(Math.random() * colors.length)];
+                            })
+                            .attr("opacity", 1)
+                            .attr("filter", "drop-shadow(0 0 3px rgba(255, 223, 94, 0.7))");
+                        
+                        // Анімуємо розліт частинок
+                        const targetDistance = 200 + Math.random() * 400; // Більша відстань розльоту
+                        const delay = Math.random() * 0.5; // Затримка для більш реалістичного вибуху
+                        
+                        gsap.to(particle.node(), {
+                            cx: centerX + Math.cos(angle) * targetDistance,
+                            cy: centerY + Math.sin(angle) * targetDistance,
+                            attr: { r: size * 0.3 }, // Зменшення розміру при розльоті
+                            opacity: 0,
+                            duration: 1.5 + Math.random(),
+                            delay: delay,
+                            ease: "power2.out"
+                        });
+                    }
+                    
+                    // Показуємо фінальне повідомлення після всіх анімацій
+                    setTimeout(showFinalMessage, 2000);
+                }
+                
+                // Функція для показу фінального повідомлення
+                function showFinalMessage() {
+                    console.log('Показуємо фінальне повідомлення');
+                    
+                    // Додаємо фінальний текст
+                    const finalMessage = svg.append("text")
+                        .attr("x", 0)
+                        .attr("y", 0)
+                        .attr("text-anchor", "middle")
+                        .attr("fill", "white")
+                        .attr("font-family", "'Syne', sans-serif")
+                        .attr("font-size", "24px")
+                        .attr("font-weight", "bold")
+                        .attr("opacity", 0)
+                        
+                    // Анімуємо появу тексту
+                    gsap.to(finalMessage.node(), {
+                        opacity: 1,
+                        duration: 1,
+                        ease: "power2.inOut",
+                        onComplete: function() {
+                            // Через 2 секунди перенаправляємо на lbry.app
+                            setTimeout(function() {
+                                console.log('Перехід на lbry.app');
+                                window.location.href = 'https://lbry.app/';
+                            }, 2000);
+                        }
+                    });
+                }
+            }
+        }
+
+        // Функція для анімації тексту по символах
+        function animateText(tspans, tspanIndex, charDelay, onComplete) {
+            if (tspanIndex >= tspans.length) {
+                if (onComplete) {
+                    setTimeout(onComplete, 500);
+                }
+                return;
+            }
+            
+            const tspan = tspans[tspanIndex];
+            tspan.style.opacity = '1';
+            
+            const text = tspan.textContent;
+            tspan.textContent = '';
+            
+            let charIndex = 0;
+            
+            // Функція, яка додає один символ за раз
+            function addNextChar() {
+                if (charIndex < text.length) {
+                    tspan.textContent += text[charIndex];
+                    charIndex++;
+                    setTimeout(addNextChar, charDelay);
+                } else {
+                    // Перейти до наступного tspan
+                    setTimeout(function() {
+                        animateText(tspans, tspanIndex + 1, charDelay, onComplete);
+                    }, 100);
+                }
+            }
+            
+            // Почати анімацію для поточного tspan
+            addNextChar();
+        }
+    </script>
+</body>
+</html>

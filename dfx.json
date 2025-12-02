@@ -32,6 +32,11 @@
       "package": "user",
       "candid": "src/user/user.did"
     },
+    "dialectica": {
+      "type": "rust",
+      "package": "dialectica",
+      "candid": "src/dialectica/dialectica.did"
+    },
     "alex_backend": {
       "candid": "src/alex_backend/alex_backend.did",
       "package": "alex_backend",
@@ -140,6 +145,11 @@
       "package": "alex_revshare",
       "type": "rust",
       "specified_id": "e454q-riaaa-aaaap-qqcyq-cai"
+    },
+    "kairos": {
+      "type": "rust",
+      "package": "kairos",
+      "candid": "src/kairos/kairos.did"
     }
   },
   "defaults": {
