@@ -1,4 +1,4 @@
-.PHONY: all clean fresh ii xrc icrc7 icrc7-scion nft-manager alex-backend perpetua feed icp-swap tokenomics user system-api alex-wallet vetkd emporium logs asset-manager alex-revshare ensure-identities clean-identities test icp-ledger lbry alex tokens frontend help
+.PHONY: all clean fresh ii xrc icrc7 icrc7-scion nft-manager alex-backend perpetua feed icp-swap tokenomics user system-api alex-wallet vetkd emporium logs asset-manager alex-revshare dialectica kairos ensure-identities clean-identities test icp-ledger lbry alex tokens frontend help
 
 # Start dfx and basic setup
 clean:
@@ -163,6 +163,22 @@ alex-revshare:
 	candid-extractor target/wasm32-unknown-unknown/release/alex_revshare.wasm > src/alex_revshare/alex_revshare.did
 	dfx deploy alex_revshare --specified-id e454q-riaaa-aaaap-qqcyq-cai
 
+# Deploy Dialectica
+dialectica:
+	@echo "Deploying Dialectica..."
+	cargo build --release --target wasm32-unknown-unknown --package dialectica
+	candid-extractor target/wasm32-unknown-unknown/release/dialectica.wasm > src/dialectica/dialectica.did
+	dfx deploy dialectica
+	dfx generate dialectica
+
+# Deploy Kairos
+kairos:
+	@echo "Deploying Kairos..."
+	cargo build --release --target wasm32-unknown-unknown --package kairos
+	candid-extractor target/wasm32-unknown-unknown/release/kairos.wasm > src/kairos/kairos.did
+	dfx deploy kairos
+	dfx generate kairos
+
 # Ensure all required identities exist (without switching current identity)
 ensure-identities:
 	@echo "Ensuring identities exist..."
@@ -277,6 +293,8 @@ help:
 	@echo "  logs              - Deploy Logs"
 	@echo "  asset-manager     - Deploy Asset Manager"
 	@echo "  alex-revshare     - Deploy Alex Revshare"
+	@echo "  dialectica        - Deploy Dialectica canister"
+	@echo "  kairos            - Deploy Kairos canister"
 	@echo "  ensure-identities - Ensure all required identities, Create if don't exist"
 	@echo "  clean-identities  - Remove all project identities"
 	@echo "  icp-ledger        - Deploy ICP Ledger (LICP)"

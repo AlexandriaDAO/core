@@ -1,0 +1,114 @@
+type BalanceInfo = record { in_game : nat64; total : nat64; available : nat64 };
+type CashoutResult = record {
+  bet_amount : nat64;
+  server_seed : text;
+  final_multiplier : float64;
+  revealed_count : nat8;
+  game_id : nat64;
+  win_amount : nat64;
+  mine_positions : blob;
+};
+type ClickResult = record {
+  is_mine : bool;
+  server_seed : opt text;
+  potential_win : nat64;
+  revealed_count : nat8;
+  game_id : nat64;
+  game_status : GameStatus;
+  new_multiplier : float64;
+  mine_positions : opt blob;
+  tile_index : nat8;
+};
+type Game = record {
+  id : nat64;
+  bet_amount : nat64;
+  status : GameStatus;
+  server_seed : opt text;
+  tiles : vec Tile;
+  potential_win : nat64;
+  player : principal;
+  client_seed : text;
+  revealed_count : nat8;
+  current_multiplier : float64;
+  created_at : nat64;
+  server_seed_hash : text;
+  mine_count : nat8;
+  ended_at : opt nat64;
+};
+type GameConfig = record {
+  bet_amount : nat64;
+  client_seed : text;
+  mine_count : nat8;
+};
+type GameError = variant {
+  ActiveGameExists : record { game_id : nat64 };
+  GameNotActive;
+  AnonymousNotAllowed;
+  GameAlreadyEnded;
+  InsufficientBalance : record { available : nat64; required : nat64 };
+  InvalidBetAmount : record { max : nat64; min : nat64; provided : nat64 };
+  GameNotFound : record { game_id : nat64 };
+  InvalidTileIndex : record { max : nat8; provided : nat8 };
+  InvalidMineCount : record { max : nat8; min : nat8; provided : nat8 };
+  NoActiveGame;
+  TransferFailed : record { reason : text };
+  InternalError : record { reason : text };
+  RngNotInitialized;
+  TileAlreadyRevealed : record { tile_index : nat8 };
+};
+type GameStatus = variant { Won; Lost; Active };
+type GameSummary = record {
+  id : nat64;
+  bet_amount : nat64;
+  status : GameStatus;
+  final_multiplier : float64;
+  revealed_count : nat8;
+  created_at : nat64;
+  mine_count : nat8;
+  win_amount : nat64;
+  ended_at : opt nat64;
+};
+type Result = variant { Ok : CashoutResult; Err : GameError };
+type Result_1 = variant { Ok : ClickResult; Err : GameError };
+type Result_2 = variant { Ok : BalanceInfo; Err : GameError };
+type Result_3 = variant { Ok : nat64; Err : GameError };
+type Result_4 = variant { Ok : StartGameResponse; Err : GameError };
+type StartGameResponse = record {
+  bet_amount : nat64;
+  server_seed_hash : text;
+  game_id : nat64;
+  mine_count : nat8;
+};
+type Stats = record { total_games : nat64; is_rng_ready : bool };
+type Tile = record { is_mine : bool; state : TileState; index : nat8 };
+type TileState = variant { Mine; Revealed; Hidden };
+service : {
+  // Calculate multiplier for given configuration (preview)
+  calculate_multiplier_preview : (nat8, nat8) -> (float64) query;
+  // Calculate next click multiplier (preview)
+  calculate_next_multiplier_preview : (nat8, nat8) -> (float64) query;
+  // Cash out winnings from an active game
+  cash_out : (nat64) -> (Result);
+  // Click a tile in an active game
+  click_tile : (nat64, nat8) -> (Result_1);
+  // Get user's active game (if any)
+  get_active_game : () -> (opt Game) query;
+  // Get a specific game by ID
+  get_game : (nat64) -> (opt Game) query;
+  // Get user's game history
+  get_game_history : (nat32, nat32) -> (vec GameSummary) query;
+  // Get user's balance in their Kairos subaccount
+  get_gaming_balance : () -> (Result_2);
+  // Get house pool LBRY balance (admin function for monitoring)
+  get_house_pool_balance : () -> (Result_3);
+  // Get full multiplier progression table for a mine count
+  get_multiplier_progression : (nat8) -> (vec float64) query;
+  // Get canister statistics
+  get_stats : () -> (Stats) query;
+  // Check if RNG is initialized (useful for frontend to know if games can start)
+  is_ready : () -> (bool) query;
+  // Start a new game
+  // Pre-requisite: User must have transferred LBRY to their Kairos subaccount
+  // via NFT Manager's spend_for_app function
+  start_game : (GameConfig) -> (Result_4);
+}

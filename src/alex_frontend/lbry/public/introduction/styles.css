@@ -1,0 +1,600 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #171717;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    cursor: default;
+}
+
+#ripple-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+    cursor: default;
+}
+
+/* Забезпечуємо, щоб контент завжди був посередині */
+#content {
+    transform-origin: center;
+}
+
+.main-node {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform-origin: center;
+}
+
+.main-node.active {
+    fill: #efbf04;
+    filter: url(#glow);
+}
+
+.node {
+    fill: rgba(255, 255, 255, 0.2);
+    stroke: rgba(255, 255, 255, 0.8);
+    stroke-width: 1.5;
+    filter: url(#glow);
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(0);
+    transform-origin: center;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.node.active {
+    fill: #efbf04;
+    filter: url(#glow);
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.4;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+    opacity: 0;
+}
+
+.branch-line {
+    stroke: rgba(255, 255, 255, 0.6);
+    stroke-width: 1;
+    fill: none;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    filter: url(#glow);
+    opacity: 0;
+    transition: all 0.5s ease;
+}
+
+.title-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    fill: #ffffff;
+    text-anchor: middle;
+    opacity: 0;
+    transform-origin: center;
+    transform: translateY(40px);
+    transition: opacity 0.5s ease, transform 1s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.subtitle-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    fill: #b8a794;
+    text-anchor: middle;
+    opacity: 0;
+    transform-origin: center;
+    transform: translateY(40px);
+    transition: opacity 0.5s ease, transform 1s ease;
+}
+
+/* Додаємо анімацію для тексту в колі */
+@keyframes fadeText {
+    0%, 100% { opacity: 1; }
+    45% { opacity: 1; }
+    50% { opacity: 0; }
+    95% { opacity: 0; }
+}
+
+.circle-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    fill: #171717;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+/* Додатковий стиль для тексту, який зникає */
+.circle-text-fade {
+    animation: fadeText 4s infinite;
+}
+
+/* Стиль для тексту в два рядки */
+.circle-text-multiline {
+    font-size: 12px;
+}
+
+.circle-text-multiline tspan {
+    text-anchor: middle;
+}
+
+.next-button {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 30px;
+    cursor: pointer;
+    padding: 12px 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.next-button::after {
+    content: '→';
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.next-button:hover {
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.next-button:hover::after {
+    transform: translateX(5px);
+}
+
+.next-button-wrapper {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.exit-tutorial {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.exit-tutorial:hover {
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+@keyframes shrinkNode {
+    to {
+        r: 40;
+        opacity: 0.6;
+    }
+}
+
+.shrink-node {
+    animation: shrinkNode 1s ease-out forwards;
+}
+
+.node-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    fill: #ffffff;
+    text-anchor: middle;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    filter: url(#glow);
+    pointer-events: none;
+}
+
+.node-description {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    fill: rgba(255, 255, 255, 0.7);
+    text-anchor: middle;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    max-width: 200px;
+    pointer-events: none;
+}
+
+/* Видаляємо всі hover ефекти */
+.node:hover {
+    transform: none;
+}
+
+.node:hover + .node-label,
+.node:hover + .node-label + .node-description {
+    opacity: 0;
+}
+
+@keyframes floatNode {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(0, -3px); }
+    100% { transform: translate(0, 0); }
+}
+
+.floating-node {
+    animation: floatNode 3s ease-in-out infinite;
+}
+
+.network-node:hover {
+    fill: #ffdf5e;
+    cursor: pointer;
+    filter: drop-shadow(0 0 8px rgba(239, 191, 4, 0.8));
+    transition: all 0.2s ease-out;
+}
+
+@keyframes moveDotsHorizontal {
+    0% { transform: translateX(-60px); }
+    100% { transform: translateX(60px); }
+}
+
+.animated-dot {
+    animation: moveDotsHorizontal 20s linear infinite;
+}
+
+.network-link {
+    stroke: rgba(255, 255, 255, 0.3);
+    stroke-width: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    fill: none;
+}
+
+.network-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    fill: #ffffff;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    text-anchor: middle;
+}
+
+/* Стилі для анімації появи */
+@keyframes nodeAppear {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.network-node.appearing {
+    animation: nodeAppear 0.5s ease-out forwards;
+}
+
+/* Стилі для анімації зв'язків */
+@keyframes linkAppear {
+    0% {
+        stroke-dasharray: 0 1000;
+        opacity: 0;
+    }
+    100% {
+        stroke-dasharray: 1000 1000;
+        opacity: 1;
+    }
+}
+
+.network-link.appearing {
+    animation: linkAppear 0.5s ease-out forwards;
+}
+
+.top-text, .bottom-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+#alexandria-info {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+#alexandria-info.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Стилі для променів знань */
+.knowledge-ray {
+    stroke: #efbf04;
+    stroke-width: 1;
+    stroke-opacity: 0.6;
+    fill: none;
+    stroke-dasharray: 5, 2;
+}
+
+/* Стилі для частинок знань */
+.knowledge-particle {
+    fill: #efbf04;
+    opacity: 0.7;
+    filter: url(#glow);
+}
+
+/* Пульсація для жовтого кола */
+@keyframes knowledgeGlow {
+    0% { filter: drop-shadow(0 0 5px rgba(239, 191, 4, 0.5)); }
+    50% { filter: drop-shadow(0 0 10px rgba(239, 191, 4, 0.7)); }
+    100% { filter: drop-shadow(0 0 5px rgba(239, 191, 4, 0.5)); }
+}
+
+.glowing-circle {
+    animation: knowledgeGlow 3s infinite;
+}
+
+/* Підсвітка тексту при активації променів */
+@keyframes textGlow {
+    0% { text-shadow: 0 0 5px rgba(239, 191, 4, 0.2); }
+    50% { text-shadow: 0 0 10px rgba(239, 191, 4, 0.5); }
+    100% { text-shadow: 0 0 5px rgba(239, 191, 4, 0.2); }
+}
+
+.top-text.glow, .bottom-text.glow {
+    animation: textGlow 3s infinite;
+}
+
+/* Стилі для контейнерів тексту */
+.text-container {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    padding: 20px;
+    max-width: 550px;
+    margin: 0 auto;
+}
+
+/* Оновлюємо стилі для typewriter text з increased line height та letter spacing */
+.typewriter-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 100;
+    fill: rgba(255, 255, 255, 0.9);
+    text-anchor: middle;
+    dominant-baseline: middle;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    filter: drop-shadow(0 0 2px rgba(239, 191, 4, 0.3));
+    line-height: 170%; /* Збільшено line height до 170% */
+    letter-spacing: 0.02em; /* Додано letter spacing 2% */
+}
+
+.typewriter-text tspan {
+    text-anchor: middle;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    filter: drop-shadow(0 0 2px rgba(239, 191, 4, 0.3));
+    letter-spacing: 0.02em; /* Додано letter spacing 2% */
+}
+
+#bottom-typewriter {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Додаємо анімацію для ефекту пульсуючого світіння */
+@keyframes textGlowPulse {
+    0% { filter: drop-shadow(0 0 2px rgba(239, 191, 4, 0.3)); }
+    50% { filter: drop-shadow(0 0 3px rgba(239, 191, 4, 0.5)); }
+    100% { filter: drop-shadow(0 0 2px rgba(239, 191, 4, 0.3)); }
+}
+
+.typewriter-text.typing, 
+.typewriter-text tspan[style*="opacity: 1"] {
+    animation: textGlowPulse 2s infinite;
+}
+
+/* Анімація буде керуватися через JavaScript, 
+   поступово показуючи кожен символ */
+
+.typed-cursor {
+    color: #efbf04;
+}
+
+/* Стиль для скляних контейнерів (Glassmorphism) */
+.glass-container {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 550px;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: all 0.8s ease;
+}
+
+.glass-container.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Додаємо ледь помітний колір для верхнього і нижнього контейнерів */
+.glass-top {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(239, 191, 4, 0.05));
+}
+
+.glass-bottom {
+    background: linear-gradient(135deg, rgba(239, 191, 4, 0.05), rgba(255, 255, 255, 0.07));
+}
+
+/* Стилі для параграфів з анімацією fade-in */
+.fade-paragraph {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.6s ease;
+}
+
+.fade-paragraph.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Додаємо невеликі відмінності в кольорі для різних параграфів */
+.paragraph-1, .paragraph-4 {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.paragraph-2, .paragraph-5 {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.paragraph-3, .paragraph-6 {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Стилі для кнопки Previous */
+.previous-button {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 30px;
+    cursor: pointer;
+    padding: 12px 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.previous-button::before {
+    content: '←';
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.previous-button:hover {
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.previous-button:hover::before {
+    transform: translateX(-5px);
+}
+
+.previous-button-wrapper {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Додайте ці стилі для canvas з частинками */
+#particles-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0; /* Початково невидимий */
+    transition: opacity 0.5s ease;
+}
+
+/* Стилі для тултіпа при ховері на вузли */
+.tooltip-container {
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}

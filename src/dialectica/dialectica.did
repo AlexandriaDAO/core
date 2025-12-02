@@ -1,0 +1,64 @@
+type Activity = record {
+  id : nat64;
+  activity_type : ActivityType;
+  updated_at : nat64;
+  user : principal;
+  created_at : nat64;
+  arweave_id : text;
+};
+type ActivityError = variant {
+  AnonymousNotAllowed;
+  NotFound : nat64;
+  Unauthorized;
+  AlreadyExists;
+  InvalidArweaveId;
+  InternalError : text;
+  InvalidComment : text;
+};
+type ActivityType = variant { Comment : text; Reaction : ReactionType };
+type CommentInfo = record {
+  id : nat64;
+  user : principal;
+  created_at : nat64;
+  comment : text;
+};
+type ReactionCounts = record {
+  total_comments : nat64;
+  likes : nat64;
+  dislikes : nat64;
+};
+type ReactionType = variant { Like; Dislike };
+type Result = variant { Ok : Activity; Err : ActivityError };
+type Result_1 = variant { Ok : vec Activity; Err : ActivityError };
+type Result_2 = variant { Ok : vec CommentInfo; Err : ActivityError };
+type Result_3 = variant { Ok : ReactionCounts; Err : ActivityError };
+type Result_4 = variant { Ok : opt ReactionType; Err : ActivityError };
+type Result_5 = variant { Ok; Err : ActivityError };
+service : {
+  // Add a comment to an NFT
+  add_comment : (text, text) -> (Result);
+  // Add or update a reaction to an NFT
+  add_reaction : (text, ReactionType) -> (Result);
+  // Get all activities for a specific NFT
+  get_activities : (text) -> (Result_1) query;
+  // Get a specific activity by ID
+  get_activity : (nat64) -> (Result) query;
+  // Get all comments for a specific NFT
+  get_comments : (text) -> (Result_2) query;
+  // Get aggregated reaction counts for a specific NFT
+  get_reaction_counts : (text) -> (Result_3) query;
+  // Get all activities by a specific user
+  get_user_activities : (principal) -> (Result_1) query;
+  // Get the current user's reaction for a specific NFT
+  get_user_reaction : (text) -> (Result_4) query;
+  // Get a specific user's reaction for a specific NFT
+  get_user_reaction_for_principal : (text, principal) -> (Result_4) query;
+  // Remove a comment (only by the comment author)
+  remove_comment : (nat64) -> (Result_5);
+  // Remove a user's reaction from an NFT
+  remove_reaction : (text) -> (Result_5);
+  // Update a comment (only by the comment author)
+  update_comment : (nat64, text) -> (Result);
+  // Get the caller's principal
+  whoami : () -> (principal) query;
+}
