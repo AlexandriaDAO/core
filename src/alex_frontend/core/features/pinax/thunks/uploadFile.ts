@@ -11,12 +11,13 @@ const uploadFile = createAsyncThunk<
 	{
 		file: File;
 		actor: ActorSubclass<_SERVICE>;
+		app?: string;
 	}, //Argument that we pass to initialize
 	{ rejectValue: string; dispatch: AppDispatch; state: RootState }
 >(
 	"pinax/uploadFile",
 	async (
-		{ file, actor },
+		{ file, actor, app },
 		{ rejectWithValue, dispatch, getState }
 	) => {
 		try {
@@ -35,6 +36,9 @@ const uploadFile = createAsyncThunk<
             transaction.addTag("Application-Id", process.env.REACT_MAINNET_APP_ID!);
             transaction.addTag("User-Principal", user?.principal || '2vxsx-fae');
             transaction.addTag("Version", "1.0");
+			if (app) {
+				transaction.addTag("Application-Name", app);
+			}
 
 			const dataToSign = await transaction.getSignatureData();
 

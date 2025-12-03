@@ -43,7 +43,7 @@ export const useUploadAndMint = () => {
 	const [success, setSuccess] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 
-	const uploadAndMint = async (file: File) => {
+	const uploadAndMint = async (file: File, app?: string) => {
 		setError(null);
 		setSuccess(null);
 		setLoading(true);
@@ -74,7 +74,7 @@ export const useUploadAndMint = () => {
 
 			// Step 7: Upload file
 			const transaction = await dispatch(
-				uploadFile({ file, actor: walletActor })
+				uploadFile({ file, actor: walletActor, app })
 			).unwrap();
 
 			// Step 8: Mint NFT
