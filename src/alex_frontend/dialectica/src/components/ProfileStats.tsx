@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/lib/components/card";
 import { Heart, MessageCircle, FileText, Coins } from "lucide-react";
 import { Principal } from "@dfinity/principal";
 import UsernameBadge from "@/components/UsernameBadge";
-import useDialectica from "@/hooks/actors/useDialectica";
+import { useAlexBackend } from "@/hooks/actors";
 import { arweaveClient } from "@/utils/arweaveClient";
 
 interface ProfileStatsProps {
@@ -31,7 +31,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
 		nftsOwned: 0,
 	});
 	const [loading, setLoading] = useState(true);
-	const { actor } = useDialectica();
+	const { actor } = useAlexBackend();
 
 	const fetchUserStats = async () => {
 		try {

@@ -7,13 +7,14 @@ import {
 	ThumbsUp,
 	ThumbsDown,
 	MessageCircle,
-	Share2,
 	ExternalLink,
 	Loader2,
 	Copy,
 	Twitter,
 	Facebook,
 	Mail,
+	Heart,
+	Eye,
 } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Card, CardContent } from "@/lib/components/card";
@@ -21,10 +22,12 @@ import MarkdownRenderer from "@/components/MarkdownRenderer";
 import UsernameBadge from "@/components/UsernameBadge";
 import AddComment from "@/components/Comment/post";
 import CommentList from "@/components/Comment/list";
-import useDialectica from "@/hooks/actors/useDialectica";
+import { useAlexBackend } from "@/hooks/actors";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import { Article, ArticleData } from "../types/article";
+import { createTokenAdapter } from "@/features/alexandrian/adapters/TokenAdapter";
+import { arweaveIdToNat } from "@/utils/id_convert";
 
 const ArticlePage: React.FC = () => {
 	const { arweaveId } = useParams({ from: "/article/$arweaveId" });
@@ -35,7 +38,7 @@ const ArticlePage: React.FC = () => {
 	const [dislikeLoading, setDislikeLoading] = useState(false);
 	const [commentRefresh, setCommentRefresh] = useState(0);
 
-	const { actor } = useDialectica();
+	const { actor } = useAlexBackend();
 	const { user } = useAppSelector((state) => state.auth);
 
 	const fetchArticle = useCallback(async () => {
@@ -64,20 +67,50 @@ const ArticlePage: React.FC = () => {
 				throw new Error("Invalid article data");
 			}
 
+			// Get author from NFT ownership
+			let authorPrincipal = "Unknown";
+			try {
+				const tokenAdapter = createTokenAdapter("NFT");
+				const tokenId = arweaveIdToNat(arweaveId);
+				const ownershipArray = await tokenAdapter.getOwnerOf([tokenId]);
+				const ownership = ownershipArray[0];
+				if (ownership && ownership.length > 0 && ownership[0]) {
+					authorPrincipal = ownership[0].owner.toText();
+				}
+			} catch (e) {
+				console.warn("Failed to fetch author from NFT ownership:", e);
+			}
+
 			// Get engagement data
 			let likes = 0;
 			let dislikes = 0;
 			let comments = 0;
+			let views = 0;
+			let impressions = 0;
 			let userLiked = false;
 			let userDisliked = false;
 
 			if (actor) {
 				try {
-					const reactionCounts = await actor.get_reaction_counts(arweaveId);
+					// Fetch all engagement data in parallel
+					const [reactionCounts, viewsResult, impressionsResult] = await Promise.all([
+						actor.get_reaction_counts(arweaveId),
+						actor.get_view_count(arweaveId),
+						actor.get_impressions(arweaveId),
+					]);
+
 					if ("Ok" in reactionCounts) {
 						likes = Number(reactionCounts.Ok.likes);
 						dislikes = Number(reactionCounts.Ok.dislikes || 0);
 						comments = Number(reactionCounts.Ok.total_comments);
+					}
+
+					if ("Ok" in viewsResult) {
+						views = Number(viewsResult.Ok);
+					}
+
+					if ("Ok" in impressionsResult) {
+						impressions = Number(impressionsResult.Ok);
 					}
 
 					if (user) {
@@ -96,6 +129,16 @@ const ArticlePage: React.FC = () => {
 								false;
 						}
 					}
+
+					// Record this view (user opened full article)
+					actor.record_view(arweaveId).then((result) => {
+						if ("Ok" in result) {
+							// Update the view count with the new value
+							setArticle(prev => prev ? { ...prev, views: Number(result.Ok) } : null);
+						}
+					}).catch(() => {
+						// Silently ignore view recording errors
+					});
 				} catch (e) {
 					console.warn("Failed to fetch engagement data:", e);
 				}
@@ -104,10 +147,12 @@ const ArticlePage: React.FC = () => {
 			setArticle({
 				...articleData,
 				arweaveId,
-				author: "Unknown", // TODO: Get from NFT ownership
+				author: authorPrincipal,
 				likes,
 				dislikes,
 				comments,
+				views,
+				impressions,
 				userLiked,
 				userDisliked,
 			});
@@ -352,6 +397,11 @@ const ArticlePage: React.FC = () => {
 								<MessageCircle className="h-5 w-5" />
 								<span>{article.comments}</span>
 							</span>
+
+							<span className="flex items-center gap-2 text-muted-foreground">
+								<Eye className="h-5 w-5" />
+								<span>{article.views}</span>
+							</span>
 						</div>
 
 						{/* Share Options */}
@@ -402,6 +452,24 @@ const ArticlePage: React.FC = () => {
 					</div>
 				</CardContent>
 			</Card>
+
+			{/* Support the Author */}
+			{article.author && article.author !== "Unknown" && (
+				<div className="mb-8 p-4 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-xl flex items-center justify-between">
+					<div className="flex items-center gap-3">
+						<Heart className="h-5 w-5 text-primary" />
+						<span className="text-sm">
+							Enjoyed this article? Show your appreciation
+						</span>
+					</div>
+					<Button asChild scale="sm" className="gap-2">
+						<Link to="/support/$principal" params={{ principal: article.author }}>
+							<Heart className="h-4 w-4" />
+							Support Author
+						</Link>
+					</Button>
+				</div>
+			)}
 
 			{/* Comments Section */}
 			<Card id="comments">

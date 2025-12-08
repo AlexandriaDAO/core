@@ -42,7 +42,6 @@ import alexandrianReducer from '@/features/alexandrian/alexandrianSlice';
 import nftReducer from '@/features/nft/slice';
 import sonoraReducer from '@/features/sonora/sonoraSlice';
 import bibliothecaReducer from '@/features/bibliotheca/bibliothecaSlice';
-import minesReducer from '@/features/mines/minesSlice';
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -90,7 +89,6 @@ const rootReducer = combineReducers({
 	nft: nftReducer,
 	sonora: sonoraReducer,
 	bibliotheca: bibliothecaReducer,
-	mines: minesReducer,
 });
 
 export default rootReducer;

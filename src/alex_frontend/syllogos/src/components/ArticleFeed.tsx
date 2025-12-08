@@ -1,19 +1,25 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowUpDown, Clock } from "lucide-react";
 import { Button } from "@/lib/components/button";
-import useDialectica from "@/hooks/actors/useDialectica";
+import { useAlexBackend } from "@/hooks/actors";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { createTokenAdapter } from "@/features/alexandrian/adapters/TokenAdapter";
-import { natToArweaveId } from "@/utils/id_convert";
+import { natToArweaveId, arweaveIdToNat } from "@/utils/id_convert";
 import { ARWEAVE_GRAPHQL_ENDPOINT } from "@/features/permasearch/utils/helpers";
-import { Principal } from "@dfinity/principal";
 import ArticleCard from "./ArticleCard";
 import { Article, ArticleData } from "../types/article";
 
 const APPLICATION_NAME = "Syllogos";
 
-// Query Arweave GraphQL to filter transactions by Application-Name tag
-async function filterByApplicationTag(arweaveIds: string[]): Promise<Set<string>> {
+export type SortOption = "newest" | "oldest";
+
+const SORT_OPTIONS: { value: SortOption; label: string; icon: React.ReactNode }[] = [
+	{ value: "newest", label: "Newest", icon: <Clock className="h-4 w-4" /> },
+	{ value: "oldest", label: "Oldest", icon: <Clock className="h-4 w-4 rotate-180" /> },
+];
+
+// Filter arweave IDs to only include those with Application-Name: Syllogos tag
+async function filterSyllogosArticles(arweaveIds: string[]): Promise<Set<string>> {
 	if (arweaveIds.length === 0) return new Set();
 
 	try {
@@ -22,8 +28,11 @@ async function filterByApplicationTag(arweaveIds: string[]): Promise<Set<string>
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				query: `
-					query GetSyllogosArticles($ids: [ID!]!) {
-						transactions(ids: $ids, tags: [{ name: "Application-Name", values: ["${APPLICATION_NAME}"] }]) {
+					query FilterSyllogosArticles($ids: [ID!]!) {
+						transactions(
+							ids: $ids
+							tags: [{ name: "Application-Name", values: ["${APPLICATION_NAME}"] }]
+						) {
 							edges {
 								node {
 									id
@@ -56,26 +65,85 @@ interface ArticleFeedProps {
 	className?: string;
 	pageSize?: number;
 	onTagClick?: (tag: string) => void;
+	showSortControls?: boolean;
+	defaultSort?: SortOption;
 }
 
 const ArticleFeed: React.FC<ArticleFeedProps> = ({
 	userPrincipal,
 	filterTag,
 	className = "",
-	pageSize = 20,
+	pageSize = 5,
 	onTagClick,
+	showSortControls = true,
+	defaultSort = "newest",
 }) => {
 	const [articles, setArticles] = useState<Article[]>([]);
+	const [syllogosArweaveIds, setSyllogosArweaveIds] = useState<string[]>([]);
+	const [sortBy, setSortBy] = useState<SortOption>(defaultSort);
 	const [loading, setLoading] = useState(true);
 	const [loadingMore, setLoadingMore] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [hasMore, setHasMore] = useState(true);
 	const [offset, setOffset] = useState(0);
+	const [isInitialized, setIsInitialized] = useState(false);
 
-	const { actor } = useDialectica();
+	const { actor } = useAlexBackend();
 	const { user } = useAppSelector((state) => state.auth);
 
-	const fetchArticles = useCallback(
+	// Fetch and filter all Syllogos articles from minted NFTs
+	const initializeSyllogosArticles = useCallback(async () => {
+		try {
+			setLoading(true);
+			const tokenAdapter = createTokenAdapter("NFT");
+			const totalSupply = await tokenAdapter.getTotalSupply();
+			console.log("[ArticleFeed] Total NFT supply:", totalSupply.toString());
+
+			if (totalSupply === 0n) {
+				setSyllogosArweaveIds([]);
+				setIsInitialized(true);
+				setLoading(false);
+				return;
+			}
+
+			// Fetch ALL token IDs from NFT canister
+			const allTokenIds = await tokenAdapter.getTokens(0n, totalSupply);
+			console.log("[ArticleFeed] Fetched all token IDs:", allTokenIds.length);
+
+			// Convert to Arweave IDs
+			const allArweaveIds = allTokenIds.map(natToArweaveId);
+
+			// Filter for Syllogos articles via Arweave GraphQL
+			const syllogosSet = await filterSyllogosArticles(allArweaveIds);
+			console.log("[ArticleFeed] Syllogos articles found:", syllogosSet.size);
+
+			// Keep only Syllogos articles, preserving token order (for sorting)
+			// Token IDs are sequential, so we can sort by them
+			const syllogosTokenIds = allTokenIds.filter(tokenId =>
+				syllogosSet.has(natToArweaveId(tokenId))
+			);
+
+			// Sort based on sortBy preference
+			// Token IDs are minted sequentially, so higher ID = newer
+			if (sortBy === "newest") {
+				syllogosTokenIds.reverse(); // Newest first (highest IDs first)
+			}
+			// For "oldest", keep original order (lowest IDs first)
+
+			const sortedArweaveIds = syllogosTokenIds.map(natToArweaveId);
+			setSyllogosArweaveIds(sortedArweaveIds);
+			setIsInitialized(true);
+			console.log("[ArticleFeed] Sorted Syllogos articles:", sortedArweaveIds.length, "sortBy:", sortBy);
+
+		} catch (err) {
+			console.error("Error initializing Syllogos articles:", err);
+			setError("Failed to load articles");
+			setLoading(false);
+		}
+	}, [sortBy]);
+
+	// Fetch a page of articles
+	const fetchArticlePage = useCallback(
 		async (startOffset: number, append: boolean = false) => {
 			try {
 				if (append) {
@@ -84,151 +152,74 @@ const ArticleFeed: React.FC<ArticleFeedProps> = ({
 					setLoading(true);
 				}
 
+				const pageArweaveIds = syllogosArweaveIds.slice(startOffset, startOffset + pageSize);
+
+				if (pageArweaveIds.length === 0) {
+					setHasMore(false);
+					return;
+				}
+
+				// Get ownership information
 				const tokenAdapter = createTokenAdapter("NFT");
-				const totalSupply = await tokenAdapter.getTotalSupply();
+				const tokenIds = pageArweaveIds.map(arweaveIdToNat);
+				const ownershipArray = await tokenAdapter.getOwnerOf(tokenIds);
 
-				if (totalSupply === 0n) {
-					setArticles([]);
-					setHasMore(false);
-					return;
-				}
-
-				let tokenIds: bigint[] = [];
-
-				if (userPrincipal) {
-					// Fetch tokens for specific user
-					// cursor should be undefined for first page, otherwise use last token ID
-					tokenIds = await tokenAdapter.getTokensOf(
-						Principal.fromText(userPrincipal),
-						startOffset > 0 ? BigInt(startOffset) : undefined,
-						BigInt(pageSize)
-					);
-				} else {
-					// Fetch recent tokens (newest first)
-					const startPosition = Math.max(
-						0,
-						Number(totalSupply) - startOffset - pageSize
-					);
-					const fetchSize = Math.min(
-						pageSize,
-						Number(totalSupply) - startOffset
-					);
-
-					if (fetchSize <= 0) {
-						setHasMore(false);
-						return;
-					}
-
-					tokenIds = await tokenAdapter.getTokens(
-						BigInt(startPosition),
-						BigInt(fetchSize)
-					);
-					tokenIds = tokenIds.reverse(); // Show newest first
-				}
-
-				if (tokenIds.length === 0) {
-					setHasMore(false);
-					return;
-				}
-
-				// Convert token IDs to Arweave IDs
-				const arweaveIds = tokenIds.map(natToArweaveId);
-
-				// Filter by Application-Name tag via Arweave GraphQL
-				const syllogosIds = await filterByApplicationTag(arweaveIds);
-
-				if (syllogosIds.size === 0) {
-					if (!append) {
-						setArticles([]);
-					}
-					setHasMore(tokenIds.length === pageSize);
-					setOffset(startOffset + tokenIds.length);
-					return;
-				}
-
-				// Filter tokenIds to only include Syllogos articles
-				const filteredTokenIds = tokenIds.filter((tokenId) =>
-					syllogosIds.has(natToArweaveId(tokenId))
-				);
-
-				// Get ownership information for filtered tokens
-				const ownershipArray = await tokenAdapter.getOwnerOf(filteredTokenIds);
-
-				// Process each filtered token
+				// Process each article
 				const fetchedArticles: (Article | null)[] = await Promise.all(
-					filteredTokenIds.map(async (tokenId, index) => {
+					pageArweaveIds.map(async (arweaveId, index) => {
 						try {
-							const arweaveId = natToArweaveId(tokenId);
-
-							// Fetch article content
-							const contentResponse = await fetch(
-								`https://arweave.net/${arweaveId}`
-							);
+							const contentResponse = await fetch(`https://arweave.net/${arweaveId}`);
 							const articleData: ArticleData = await contentResponse.json();
 
-							// Validate it's actually an article (has required fields)
-							if (
-								!articleData.title ||
-								!articleData.content ||
-								!articleData.createdAt
-							) {
+							// Validate required fields
+							if (!articleData.title || !articleData.content || !articleData.createdAt) {
 								return null;
 							}
 
-							// Apply tag filter if specified
-							if (
-								filterTag &&
-								(!articleData.tags ||
-									!articleData.tags.includes(filterTag.toLowerCase()))
-							) {
-								return null;
+							// Apply tag filter (case-insensitive)
+							if (filterTag) {
+								const hasMatchingTag = articleData.tags?.some(
+									(tag) => tag.toLowerCase() === filterTag.toLowerCase()
+								);
+								if (!hasMatchingTag) return null;
 							}
 
-							// Get owner info
+							// Get owner
 							const ownership = ownershipArray[index];
-							const owner =
-								ownership && ownership.length > 0 ? ownership[0] : null;
-							const authorPrincipal = owner
-								? owner.owner.toText()
-								: "Unknown";
+							const owner = ownership && ownership.length > 0 ? ownership[0] : null;
+							const authorPrincipal = owner ? owner.owner.toText() : "Unknown";
 
 							// Get engagement data
-							let likes = 0;
-							let dislikes = 0;
-							let comments = 0;
-							let userLiked = false;
-							let userDisliked = false;
+							let likes = 0, dislikes = 0, comments = 0, views = 0, impressions = 0;
+							let userLiked = false, userDisliked = false;
 
 							if (actor) {
 								try {
-									const reactionCounts =
-										await actor.get_reaction_counts(arweaveId);
+									const [reactionCounts, viewsResult, impressionsResult] = await Promise.all([
+										actor.get_reaction_counts(arweaveId),
+										actor.get_view_count(arweaveId),
+										actor.get_impressions(arweaveId),
+									]);
+
 									if ("Ok" in reactionCounts) {
 										likes = Number(reactionCounts.Ok.likes);
 										dislikes = Number(reactionCounts.Ok.dislikes || 0);
 										comments = Number(reactionCounts.Ok.total_comments);
 									}
+									if ("Ok" in viewsResult) views = Number(viewsResult.Ok);
+									if ("Ok" in impressionsResult) impressions = Number(impressionsResult.Ok);
 
 									if (user) {
-										const userReaction =
-											await actor.get_user_reaction(arweaveId);
-										if (
-											"Ok" in userReaction &&
-											userReaction.Ok.length > 0
-										) {
+										const userReaction = await actor.get_user_reaction(arweaveId);
+										if ("Ok" in userReaction && userReaction.Ok.length > 0) {
 											const reaction = userReaction.Ok[0];
-											userLiked =
-												(reaction &&
-													typeof reaction === "object" &&
-													"Like" in reaction) ||
-												false;
-											userDisliked =
-												(reaction &&
-													typeof reaction === "object" &&
-													"Dislike" in reaction) ||
-												false;
+											userLiked = !!(reaction && typeof reaction === "object" && "Like" in reaction);
+											userDisliked = !!(reaction && typeof reaction === "object" && "Dislike" in reaction);
 										}
 									}
+
+									// Record impression
+									actor.record_impression(arweaveId).catch(() => {});
 								} catch (error) {
 									console.warn("Failed to fetch engagement data:", error);
 								}
@@ -241,20 +232,20 @@ const ArticleFeed: React.FC<ArticleFeedProps> = ({
 								likes,
 								dislikes,
 								comments,
+								views,
+								impressions,
 								userLiked,
 								userDisliked,
 							} as Article;
 						} catch (error) {
-							console.warn("Failed to process token:", tokenId, error);
+							console.warn("Failed to process article:", arweaveId, error);
 							return null;
 						}
 					})
 				);
 
-				// Filter out nulls and non-articles
-				const validArticles = fetchedArticles.filter(
-					(a): a is Article => a !== null
-				);
+				const validArticles = fetchedArticles.filter((a): a is Article => a !== null);
+				const newOffset = startOffset + pageArweaveIds.length;
 
 				if (append) {
 					setArticles((prev) => [...prev, ...validArticles]);
@@ -262,9 +253,8 @@ const ArticleFeed: React.FC<ArticleFeedProps> = ({
 					setArticles(validArticles);
 				}
 
-				// Check if there are more articles to load
-				setHasMore(tokenIds.length === pageSize);
-				setOffset(startOffset + tokenIds.length);
+				setHasMore(newOffset < syllogosArweaveIds.length);
+				setOffset(newOffset);
 			} catch (err) {
 				console.error("Error fetching articles:", err);
 				setError("Failed to load articles");
@@ -273,19 +263,34 @@ const ArticleFeed: React.FC<ArticleFeedProps> = ({
 				setLoadingMore(false);
 			}
 		},
-		[userPrincipal, filterTag, pageSize, actor, user]
+		[syllogosArweaveIds, pageSize, filterTag, actor, user]
 	);
 
+	// Initialize on mount and when sortBy changes
 	useEffect(() => {
 		setArticles([]);
 		setOffset(0);
 		setHasMore(true);
-		fetchArticles(0, false);
-	}, [fetchArticles]);
+		setIsInitialized(false);
+		initializeSyllogosArticles();
+	}, [initializeSyllogosArticles]);
+
+	// Fetch first page after initialization or when filterTag changes
+	useEffect(() => {
+		if (isInitialized && syllogosArweaveIds.length > 0) {
+			setArticles([]);
+			setOffset(0);
+			setHasMore(true);
+			fetchArticlePage(0, false);
+		} else if (isInitialized) {
+			setLoading(false);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isInitialized, syllogosArweaveIds, filterTag]);
 
 	const handleLoadMore = () => {
 		if (!loadingMore && hasMore) {
-			fetchArticles(offset, true);
+			fetchArticlePage(offset, true);
 		}
 	};
 
@@ -361,7 +366,7 @@ const ArticleFeed: React.FC<ArticleFeedProps> = ({
 		return (
 			<div className={`text-center py-12 ${className}`}>
 				<p className="text-muted-foreground mb-4">{error}</p>
-				<Button variant="outline" onClick={() => fetchArticles(0, false)}>
+				<Button variant="outline" onClick={() => initializeSyllogosArticles()}>
 					Try again
 				</Button>
 			</div>
@@ -389,6 +394,30 @@ const ArticleFeed: React.FC<ArticleFeedProps> = ({
 
 	return (
 		<div className={`space-y-6 ${className}`}>
+			{/* Sort Controls */}
+			{showSortControls && syllogosArweaveIds.length > 1 && (
+				<div className="flex items-center gap-2 pb-2">
+					<ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+					<span className="text-sm text-muted-foreground mr-2">Sort by:</span>
+					<div className="flex flex-wrap gap-2">
+						{SORT_OPTIONS.map((option) => (
+							<button
+								key={option.value}
+								onClick={() => setSortBy(option.value)}
+								className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full transition-colors ${
+									sortBy === option.value
+										? "bg-primary text-primary-foreground"
+										: "bg-muted hover:bg-muted/80 text-muted-foreground"
+								}`}
+							>
+								{option.icon}
+								{option.label}
+							</button>
+						))}
+					</div>
+				</div>
+			)}
+
 			{articles.map((article) => (
 				<ArticleCard
 					key={article.arweaveId}

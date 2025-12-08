@@ -1,9 +1,7 @@
 import React from "react";
-import { useParams, Link } from "@tanstack/react-router";
-import { ArrowLeft, User, FileText } from "lucide-react";
-import { Button } from "@/lib/components/button";
-import { Card, CardContent } from "@/lib/components/card";
-import UsernameBadge from "@/components/UsernameBadge";
+import { useParams } from "@tanstack/react-router";
+import { FileText } from "lucide-react";
+import AuthorProfileCard from "../components/AuthorProfileCard";
 import ArticleFeed from "../components/ArticleFeed";
 
 const AuthorPage: React.FC = () => {
@@ -11,32 +9,10 @@ const AuthorPage: React.FC = () => {
 
 	return (
 		<div className="container mx-auto px-4 py-8">
-			{/* Back Navigation */}
-			<Button variant="ghost" className="mb-6" asChild>
-				<Link to="/">
-					<ArrowLeft className="h-4 w-4 mr-2" />
-					Back
-				</Link>
-			</Button>
-
-			{/* Author Header */}
-			<Card className="mb-8">
-				<CardContent className="p-6">
-					<div className="flex items-center gap-4">
-						<div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-							<User className="h-8 w-8 text-primary" />
-						</div>
-						<div>
-							<div className="mb-2">
-								<UsernameBadge principal={principal} />
-							</div>
-							<p className="text-sm text-muted-foreground font-mono">
-								{principal}
-							</p>
-						</div>
-					</div>
-				</CardContent>
-			</Card>
+			{/* Author Profile Card */}
+			<div className="mb-8">
+				<AuthorProfileCard principal={principal} />
+			</div>
 
 			{/* Articles Header */}
 			<div className="flex items-center gap-2 mb-6">

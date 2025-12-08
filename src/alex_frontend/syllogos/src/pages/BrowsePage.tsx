@@ -1,23 +1,11 @@
 import React, { useState } from "react";
 import { useSearch, useNavigate } from "@tanstack/react-router";
-import { X, Tag, TrendingUp } from "lucide-react";
+import { X, Tag, TrendingUp, Loader2 } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/lib/components/card";
+import { Skeleton } from "@/lib/components/skeleton";
 import ArticleFeed from "../components/ArticleFeed";
-
-// Popular tags - in a real app, these would come from aggregated data
-const POPULAR_TAGS = [
-	"web3",
-	"crypto",
-	"defi",
-	"nft",
-	"blockchain",
-	"technology",
-	"programming",
-	"tutorial",
-	"opinion",
-	"news",
-];
+import { usePopularTags } from "../hooks/usePopularTags";
 
 const BrowsePage: React.FC = () => {
 	const search = useSearch({ from: "/browse" });
@@ -25,6 +13,7 @@ const BrowsePage: React.FC = () => {
 	const [activeTag, setActiveTag] = useState<string | null>(
 		(search as any)?.tag || null
 	);
+	const { tags: popularTags, loading: tagsLoading } = usePopularTags();
 
 	const handleTagClick = (tag: string) => {
 		if (activeTag === tag) {
@@ -56,21 +45,41 @@ const BrowsePage: React.FC = () => {
 								</CardTitle>
 							</CardHeader>
 							<CardContent>
-								<div className="flex flex-wrap gap-2">
-									{POPULAR_TAGS.map((tag) => (
-										<button
-											key={tag}
-											onClick={() => handleTagClick(tag)}
-											className={`px-3 py-1 text-sm rounded-full transition-colors ${
-												activeTag === tag
-													? "bg-primary text-primary-foreground"
-													: "bg-muted hover:bg-muted/80"
-											}`}
-										>
-											#{tag}
-										</button>
-									))}
-								</div>
+								{tagsLoading ? (
+									<div className="flex flex-wrap gap-2">
+										{[...Array(6)].map((_, i) => (
+											<Skeleton key={i} className="h-7 w-16 rounded-full" />
+										))}
+									</div>
+								) : popularTags.length > 0 ? (
+									<div className="flex flex-wrap gap-2">
+										{popularTags.map(({ tag, count }) => (
+											<button
+												key={tag}
+												onClick={() => handleTagClick(tag)}
+												className={`px-3 py-1 text-sm rounded-full transition-colors flex items-center gap-1.5 ${
+													activeTag === tag
+														? "bg-primary text-primary-foreground"
+														: "bg-muted hover:bg-muted/80"
+												}`}
+												title={`${count} article${count !== 1 ? 's' : ''}`}
+											>
+												#{tag}
+												<span className={`text-xs ${
+													activeTag === tag
+														? "text-primary-foreground/70"
+														: "text-muted-foreground"
+												}`}>
+													{count}
+												</span>
+											</button>
+										))}
+									</div>
+								) : (
+									<p className="text-sm text-muted-foreground text-center py-2">
+										No tags found yet
+									</p>
+								)}
 							</CardContent>
 						</Card>
 
@@ -121,7 +130,7 @@ const BrowsePage: React.FC = () => {
 					{/* Article Feed */}
 					<ArticleFeed
 						filterTag={activeTag || undefined}
-						pageSize={12}
+						pageSize={5}
 						onTagClick={handleTagClick}
 					/>
 				</main>

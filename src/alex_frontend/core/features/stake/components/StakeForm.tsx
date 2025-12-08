@@ -175,7 +175,7 @@ const StakeForm: React.FC = () => {
 
                                 <Alert>
                                     <AlertDescription>
-                                        If the transaction doesn't complete as expected, please check the <Link to='/exchange/redeem'><strong>Redeem Page</strong></Link> to locate your tokens
+                                        If the transaction doesn't complete as expected, please check the <Link to='/swap/redeem'><strong>Redeem Page</strong></Link> to locate your tokens
                                     </AlertDescription>
                                 </Alert>
                             </form>

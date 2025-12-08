@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { PenSquare, FileText, Clock, Trash2 } from "lucide-react";
+import { FileText, Clock, Trash2 } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/lib/components/card";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import UsernameBadge from "@/components/UsernameBadge";
+import AuthorProfileCard from "../components/AuthorProfileCard";
 import ArticleFeed from "../components/ArticleFeed";
 import { ArticleDraft } from "../types/article";
 
@@ -57,32 +57,10 @@ const ProfilePage: React.FC = () => {
 
 	return (
 		<div className="container mx-auto px-4 py-8">
-			{/* Profile Header */}
-			<Card className="mb-8">
-				<CardContent className="p-6">
-					<div className="flex items-center justify-between flex-wrap gap-4">
-						<div className="flex items-center gap-4">
-							<div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
-								{userPrincipal.substring(0, 2).toUpperCase()}
-							</div>
-							<div>
-								<div className="w-fit">
-									<UsernameBadge principal={userPrincipal} />
-								</div>
-								<p className="text-sm text-muted-foreground font-mono mt-1">
-									{userPrincipal}
-								</p>
-							</div>
-						</div>
-						<Button asChild>
-							<Link to="/write">
-								<PenSquare className="h-4 w-4 mr-2" />
-								Write Article
-							</Link>
-						</Button>
-					</div>
-				</CardContent>
-			</Card>
+			{/* Profile Card */}
+			<div className="mb-8">
+				<AuthorProfileCard principal={userPrincipal} isOwnProfile />
+			</div>
 
 			{/* Draft Recovery */}
 			{draft && (draft.title || draft.content) && (

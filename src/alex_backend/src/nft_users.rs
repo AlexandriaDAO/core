@@ -112,7 +112,7 @@ async fn update_nft_users() -> Result<Vec<UserNFTInfo>, String> {
     Ok(updated_users)
 }
 
-fn setup_timer() {
+pub fn setup_timer() {
     // Set up timer to update NFT users every 4 hours
     let timer_duration_nanos: u64 = 4 * 60 * 60 * 1_000_000_000; // 4 hours in nanoseconds
     ic_cdk_timers::set_timer_interval(std::time::Duration::from_nanos(timer_duration_nanos), || {
@@ -125,15 +125,6 @@ fn setup_timer() {
     });
 }
 
-#[ic_cdk::init]
-fn init() {
-    setup_timer();
-}
-
-#[ic_cdk::post_upgrade]
-fn post_upgrade() {
-    setup_timer();
-}
 
 #[ic_cdk::query]
 pub fn get_stored_nft_users() -> Vec<UserNFTInfo> {

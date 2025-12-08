@@ -21,6 +21,8 @@ export interface Article extends ArticleData {
 	likes: number;
 	dislikes: number;
 	comments: number;
+	views: number;           // unique view count
+	impressions: number;     // feed appearance count
 	userLiked: boolean;
 	userDisliked: boolean;
 }

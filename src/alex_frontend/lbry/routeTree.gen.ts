@@ -11,6 +11,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './src/routes/__root'
+import { Route as TokenomicsRouteImport } from './src/routes/tokenomics'
+import { Route as StatusRouteImport } from './src/routes/status'
 import { Route as IndexRouteImport } from './src/routes/index'
 import { Route as SwapInsightsRouteImport } from './src/routes/swap/insights'
 import { Route as NftTokenIdRouteImport } from './src/routes/nft.$tokenId'
@@ -107,6 +109,18 @@ const AuthRouteLazyRoute = AuthRouteLazyRouteImport.update({
 } as any).lazy(() =>
   import('./src/routes/_auth/route.lazy').then((d) => d.Route),
 )
+const TokenomicsRoute = TokenomicsRouteImport.update({
+  id: '/tokenomics',
+  path: '/tokenomics',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() =>
+  import('./src/routes/tokenomics.lazy').then((d) => d.Route),
+)
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./src/routes/status.lazy').then((d) => d.Route))
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -388,6 +402,8 @@ const AuthAppPerpetuaUserUserIdItemItemIdLazyRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/status': typeof StatusRoute
+  '/tokenomics': typeof TokenomicsRoute
   '/info': typeof InfoRouteLazyRouteWithChildren
   '/swap': typeof AuthSwapRouteLazyRouteWithChildren
   '/manager': typeof ManagerLazyRoute
@@ -426,6 +442,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/status': typeof StatusRoute
+  '/tokenomics': typeof TokenomicsRoute
   '/swap': typeof AuthSwapIndexLazyRoute
   '/manager': typeof ManagerLazyRoute
   '/app/alexandrian': typeof AppAlexandrianRoute
@@ -461,6 +479,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/status': typeof StatusRoute
+  '/tokenomics': typeof TokenomicsRoute
   '/_auth': typeof AuthRouteLazyRouteWithChildren
   '/info': typeof InfoRouteLazyRouteWithChildren
   '/swap': typeof SwapRouteLazyRouteWithChildren
@@ -504,6 +524,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/status'
+    | '/tokenomics'
     | '/info'
     | '/swap'
     | '/manager'
@@ -542,6 +564,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/status'
+    | '/tokenomics'
     | '/swap'
     | '/manager'
     | '/app/alexandrian'
@@ -576,6 +600,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/status'
+    | '/tokenomics'
     | '/_auth'
     | '/info'
     | '/swap'
@@ -618,6 +644,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  StatusRoute: typeof StatusRoute
+  TokenomicsRoute: typeof TokenomicsRoute
   AuthRouteLazyRoute: typeof AuthRouteLazyRouteWithChildren
   InfoRouteLazyRoute: typeof InfoRouteLazyRouteWithChildren
   SwapRouteLazyRoute: typeof SwapRouteLazyRouteWithChildren
@@ -655,6 +683,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof AuthRouteLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tokenomics': {
+      id: '/tokenomics'
+      path: '/tokenomics'
+      fullPath: '/tokenomics'
+      preLoaderRoute: typeof TokenomicsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -1061,6 +1103,8 @@ const SwapRouteLazyRouteWithChildren = SwapRouteLazyRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  StatusRoute: StatusRoute,
+  TokenomicsRoute: TokenomicsRoute,
   AuthRouteLazyRoute: AuthRouteLazyRouteWithChildren,
   InfoRouteLazyRoute: InfoRouteLazyRouteWithChildren,
   SwapRouteLazyRoute: SwapRouteLazyRouteWithChildren,

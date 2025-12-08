@@ -9,9 +9,11 @@ import estimateCost from '../thunks/estimateCost';
 import fetchWallets from '../thunks/fetchWallets';
 import selectWallet from '../thunks/selectWallet';
 import processPayment from '../thunks/processPayment';
-import uploadFile from '../thunks/uploadFile';
+import uploadFile, { ArweaveTag } from '../thunks/uploadFile';
 import mint from '../../nft/thunks/mint';
 import { reset } from '../pinaxSlice';
+
+export type { ArweaveTag } from '../thunks/uploadFile';
 
 const validateFileType = (file: File) => {
 	const typeInfo = getFileTypeInfo(file.type);
@@ -43,7 +45,7 @@ export const useUploadAndMint = () => {
 	const [success, setSuccess] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 
-	const uploadAndMint = async (file: File, app?: string) => {
+	const uploadAndMint = async (file: File, tags?: ArweaveTag[]) => {
 		setError(null);
 		setSuccess(null);
 		setLoading(true);
@@ -74,7 +76,7 @@ export const useUploadAndMint = () => {
 
 			// Step 7: Upload file
 			const transaction = await dispatch(
-				uploadFile({ file, actor: walletActor, app })
+				uploadFile({ file, actor: walletActor, tags })
 			).unwrap();
 
 			// Step 8: Mint NFT

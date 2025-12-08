@@ -9,7 +9,7 @@ import { Principal } from "@dfinity/principal";
 import ProfileStats from "../components/ProfileStats";
 import ProfilePostsList from "../components/ProfilePostsList";
 import UsernameBadge from "@/components/UsernameBadge";
-import useDialectica from "@/hooks/actors/useDialectica";
+import { useAlexBackend } from "@/hooks/actors";
 
 interface ProfilePageProps {
 	userPrincipal?: string; // If not provided, show current user's profile
@@ -93,7 +93,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userPrincipal }) => {
 
 // Compact Activity Feed for Sidebar
 const ActivityFeedCompact: React.FC<{ userPrincipal: string }> = ({ userPrincipal }) => {
-	const { actor } = useDialectica();
+	const { actor } = useAlexBackend();
 	const [activities, setActivities] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 
@@ -181,7 +181,7 @@ const ActivityFeedCompact: React.FC<{ userPrincipal: string }> = ({ userPrincipa
 
 // Activity Feed Component (Full version - kept for compatibility)
 const ActivityFeed: React.FC<{ userPrincipal: string }> = ({ userPrincipal }) => {
-	const { actor } = useDialectica();
+	const { actor } = useAlexBackend();
 	const [activities, setActivities] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 

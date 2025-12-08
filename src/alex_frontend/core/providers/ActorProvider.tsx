@@ -30,10 +30,7 @@ import {
 	useIcpSwapFactory,
 	useLogs,
 	useEmporium,
-	useDialectica,
-	useKairos,
 } from "@/hooks/actors";
-import { Button } from "@/lib/components/button";
 
 // Component using multiple actors
 export default function ActorProvider() {
@@ -57,8 +54,6 @@ export default function ActorProvider() {
 	const icpSwapFactory = useIcpSwapFactory();
 	const logs = useLogs();
 	const emporium = useEmporium();
-	const dialectica = useDialectica();
-	const kairos = useKairos();
 
 	const onRequest = useCallback(
 		(data: InterceptorRequestData) => {
@@ -134,8 +129,6 @@ export default function ActorProvider() {
 			icpSwapFactory.setInterceptors(interceptors);
 			logs.setInterceptors(interceptors);
 			emporium.setInterceptors(interceptors);
-			dialectica.setInterceptors(interceptors);
-			kairos.setInterceptors(interceptors);
 		});
 	}, [interceptors]);
 

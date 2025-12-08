@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/lib/components/card";
 import { Progress } from "@/lib/components/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/lib/components/alert";
 import { Separator } from "@/lib/components/separator";
-import { useUploadAndMint } from "@/features/pinax/hooks/useUploadAndMint";
+import { useUploadAndMint, ArweaveTag } from "@/features/pinax/hooks/useUploadAndMint";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import ArticleEditor from "./ArticleEditor";
@@ -93,7 +93,12 @@ const ArticleComposer: React.FC<ArticleComposerProps> = ({
 				{ type: "application/json" }
 			);
 
-			const transactionId = await uploadAndMint(articleFile, "Syllogos");
+			const tags: ArweaveTag[] = [
+				{ name: "Application-Name", value: "Syllogos" },
+				{ name: "Environment", value: process.env.DFX_NETWORK === "ic" ? "production" : "local" },
+			];
+
+			const transactionId = await uploadAndMint(articleFile, tags);
 
 			if (transactionId) {
 				setPublishSuccess(transactionId);

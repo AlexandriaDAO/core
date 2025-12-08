@@ -11,8 +11,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './src/routes/__root'
+import { Route as SupportRouteImport } from './src/routes/support'
 import { Route as BrowseRouteImport } from './src/routes/browse'
 import { Route as IndexRouteImport } from './src/routes/index'
+import { Route as SupportIndexRouteImport } from './src/routes/support/index'
+import { Route as SupportPrincipalRouteImport } from './src/routes/support/$principal'
 import { Route as AuthorPrincipalRouteImport } from './src/routes/author.$principal'
 import { Route as ArticleArweaveIdRouteImport } from './src/routes/article.$arweaveId'
 import { Route as AuthWriteRouteImport } from './src/routes/_auth/write'
@@ -26,6 +29,11 @@ const AuthRouteLazyRoute = AuthRouteLazyRouteImport.update({
 } as any).lazy(() =>
   import('./src/routes/_auth/route.lazy').then((d) => d.Route),
 )
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BrowseRoute = BrowseRouteImport.update({
   id: '/browse',
   path: '/browse',
@@ -36,6 +44,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./src/routes/index.lazy').then((d) => d.Route))
+const SupportIndexRoute = SupportIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SupportRoute,
+} as any).lazy(() =>
+  import('./src/routes/support/index.lazy').then((d) => d.Route),
+)
+const SupportPrincipalRoute = SupportPrincipalRouteImport.update({
+  id: '/$principal',
+  path: '/$principal',
+  getParentRoute: () => SupportRoute,
+} as any).lazy(() =>
+  import('./src/routes/support/$principal.lazy').then((d) => d.Route),
+)
 const AuthorPrincipalRoute = AuthorPrincipalRouteImport.update({
   id: '/author/$principal',
   path: '/author/$principal',
@@ -68,10 +90,13 @@ const AuthProfileRoute = AuthProfileRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/browse': typeof BrowseRoute
+  '/support': typeof SupportRouteWithChildren
   '/profile': typeof AuthProfileRoute
   '/write': typeof AuthWriteRoute
   '/article/$arweaveId': typeof ArticleArweaveIdRoute
   '/author/$principal': typeof AuthorPrincipalRoute
+  '/support/$principal': typeof SupportPrincipalRoute
+  '/support/': typeof SupportIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -80,26 +105,34 @@ export interface FileRoutesByTo {
   '/write': typeof AuthWriteRoute
   '/article/$arweaveId': typeof ArticleArweaveIdRoute
   '/author/$principal': typeof AuthorPrincipalRoute
+  '/support/$principal': typeof SupportPrincipalRoute
+  '/support': typeof SupportIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/browse': typeof BrowseRoute
+  '/support': typeof SupportRouteWithChildren
   '/_auth': typeof AuthRouteLazyRouteWithChildren
   '/_auth/profile': typeof AuthProfileRoute
   '/_auth/write': typeof AuthWriteRoute
   '/article/$arweaveId': typeof ArticleArweaveIdRoute
   '/author/$principal': typeof AuthorPrincipalRoute
+  '/support/$principal': typeof SupportPrincipalRoute
+  '/support/': typeof SupportIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/browse'
+    | '/support'
     | '/profile'
     | '/write'
     | '/article/$arweaveId'
     | '/author/$principal'
+    | '/support/$principal'
+    | '/support/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -108,20 +141,26 @@ export interface FileRouteTypes {
     | '/write'
     | '/article/$arweaveId'
     | '/author/$principal'
+    | '/support/$principal'
+    | '/support'
   id:
     | '__root__'
     | '/'
     | '/browse'
+    | '/support'
     | '/_auth'
     | '/_auth/profile'
     | '/_auth/write'
     | '/article/$arweaveId'
     | '/author/$principal'
+    | '/support/$principal'
+    | '/support/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BrowseRoute: typeof BrowseRoute
+  SupportRoute: typeof SupportRouteWithChildren
   AuthRouteLazyRoute: typeof AuthRouteLazyRouteWithChildren
   ArticleArweaveIdRoute: typeof ArticleArweaveIdRoute
   AuthorPrincipalRoute: typeof AuthorPrincipalRoute
@@ -134,6 +173,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof AuthRouteLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/browse': {
@@ -149,6 +195,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/support/': {
+      id: '/support/'
+      path: '/'
+      fullPath: '/support/'
+      preLoaderRoute: typeof SupportIndexRouteImport
+      parentRoute: typeof SupportRoute
+    }
+    '/support/$principal': {
+      id: '/support/$principal'
+      path: '/$principal'
+      fullPath: '/support/$principal'
+      preLoaderRoute: typeof SupportPrincipalRouteImport
+      parentRoute: typeof SupportRoute
     }
     '/author/$principal': {
       id: '/author/$principal'
@@ -181,6 +241,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SupportRouteChildren {
+  SupportPrincipalRoute: typeof SupportPrincipalRoute
+  SupportIndexRoute: typeof SupportIndexRoute
+}
+
+const SupportRouteChildren: SupportRouteChildren = {
+  SupportPrincipalRoute: SupportPrincipalRoute,
+  SupportIndexRoute: SupportIndexRoute,
+}
+
+const SupportRouteWithChildren =
+  SupportRoute._addFileChildren(SupportRouteChildren)
+
 interface AuthRouteLazyRouteChildren {
   AuthProfileRoute: typeof AuthProfileRoute
   AuthWriteRoute: typeof AuthWriteRoute
@@ -198,6 +271,7 @@ const AuthRouteLazyRouteWithChildren = AuthRouteLazyRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BrowseRoute: BrowseRoute,
+  SupportRoute: SupportRouteWithChildren,
   AuthRouteLazyRoute: AuthRouteLazyRouteWithChildren,
   ArticleArweaveIdRoute: ArticleArweaveIdRoute,
   AuthorPrincipalRoute: AuthorPrincipalRoute,

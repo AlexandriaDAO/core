@@ -21,8 +21,6 @@ import {
 	useIcpSwapFactory,
 	useLogs,
 	useEmporium,
-	useDialectica,
-	useKairos,
 } from "@/hooks/actors";
 
 export function useLogout() {
@@ -47,8 +45,6 @@ export function useLogout() {
 	const icpSwapFactory = useIcpSwapFactory();
 	const logs = useLogs();
 	const emporium = useEmporium();
-	const dialectica = useDialectica();
-	const kairos = useKairos();
 
 	const logout = async () => {
 		await clear();
@@ -73,8 +69,6 @@ export function useLogout() {
 		icpSwapFactory.reset();
 		logs.reset();
 		emporium.reset();
-		dialectica.reset();
-		kairos.reset();
 
 		// window.location.href = "/";
 	};

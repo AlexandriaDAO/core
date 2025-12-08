@@ -14,6 +14,7 @@ import {
 	AtSign,
 	Copy,
 	X,
+	TrendingUp,
 } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Card, CardContent } from "@/lib/components/card";
@@ -196,184 +197,181 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
 			}`}
 			onClick={handleCardClick}
 		>
-			<CardContent className="p-5 space-y-4">
-				{/* Article Header */}
-				<div className="flex items-start justify-between gap-4">
-					<div className="flex-1 min-w-0">
-						{/* Title */}
-						<h3 className="text-xl font-bold mb-2 line-clamp-2 hover:text-primary transition-colors">
-							{article.title}
-						</h3>
+			<CardContent className="p-4 flex flex-col gap-4">
+				{/* Top Row: Author/Date on left, Stats/Menu on right */}
+				<div className="flex items-center justify-between">
+					{/* Author and Date */}
+					<div className="flex items-center gap-2 text-sm text-muted-foreground">
+						<Link
+							to="/author/$principal"
+							params={{ principal: article.author }}
+							className="hover:opacity-70 transition-opacity"
+							onClick={(e) => e.stopPropagation()}
+						>
+							<UsernameBadge principal={article.author} />
+						</Link>
+						<span>·</span>
+						<span>{formatDate(article.createdAt)}</span>
+					</div>
 
-						{/* Author and Meta */}
-						<div className="flex items-center gap-3 text-sm text-muted-foreground">
-							<Link
-								to="/author/$principal"
-								params={{ principal: article.author }}
-								className="hover:opacity-70 transition-opacity"
-								onClick={(e) => e.stopPropagation()}
-							>
-								<UsernameBadge principal={article.author} />
-							</Link>
-							<span>·</span>
-							<span>{formatDate(article.createdAt)}</span>
+					{/* Stats and Menu */}
+					<div className="flex items-center gap-3 text-xs text-muted-foreground">
+						{article.impressions > 0 && (
+							<span className="flex items-center gap-1">
+								<TrendingUp className="h-3.5 w-3.5" />
+								{article.impressions.toLocaleString()}
+							</span>
+						)}
+						<span className="flex items-center gap-1">
+							<Clock className="h-3.5 w-3.5" />
+							{article.readTime}m
+						</span>
+						<span className="flex items-center gap-1">
+							<BookOpen className="h-3.5 w-3.5" />
+							{article.wordCount.toLocaleString()}
+						</span>
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<button
+									className="p-1 rounded hover:bg-muted transition-colors"
+									onClick={(e) => e.stopPropagation()}
+								>
+									<MoreVertical className="h-4 w-4" />
+								</button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem onClick={() => handleShare("copy")}>
+									Copy link
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() =>
+										window.open(
+											`https://arweave.net/${article.arweaveId}`,
+											"_blank"
+										)
+									}
+								>
+									View on Arweave
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+				</div>
+
+				{/* Center Content: Title, Excerpt, Tags */}
+				<div className="flex flex-col gap-1.5">
+					<h3 className="text-lg font-bold line-clamp-2 hover:text-primary transition-colors">
+						{article.title}
+					</h3>
+					<p className="text-muted-foreground line-clamp-2 text-sm">{article.excerpt}</p>
+					{article.tags && article.tags.length > 0 && (
+						<div className="flex flex-wrap gap-1.5 mt-0.5">
+							{article.tags.map((tag) => (
+								<button
+									key={tag}
+									onClick={(e) => {
+										e.stopPropagation();
+										onTagClick?.(tag);
+									}}
+									className="px-2 py-0.5 text-xs bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-colors"
+								>
+									#{tag}
+								</button>
+							))}
 						</div>
-					</div>
-
-					{/* More Options */}
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button
-								variant="ghost"
-								scale="sm"
-								onClick={(e) => e.stopPropagation()}
-							>
-								<MoreVertical className="h-4 w-4" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem onClick={() => handleShare("copy")}>
-								Copy link
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={() =>
-									window.open(
-										`https://arweave.net/${article.arweaveId}`,
-										"_blank"
-									)
-								}
-							>
-								View on Arweave
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+					)}
 				</div>
 
-				{/* Excerpt */}
-				<p className="text-muted-foreground line-clamp-3">{article.excerpt}</p>
-
-				{/* Tags */}
-				{article.tags && article.tags.length > 0 && (
-					<div className="flex flex-wrap gap-2">
-						{article.tags.map((tag) => (
-							<button
-								key={tag}
-								onClick={(e) => {
-									e.stopPropagation();
-									onTagClick?.(tag);
-								}}
-								className="px-2 py-1 text-xs bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-colors"
-							>
-								#{tag}
-							</button>
-						))}
-					</div>
-				)}
-
-				{/* Meta Info */}
-				<div className="flex items-center gap-4 text-sm text-muted-foreground">
-					<span className="flex items-center gap-1">
-						<Clock className="h-4 w-4" />
-						{article.readTime} min read
-					</span>
-					<span className="flex items-center gap-1">
-						<BookOpen className="h-4 w-4" />
-						{article.wordCount.toLocaleString()} words
-					</span>
-				</div>
-
-				{/* Actions */}
-				<div className="flex items-center justify-between pt-3 border-t">
-					<div className="flex items-center gap-4">
-						{/* Like Button */}
+				{/* Actions Row - Compact Icons */}
+				<div className="flex items-center justify-between">
+					{/* Left: Like, Dislike, Comments */}
+					<div className="flex items-center gap-1">
+						{/* Like */}
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<Button
-										variant="ghost"
-										scale="sm"
-										className={`gap-2 ${
-											article.userLiked ? "text-green-500" : ""
-										}`}
+									<button
+										className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-colors ${
+											article.userLiked
+												? "text-green-500"
+												: "text-muted-foreground hover:text-primary hover:bg-primary/10"
+										} ${(!user || likeLoading) ? "opacity-50 cursor-not-allowed" : ""}`}
 										onClick={handleLike}
 										disabled={!user || likeLoading}
 									>
 										{likeLoading ? (
-											<Loader2 className="h-4 w-4 animate-spin" />
+											<Loader2 className="h-5 w-5 animate-spin" />
 										) : (
 											<ThumbsUp
-												className={`h-4 w-4 ${
-													article.userLiked ? "fill-current" : ""
-												}`}
+												className={`h-5 w-5 ${article.userLiked ? "fill-current" : ""}`}
 											/>
 										)}
-										{article.likes > 0 && <span>{article.likes}</span>}
-									</Button>
+										{article.likes > 0 && (
+											<span className="text-sm font-medium">{article.likes}</span>
+										)}
+									</button>
 								</TooltipTrigger>
 								{!user && (
 									<TooltipContent>
-										<p>Sign in to like articles</p>
+										<p>Sign in to like</p>
 									</TooltipContent>
 								)}
 							</Tooltip>
 						</TooltipProvider>
 
-						{/* Dislike Button */}
+						{/* Dislike */}
 						<TooltipProvider>
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<Button
-										variant="ghost"
-										scale="sm"
-										className={`gap-2 ${
-											article.userDisliked ? "text-red-500" : ""
-										}`}
+									<button
+										className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-colors ${
+											article.userDisliked
+												? "text-red-500"
+												: "text-muted-foreground hover:text-primary hover:bg-primary/10"
+										} ${(!user || dislikeLoading) ? "opacity-50 cursor-not-allowed" : ""}`}
 										onClick={handleDislike}
 										disabled={!user || dislikeLoading}
 									>
 										{dislikeLoading ? (
-											<Loader2 className="h-4 w-4 animate-spin" />
+											<Loader2 className="h-5 w-5 animate-spin" />
 										) : (
 											<ThumbsDown
-												className={`h-4 w-4 ${
-													article.userDisliked ? "fill-current" : ""
-												}`}
+												className={`h-5 w-5 ${article.userDisliked ? "fill-current" : ""}`}
 											/>
 										)}
-										{article.dislikes > 0 && <span>{article.dislikes}</span>}
-									</Button>
+										{article.dislikes > 0 && (
+											<span className="text-sm font-medium">{article.dislikes}</span>
+										)}
+									</button>
 								</TooltipTrigger>
 								{!user && (
 									<TooltipContent>
-										<p>Sign in to dislike articles</p>
+										<p>Sign in to dislike</p>
 									</TooltipContent>
 								)}
 							</Tooltip>
 						</TooltipProvider>
 
-						{/* Comments Count */}
-						<Button
-							variant="ghost"
-							scale="sm"
-							className="gap-2"
+						{/* Comments */}
+						<button
+							className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
 							onClick={(e) => {
 								e.stopPropagation();
 								router.navigate({ to: `/article/${article.arweaveId}#comments` });
 							}}
 						>
-							<MessageCircle className="h-4 w-4" />
-							{article.comments > 0 && <span>{article.comments}</span>}
-						</Button>
+							<MessageCircle className="h-5 w-5" />
+							{article.comments > 0 && (
+								<span className="text-sm font-medium">{article.comments}</span>
+							)}
+						</button>
 					</div>
 
-					{/* Share Button with Slide-out Panel */}
-					<div
-						className="relative flex items-center overflow-hidden"
-						ref={sharePanelRef}
-					>
+					{/* Right: Share */}
+					<div className="relative flex items-center" ref={sharePanelRef}>
 						{showSharePanel && (
 							<div
-								className={`flex items-center gap-1 mr-2 ${
+								className={`flex items-center gap-0.5 mr-1 ${
 									isClosing
 										? "animate-slide-out-right"
 										: "animate-slide-in-left"
@@ -382,17 +380,15 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
 								<TooltipProvider>
 									<Tooltip>
 										<TooltipTrigger asChild>
-											<Button
-												variant="ghost"
-												scale="sm"
-												className="h-8 w-8 p-0"
+											<button
+												className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
 												onClick={(e) => {
 													e.stopPropagation();
 													handleShare("copy");
 												}}
 											>
 												<Copy className="h-4 w-4" />
-											</Button>
+											</button>
 										</TooltipTrigger>
 										<TooltipContent>
 											<p>Copy link</p>
@@ -403,17 +399,15 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
 								<TooltipProvider>
 									<Tooltip>
 										<TooltipTrigger asChild>
-											<Button
-												variant="ghost"
-												scale="sm"
-												className="h-8 w-8 p-0"
+											<button
+												className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
 												onClick={(e) => {
 													e.stopPropagation();
 													handleShare("twitter");
 												}}
 											>
 												<Twitter className="h-4 w-4" />
-											</Button>
+											</button>
 										</TooltipTrigger>
 										<TooltipContent>
 											<p>Share on Twitter</p>
@@ -424,17 +418,15 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
 								<TooltipProvider>
 									<Tooltip>
 										<TooltipTrigger asChild>
-											<Button
-												variant="ghost"
-												scale="sm"
-												className="h-8 w-8 p-0"
+											<button
+												className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
 												onClick={(e) => {
 													e.stopPropagation();
 													handleShare("facebook");
 												}}
 											>
 												<Facebook className="h-4 w-4" />
-											</Button>
+											</button>
 										</TooltipTrigger>
 										<TooltipContent>
 											<p>Share on Facebook</p>
@@ -445,17 +437,15 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
 								<TooltipProvider>
 									<Tooltip>
 										<TooltipTrigger asChild>
-											<Button
-												variant="ghost"
-												scale="sm"
-												className="h-8 w-8 p-0"
+											<button
+												className="p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
 												onClick={(e) => {
 													e.stopPropagation();
 													handleShare("email");
 												}}
 											>
 												<Mail className="h-4 w-4" />
-											</Button>
+											</button>
 										</TooltipTrigger>
 										<TooltipContent>
 											<p>Share via Email</p>
@@ -465,18 +455,20 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
 							</div>
 						)}
 
-						<Button
-							variant="ghost"
-							scale="sm"
-							className={`gap-2 ${showSharePanel ? "text-primary" : ""}`}
+						<button
+							className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-colors ${
+								showSharePanel
+									? "text-primary bg-primary/10"
+									: "text-muted-foreground hover:text-primary hover:bg-primary/10"
+							}`}
 							onClick={handleShareClick}
 						>
 							{showSharePanel ? (
-								<X className="h-4 w-4" />
+								<X className="h-5 w-5" />
 							) : (
-								<Share2 className="h-4 w-4" />
+								<Share2 className="h-5 w-5" />
 							)}
-						</Button>
+						</button>
 					</div>
 				</div>
 			</CardContent>

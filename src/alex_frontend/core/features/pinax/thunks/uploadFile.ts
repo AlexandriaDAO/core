@@ -6,18 +6,23 @@ import { setProgress } from "../pinaxSlice";
 import { readFileAsBuffer } from "../utils";
 import { arweaveClient } from "@/utils/arweaveClient";
 
+export interface ArweaveTag {
+	name: string;
+	value: string;
+}
+
 const uploadFile = createAsyncThunk<
 	string, // This is the return type of the thunk's payload
 	{
 		file: File;
 		actor: ActorSubclass<_SERVICE>;
-		app?: string;
+		tags?: ArweaveTag[];
 	}, //Argument that we pass to initialize
 	{ rejectValue: string; dispatch: AppDispatch; state: RootState }
 >(
 	"pinax/uploadFile",
 	async (
-		{ file, actor, app },
+		{ file, actor, tags },
 		{ rejectWithValue, dispatch, getState }
 	) => {
 		try {
@@ -32,12 +37,17 @@ const uploadFile = createAsyncThunk<
 
 			transaction.setOwner(wallet.public.n);
 
+			// Add default tags
 			transaction.addTag("Content-Type", file.type);
-            transaction.addTag("Application-Id", process.env.REACT_MAINNET_APP_ID!);
-            transaction.addTag("User-Principal", user?.principal || '2vxsx-fae');
-            transaction.addTag("Version", "1.0");
-			if (app) {
-				transaction.addTag("Application-Name", app);
+			transaction.addTag("Application-Id", process.env.REACT_MAINNET_APP_ID!);
+			transaction.addTag("User-Principal", user?.principal || '2vxsx-fae');
+			transaction.addTag("Version", "1.0");
+
+			// Add custom tags
+			if (tags && tags.length > 0) {
+				for (const tag of tags) {
+					transaction.addTag(tag.name, tag.value);
+				}
 			}
 
 			const dataToSign = await transaction.getSignatureData();
