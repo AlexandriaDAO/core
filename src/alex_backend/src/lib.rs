@@ -8,6 +8,16 @@ use std::borrow::Cow;
 mod nft_users;
 pub use nft_users::{UserNFTInfo, get_stored_nft_users};
 
+// Dialectica module - social features (reactions, comments, views, impressions)
+pub mod dialectica;
+
+// Re-export dialectica types for candid export
+pub use dialectica::{
+    Activity, ActivityType, ActivityError, ActivityResult,
+    ReactionType, ReactionCounts, CommentInfo,
+    AddCommentRequest, AddReactionRequest, ActivityResponse, UpdateCommentRequest,
+};
+
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
 pub const ICRC7_SCION_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 pub const USER_CANISTER_ID: &str = "yo4hu-nqaaa-aaaap-qkmoq-cai";
@@ -224,6 +234,19 @@ pub fn start_alex_supply_timer() -> Result<String, String> {
     });
     
     Ok("ALEX token supply timer started. Will update every 24 hours.".to_string())
+}
+
+#[ic_cdk::init]
+fn init() {
+    ic_cdk::setup();
+    dialectica::init();
+    nft_users::setup_timer();
+}
+
+#[ic_cdk::post_upgrade]
+fn post_upgrade() {
+    dialectica::init();
+    nft_users::setup_timer();
 }
 
 ic_cdk::export_candid!();

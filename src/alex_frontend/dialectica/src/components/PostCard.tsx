@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ThumbsUp, ThumbsDown, MessageCircle, Share2, MoreVertical, ChevronDown, ChevronUp, Loader2, Twitter, Facebook, Mail, AtSign, Copy, X } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MessageCircle, Share2, MoreVertical, ChevronDown, ChevronUp, Loader2, Twitter, Facebook, Mail, AtSign, Copy, X, TrendingUp } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Card, CardContent } from "@/lib/components/card";
 import {
@@ -31,6 +31,7 @@ interface PostCardProps {
 	likes?: number;
 	dislikes?: number;
 	comments?: number;
+	impressions?: number;
 	userLiked?: boolean;
 	userDisliked?: boolean;
 	onLike?: () => Promise<void>;
@@ -49,6 +50,7 @@ const PostCard: React.FC<PostCardProps> = ({
 	likes = 0,
 	dislikes = 0,
 	comments = 0,
+	impressions = 0,
 	userLiked = false,
 	userDisliked = false,
 	onLike,
@@ -165,7 +167,9 @@ const PostCard: React.FC<PostCardProps> = ({
 
 	const formatTimestamp = (timestamp: string) => {
 		try {
-			const date = new Date(parseInt(timestamp) / 1000000); // Convert nanoseconds to milliseconds
+			const ts = parseInt(timestamp);
+			// Timestamp is in milliseconds
+			const date = new Date(ts);
 			const now = new Date();
 			const diffMs = now.getTime() - date.getTime();
 			const diffMinutes = Math.floor(diffMs / (1000 * 60));
@@ -358,6 +362,14 @@ const PostCard: React.FC<PostCardProps> = ({
 							{comments > 0 && <span>{comments}</span>}
 							{showComments ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
 						</Button>
+
+						{/* Impressions */}
+						{impressions > 0 && (
+							<span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+								<TrendingUp className="h-4 w-4" />
+								{impressions.toLocaleString()}
+							</span>
+						)}
 					</div>
 
 					{/* Share Button with Slide-out Panel */}

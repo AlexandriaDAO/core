@@ -23,7 +23,7 @@ const LbryUnlockedBalance: React.FC<LbryUnlockedBalanceProps> = ({ menu }) => {
 
 	if (menu) {
 		return (
-			<Link to='/swap/balance'>
+			<Link to='/swap'>
 				<DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
 					<LockOpen />
 					<span className="flex-grow text-left">LBRY</span>
@@ -50,7 +50,7 @@ const LbryUnlockedBalance: React.FC<LbryUnlockedBalanceProps> = ({ menu }) => {
 							<DollarSign 
 								size={18} 
 								className="text-gray-400 hover:text-gray-200 cursor-pointer transition-colors" 
-								onClick={() => navigate({ to: '/exchange' })}
+								onClick={() => navigate({ to: '/swap' })}
 							/>
 						</TooltipTrigger>
 						<TooltipContent>

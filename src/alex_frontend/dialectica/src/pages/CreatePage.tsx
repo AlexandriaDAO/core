@@ -1,5 +1,5 @@
 import React from "react";
-import { Edit3, Sparkles, FileText, Upload, Zap } from "lucide-react";
+import { Edit3, FileText, Upload, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/lib/components/card";
 import { useRouter } from "@tanstack/react-router";
 import PostComposer from "../components/PostComposer";
@@ -10,9 +10,9 @@ const CreatePage: React.FC = () => {
 	const router = useRouter();
 	const { user } = useAppSelector((state) => state.auth);
 
-	const handlePostCreated = () => {
-		// Navigate back to home after creating a post
-		router.navigate({ to: "/" });
+	const handlePostCreated = (arweaveId: string) => {
+		// Navigate to the newly created post
+		router.navigate({ to: "/post/$arweaveId", params: { arweaveId } });
 	};
 
 	if (!user) {
@@ -51,15 +51,10 @@ const CreatePage: React.FC = () => {
 				<div className="lg:col-span-2 space-y-6">
 					{/* User Info */}
 					<Card>
-						<CardContent className="p-6">
-							<div className="flex items-center gap-3 mb-4">
-								<div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-									<Sparkles className="h-5 w-5 text-primary" />
-								</div>
-								<div>
-									<p className="text-sm font-roboto-condensed font-medium">Posting as</p>
-									<UsernameBadge principal={user.principal} />
-								</div>
+						<CardContent className="px-4 py-3">
+							<div className="flex items-center gap-3">
+								<span className="text-sm font-roboto-condensed text-muted-foreground">Posting as</span>
+								<UsernameBadge principal={user.principal} />
 							</div>
 						</CardContent>
 					</Card>

@@ -30,7 +30,7 @@ const UsdBalance: React.FC<UsdBalanceProps> = ({ menu }) => {
 
   if (menu) {
     return (
-      <Link to='/swap/balance'>
+      <Link to='/swap'>
         <DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
           <Wallet />
           <span className="flex-grow text-left">USD</span>

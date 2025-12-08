@@ -14,7 +14,6 @@ pub const FRONTEND_CANISTER_ID: &str = "yj5ba-aiaaa-aaaap-qkmoa-cai";
 pub const ICP_SWAP: &str = "54fqz-5iaaa-aaaap-qkmqa-cai";
 pub const NFT_MANAGER: &str = "5sh5r-gyaaa-aaaap-qkmra-cai";
 pub const EMPORIUM: &str = "zdcg2-dqaaa-aaaap-qpnha-cai";
-pub const KAIROS: &str = "be2us-64aaa-aaaaa-qaabq-cai";
 
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
@@ -53,10 +52,6 @@ pub fn emporium_principal() -> Principal {
     get_principal(EMPORIUM)
 }
 
-pub fn kairos_principal() -> Principal {
-    get_principal(KAIROS)
-}
-
 mod init;
 pub use init::*;
 
@@ -77,9 +72,6 @@ pub use nft_wallets::*;
 
 mod topup_wallet;
 pub use topup_wallet::*;
-
-mod topup_app;
-pub use topup_app::*;
 
 mod update;
 pub use update::*;

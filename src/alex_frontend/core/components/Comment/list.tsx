@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/lib/components/card";
-import { useDialectica } from "@/hooks/actors";
+import { useAlexBackend } from "@/hooks/actors";
 import { Principal } from "@dfinity/principal";
 import { convertTimestamp } from "@/utils/general";
 import UsernameBadge from "@/components/UsernameBadge";
@@ -29,7 +29,7 @@ const CommentList: React.FC<CommentListProps> = ({
 }) => {
 	const [comments, setComments] = useState<Comment[]>([]);
 	const [loading, setLoading] = useState(true);
-	const { actor } = useDialectica();
+	const { actor } = useAlexBackend();
 
 	const fetchComments = async () => {
 		if (!actor) return;

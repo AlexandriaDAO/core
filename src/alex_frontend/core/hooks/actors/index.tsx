@@ -16,5 +16,3 @@ export { default as usePerpetua } from "./usePerpetua";
 export { default as useIcpSwapFactory } from "./useIcpSwapFactory";
 export { default as useLogs } from "./useLogs";
 export { default as useEmporium } from "./useEmporium";
-export { default as useDialectica } from "./useDialectica";
-export { default as useKairos } from "./useKairos";

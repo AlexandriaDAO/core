@@ -66,22 +66,6 @@ service : () -> {
   principal_to_account : (principal) -> (text) query;
   principal_to_subaccount : (principal) -> (blob) query;
   scion_to_og_id : (nat) -> (nat) query;
-  // Transfer LBRY from user's locked balance to an approved app's user subaccount.
-  // This allows apps like Kairos to use the user's spending balance for gaming.
-  // 
-  // # Flow
-  // 1. User calls this function with app canister and amount
-  // 2. Validates app is approved (e.g., Kairos)
-  // 3. Checks user has sufficient locked balance
-  // 4. Transfers from NFT Manager subaccount[user] → App subaccount[user]
-  // 
-  // # Arguments
-  // * `app_canister` - The canister ID of the app (must be approved)
-  // * `amount` - Amount in e8s to transfer
-  // 
-  // # Returns
-  // * Block index on success
-  spend_for_app : (principal, nat64) -> (Result);
   subaccount_to_principal : (blob) -> (opt principal) query;
   to_nft_subaccount : (nat) -> (blob) query;
   total_supply : () -> (Result);

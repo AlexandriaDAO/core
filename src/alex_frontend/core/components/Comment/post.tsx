@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/lib/components/button";
 import { Textarea } from "@/lib/components/textarea";
 import { Send } from "lucide-react";
-import { useDialectica } from "@/hooks/actors";
+import { useAlexBackend } from "@/hooks/actors";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 
@@ -21,7 +21,7 @@ const AddComment: React.FC<AddCommentProps> = ({
 }) => {
 	const [comment, setComment] = useState("");
 	const [submitting, setSubmitting] = useState(false);
-	const { actor } = useDialectica();
+	const { actor } = useAlexBackend();
 	const { user } = useAppSelector((state) => state.auth);
 
 	const handleAddComment = async () => {

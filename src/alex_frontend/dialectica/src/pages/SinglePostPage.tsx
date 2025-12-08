@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, ExternalLink, Copy, AlertCircle } from "lucide-react";
+import { ArrowLeft, ExternalLink, Copy, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Card, CardContent, CardHeader } from "@/lib/components/card";
 import { useParams, useRouter } from "@tanstack/react-router";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { createTokenAdapter } from "@/features/alexandrian/adapters/TokenAdapter";
-import { natToArweaveId } from "@/utils/id_convert";
+import { arweaveIdToNat } from "@/utils/id_convert";
 import PostCard from "../components/PostCard";
-import useDialectica from "@/hooks/actors/useDialectica";
+import { useAlexBackend } from "@/hooks/actors";
 import { AddComment, CommentList } from "@/components/Comment";
 import { toast } from "sonner";
 
@@ -21,6 +21,8 @@ interface Post {
 	likes: number;
 	dislikes: number;
 	comments: number;
+	views: number;
+	impressions: number;
 	userLiked: boolean;
 	userDisliked: boolean;
 }
@@ -32,7 +34,7 @@ const SinglePostPage: React.FC = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [refreshTrigger, setRefreshTrigger] = useState(0);
-	const { actor } = useDialectica();
+	const { actor } = useAlexBackend();
 	const { user } = useAppSelector((state) => state.auth);
 
 	const fetchPost = async () => {
@@ -40,112 +42,101 @@ const SinglePostPage: React.FC = () => {
 			setLoading(true);
 			setError(null);
 
-			// Create NFT adapter to search for the post by arweave ID
+			// Get ownership information for this arweave ID
 			const tokenAdapter = createTokenAdapter("NFT");
-			const totalSupply = await tokenAdapter.getTotalSupply();
+			const tokenId = arweaveIdToNat(arweaveId);
+			const ownershipArray = await tokenAdapter.getOwnerOf([tokenId]);
+			const ownership = ownershipArray[0];
+			const owner = ownership && ownership.length > 0 ? ownership[0] : null;
 
-			if (totalSupply === 0n) {
+			if (!owner) {
 				setError("Post not found");
 				return;
 			}
 
-			// Search through tokens to find the one that matches this arweave ID
-			let foundPost: Post | null = null;
-			const batchSize = 50;
+			const authorPrincipal = owner.owner.toText();
 
-			for (let start = 0; start < Number(totalSupply); start += batchSize) {
-				const end = Math.min(start + batchSize, Number(totalSupply));
-				const tokenIds = await tokenAdapter.getTokens(BigInt(start), BigInt(end - start));
-				
-				for (const tokenId of tokenIds) {
-					const tokenArweaveId = natToArweaveId(tokenId);
-					
-					if (tokenArweaveId === arweaveId) {
-						// Found the matching token, get its details
-						const ownershipArray = await tokenAdapter.getOwnerOf([tokenId]);
-						const ownership = ownershipArray[0];
-						const owner = ownership && ownership.length > 0 ? ownership[0] : null;
-						const authorPrincipal = owner ? owner.owner.toText() : 'Unknown';
+			// Fetch post content
+			const contentResponse = await fetch(`https://arweave.net/${arweaveId}`);
+			const rawContent = await contentResponse.text();
 
-						// Try to determine content type by fetching headers
-						let contentType = 'application/octet-stream';
-						try {
-							const headResponse = await fetch(`https://arweave.net/${arweaveId}`, { method: 'HEAD' });
-							const fetchedContentType = headResponse.headers.get('Content-Type');
-							if (fetchedContentType) {
-								contentType = fetchedContentType;
-							}
-						} catch {
-							contentType = 'text/plain';
-						}
+			// Parse JSON post data
+			let content = "";
+			let postTimestamp: number = Date.now();
+			let postMediaArweaveId: string | undefined;
+			let postMediaType: string | undefined;
 
-						// Get content for text posts
-						let content = '';
-						if (contentType === 'text/plain' || contentType.startsWith('text/')) {
-							try {
-								const contentResponse = await fetch(`https://arweave.net/${arweaveId}`);
-								content = await contentResponse.text();
-							} catch {
-								content = '';
-							}
-						}
-
-						// Get reaction counts and user reaction
-						let likes = 0;
-						let dislikes = 0;
-						let comments = 0;
-						let userLiked = false;
-						let userDisliked = false;
-
-						if (actor) {
-							try {
-								const reactionCounts = await actor.get_reaction_counts(arweaveId);
-								if ('Ok' in reactionCounts) {
-									likes = Number(reactionCounts.Ok.likes);
-									dislikes = Number(reactionCounts.Ok.dislikes || 0);
-									comments = Number(reactionCounts.Ok.total_comments);
-								}
-
-								if (user) {
-									const userReaction = await actor.get_user_reaction(arweaveId);
-									if ('Ok' in userReaction && userReaction.Ok.length > 0) {
-										const reaction = userReaction.Ok[0];
-										userLiked = (reaction && typeof reaction === 'object' && 'Like' in reaction) || false;
-										userDisliked = (reaction && typeof reaction === 'object' && 'Dislike' in reaction) || false;
-									}
-								}
-							} catch (error) {
-								console.warn('Failed to fetch reaction data:', error);
-							}
-						}
-
-						foundPost = {
-							arweaveId,
-							author: authorPrincipal,
-							timestamp: Date.now().toString(),
-							content: content || undefined,
-							mediaType: contentType !== 'text/plain' && !contentType.startsWith('text/') ? contentType : undefined,
-							mediaUrl: contentType !== 'text/plain' && !contentType.startsWith('text/') ? `https://arweave.net/${arweaveId}` : undefined,
-							likes,
-							dislikes,
-							comments,
-							userLiked,
-							userDisliked,
-						};
-						break;
-					}
+			try {
+				const jsonData = JSON.parse(rawContent);
+				content = jsonData.content || jsonData.text || "";
+				if (jsonData.createdAt) {
+					postTimestamp = Number(jsonData.createdAt);
+				} else if (jsonData.timestamp) {
+					postTimestamp = Number(jsonData.timestamp);
 				}
-
-				if (foundPost) break;
+				// Extract media reference if present
+				if (jsonData.mediaArweaveId) {
+					postMediaArweaveId = jsonData.mediaArweaveId;
+					postMediaType = jsonData.mediaType;
+				}
+			} catch {
+				// Not JSON, treat as plain text
+				content = rawContent;
 			}
 
-			if (foundPost) {
-				setPost(foundPost);
-			} else {
-				setError("Post not found");
+			// Get engagement data
+			let likes = 0, dislikes = 0, comments = 0, views = 0, impressions = 0;
+			let userLiked = false, userDisliked = false;
+
+			if (actor) {
+				try {
+					const [reactionCounts, viewsResult, impressionsResult] = await Promise.all([
+						actor.get_reaction_counts(arweaveId),
+						actor.get_view_count(arweaveId),
+						actor.get_impressions(arweaveId),
+					]);
+
+					if ("Ok" in reactionCounts) {
+						likes = Number(reactionCounts.Ok.likes);
+						dislikes = Number(reactionCounts.Ok.dislikes || 0);
+						comments = Number(reactionCounts.Ok.total_comments);
+					}
+					if ("Ok" in viewsResult) views = Number(viewsResult.Ok);
+					if ("Ok" in impressionsResult) impressions = Number(impressionsResult.Ok);
+
+					if (user) {
+						const userReaction = await actor.get_user_reaction(arweaveId);
+						if ("Ok" in userReaction && userReaction.Ok.length > 0) {
+							const reaction = userReaction.Ok[0];
+							userLiked = !!(reaction && typeof reaction === "object" && "Like" in reaction);
+							userDisliked = !!(reaction && typeof reaction === "object" && "Dislike" in reaction);
+						}
+					}
+
+					// Record view for single post page
+					actor.record_view(arweaveId).catch(() => {});
+				} catch (error) {
+					console.warn("Failed to fetch engagement data:", error);
+				}
 			}
+
+			setPost({
+				arweaveId,
+				author: authorPrincipal,
+				timestamp: postTimestamp.toString(),
+				content: content || undefined,
+				mediaType: postMediaArweaveId ? postMediaType : undefined,
+				mediaUrl: postMediaArweaveId ? `https://arweave.net/${postMediaArweaveId}` : undefined,
+				likes,
+				dislikes,
+				comments,
+				views,
+				impressions,
+				userLiked,
+				userDisliked,
+			});
 		} catch (err) {
-			console.error('Error fetching post:', err);
+			console.error("Error fetching post:", err);
 			setError("Failed to load post");
 		} finally {
 			setLoading(false);
@@ -162,18 +153,22 @@ const SinglePostPage: React.FC = () => {
 		if (!actor || !user || !post) return;
 
 		try {
-			const result = await actor.add_reaction(arweaveId, { 'Like': null });
-			if ('Ok' in result) {
-				setPost(prev => prev ? {
-					...prev,
-					likes: prev.userLiked ? prev.likes - 1 : prev.likes + 1,
-					dislikes: prev.userDisliked && !prev.userLiked ? prev.dislikes - 1 : prev.dislikes,
-					userLiked: !prev.userLiked,
-					userDisliked: false,
-				} : null);
+			const result = await actor.add_reaction(arweaveId, { Like: null });
+			if ("Ok" in result) {
+				setPost((prev) =>
+					prev
+						? {
+								...prev,
+								likes: prev.userLiked ? prev.likes - 1 : prev.likes + 1,
+								dislikes: prev.userDisliked && !prev.userLiked ? prev.dislikes - 1 : prev.dislikes,
+								userLiked: !prev.userLiked,
+								userDisliked: false,
+						  }
+						: null
+				);
 			}
 		} catch (error) {
-			console.error('Failed to like post:', error);
+			console.error("Failed to like post:", error);
 		}
 	};
 
@@ -181,25 +176,23 @@ const SinglePostPage: React.FC = () => {
 		if (!actor || !user || !post) return;
 
 		try {
-			const result = await actor.add_reaction(arweaveId, { 'Dislike': null });
-			if ('Ok' in result) {
-				setPost(prev => prev ? {
-					...prev,
-					dislikes: prev.userDisliked ? prev.dislikes - 1 : prev.dislikes + 1,
-					likes: prev.userLiked && !prev.userDisliked ? prev.likes - 1 : prev.likes,
-					userDisliked: !prev.userDisliked,
-					userLiked: false,
-				} : null);
+			const result = await actor.add_reaction(arweaveId, { Dislike: null });
+			if ("Ok" in result) {
+				setPost((prev) =>
+					prev
+						? {
+								...prev,
+								dislikes: prev.userDisliked ? prev.dislikes - 1 : prev.dislikes + 1,
+								likes: prev.userLiked && !prev.userDisliked ? prev.likes - 1 : prev.likes,
+								userDisliked: !prev.userDisliked,
+								userLiked: false,
+						  }
+						: null
+				);
 			}
 		} catch (error) {
-			console.error('Failed to dislike post:', error);
+			console.error("Failed to dislike post:", error);
 		}
-	};
-
-	const handleShare = () => {
-		const postUrl = window.location.href;
-		navigator.clipboard.writeText(postUrl);
-		toast.success("Post link copied to clipboard!");
 	};
 
 	const handleCopyArweaveId = () => {
@@ -208,7 +201,7 @@ const SinglePostPage: React.FC = () => {
 	};
 
 	const handleViewOnArweave = () => {
-		window.open(`https://arweave.net/${arweaveId}`, '_blank');
+		window.open(`https://arweave.net/${arweaveId}`, "_blank");
 	};
 
 	const handleGoBack = () => {
@@ -216,10 +209,9 @@ const SinglePostPage: React.FC = () => {
 	};
 
 	const handleCommentAdded = () => {
-		// Refresh comment count
-		setRefreshTrigger(prev => prev + 1);
+		setRefreshTrigger((prev) => prev + 1);
 		if (post) {
-			setPost(prev => prev ? { ...prev, comments: prev.comments + 1 } : null);
+			setPost((prev) => (prev ? { ...prev, comments: prev.comments + 1 } : null));
 		}
 	};
 
@@ -227,7 +219,7 @@ const SinglePostPage: React.FC = () => {
 		return (
 			<div className="max-w-4xl mx-auto py-12">
 				<div className="flex justify-center">
-					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+					<Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
 				</div>
 			</div>
 		);
@@ -286,11 +278,11 @@ const SinglePostPage: React.FC = () => {
 				likes={post.likes}
 				dislikes={post.dislikes}
 				comments={post.comments}
+				impressions={post.impressions}
 				userLiked={post.userLiked}
 				userDisliked={post.userDisliked}
 				onLike={handleLike}
 				onDislike={handleDislike}
-				onShare={handleShare}
 				clickable={false}
 			/>
 
@@ -300,13 +292,9 @@ const SinglePostPage: React.FC = () => {
 					<h2 className="text-lg font-roboto-condensed font-semibold">Comments</h2>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					<AddComment 
-						arweaveId={arweaveId} 
-						onCommentAdded={handleCommentAdded}
-						maxLength={1000}
-					/>
-					<CommentList 
-						arweaveId={arweaveId} 
+					<AddComment arweaveId={arweaveId} onCommentAdded={handleCommentAdded} maxLength={1000} />
+					<CommentList
+						arweaveId={arweaveId}
 						refreshTrigger={refreshTrigger}
 						showUserBadge={true}
 						variant="default"

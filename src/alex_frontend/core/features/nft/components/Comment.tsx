@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/lib/components/button";
 import { Textarea } from "@/lib/components/textarea";
-import { useDialectica } from "@/hooks/actors";
+import { useAlexBackend } from "@/hooks/actors";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import { Principal } from "@dfinity/principal";
@@ -24,7 +24,7 @@ const Comment: React.FC<CommentProps> = ({ arweaveId }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	
-	const { actor } = useDialectica();
+	const { actor } = useAlexBackend();
 	const { user } = useAppSelector((state) => state.auth);
 
 	// Fetch comments

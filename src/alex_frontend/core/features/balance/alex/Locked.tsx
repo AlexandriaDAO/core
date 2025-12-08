@@ -21,7 +21,7 @@ const AlexLockedBalance: React.FC<AlexLockedBalanceProps> = ({ menu }) => {
 
 	if (menu) {
 		return (
-			<Link to='/swap/balance'>
+			<Link to='/swap'>
 				<DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
 					<Lock />
 					<span className="flex-grow text-left">ALEX</span>

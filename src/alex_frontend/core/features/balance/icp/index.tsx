@@ -24,7 +24,7 @@ const IcpBalance: React.FC<IcpBalanceProps> = ({ menu }) => {
 
   if (menu) {
     return (
-      <Link to='/swap/balance'>
+      <Link to='/swap'>
         <DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
           <Wallet />
           <span className="flex-grow text-left">ICP</span>
