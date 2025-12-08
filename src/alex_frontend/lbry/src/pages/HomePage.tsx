@@ -1,7 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { cn } from "@/lib/utils";
-import { appsData, thirdPartyAppsData } from "@/config/apps";
+import { appsData } from "@/config/apps";
 import AppCard from "@/components/AppCard";
 const IntroductionAnimation = lazy(
 	() => import("./../components/IntroductionAnimation")
@@ -186,39 +186,6 @@ const HomePage: React.FC = () => {
 							<AppCard key={app.name} app={app} size="default" />
 						))}
 					</div>
-
-					{/* 3rd Party Apps Section */}
-					{thirdPartyAppsData.length > 0 && (
-						<>
-							<h2
-								className={cn(
-									"self-stretch text-center",
-									"font-syne font-semibold",
-									"text-[clamp(25px,5vw,50px)]",
-									"text-foreground transition-colors duration-300",
-									"m-0 mt-16"
-								)}
-							>
-								Third Party Apps
-							</h2>
-							<div
-								className={cn(
-									"grid gap-2.5 md:gap-5 w-full max-w-[1200px] px-2.5 mt-10",
-									isMobile
-										? "grid-cols-2"
-										: "grid-cols-[repeat(auto-fit,minmax(180px,1fr))]"
-								)}
-							>
-								{thirdPartyAppsData.map((app) => (
-									<AppCard
-										key={app.name}
-										app={app}
-										size="default"
-									/>
-								))}
-							</div>
-						</>
-					)}
 				</div>
 			</div>
 			<Suspense fallback={<div>Loading...</div>}>

@@ -17,7 +17,11 @@ wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797b
 dfx identity use alex
 
 # Build the frontend (will use .env.production automatically)
-npm run build
+npm run build -w lbry
+# npm run build -w syllogos
+# npm run build -w bibliotheca
+# npm run build -w sonora
+# npm run build -w dialectica
 
 # Deploy to IC
 dfx deploy alex_frontend --network ic

@@ -385,9 +385,9 @@ const AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute =
     path: '/app/perpetua/user/$userId/shelf/$shelfId',
     getParentRoute: () => AuthRouteLazyRoute,
   } as any).lazy(() =>
-    import('./src/routes/_auth/app/perpetua/user/$userId/shelf.$shelfId.lazy').then(
-      (d) => d.Route,
-    ),
+    import(
+      './src/routes/_auth/app/perpetua/user/$userId/shelf.$shelfId.lazy'
+    ).then((d) => d.Route),
   )
 const AuthAppPerpetuaUserUserIdItemItemIdLazyRoute =
   AuthAppPerpetuaUserUserIdItemItemIdLazyRouteImport.update({
@@ -395,9 +395,9 @@ const AuthAppPerpetuaUserUserIdItemItemIdLazyRoute =
     path: '/app/perpetua/user/$userId/item/$itemId',
     getParentRoute: () => AuthRouteLazyRoute,
   } as any).lazy(() =>
-    import('./src/routes/_auth/app/perpetua/user/$userId/item.$itemId.lazy').then(
-      (d) => d.Route,
-    ),
+    import(
+      './src/routes/_auth/app/perpetua/user/$userId/item.$itemId.lazy'
+    ).then((d) => d.Route),
   )
 
 export interface FileRoutesByFullPath {

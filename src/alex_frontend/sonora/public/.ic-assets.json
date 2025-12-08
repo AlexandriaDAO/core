@@ -1,5 +1,36 @@
 [
   {
+    "match": "**/*.js",
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/javascript",
+      "Cache-Control": "public, max-age=31536000, immutable"
+    }
+  },
+  {
+    "match": "**/*.css",
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "text/css",
+      "Cache-Control": "public, max-age=31536000, immutable"
+    }
+  },
+  {
+    "match": "**/*.wasm",
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/wasm",
+      "Cache-Control": "public, max-age=31536000, immutable"
+    }
+  },
+  {
+    "match": "**/*.json",
+    "headers": {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json"
+    }
+  },
+  {
     "match": ".well-known",
     "ignore": false
   },

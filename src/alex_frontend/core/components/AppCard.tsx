@@ -17,7 +17,6 @@ const AppCard: React.FC<AppCardProps> = ({
 }) => {
 	const isSmall = size === "small";
 	const isComingSoon = app.comingSoon ?? false;
-	const isThirdParty = app.isThirdParty ?? false;
 
 	const cardContent = (
 		<div
@@ -82,22 +81,6 @@ const AppCard: React.FC<AppCardProps> = ({
 			)}
 		</div>
 	);
-
-	if (isThirdParty) {
-		return (
-			<a
-				href={isComingSoon ? "#" : app.path}
-				target="_blank"
-				rel="noopener noreferrer"
-				className="no-underline w-full"
-				onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
-					isComingSoon && e.preventDefault()
-				}
-			>
-				{cardContent}
-			</a>
-		);
-	}
 
 	return (
 		<Link
