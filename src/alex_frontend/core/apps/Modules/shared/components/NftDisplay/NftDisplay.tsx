@@ -10,7 +10,6 @@ import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/service
 import { useUsername } from '@/hooks/useUsername';
 import { NftDisplayProps } from './types';
 import { getTransactionService } from '@/apps/Modules/shared/services/transactionService';
-import { useAssetManager } from '@/hooks/actors';
 
 // Constants
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
@@ -18,7 +17,7 @@ const MAX_FETCH_ATTEMPTS_PER_ARWEAVE_ID = 3;
 
 /**
  * Universal NFT Display Component
- * 
+ *
  * A flexible component for displaying NFTs consistently across the application.
  * Supports different display densities, data loading strategies, and customizable features.
  * Footer functionality has been removed and details are expected to be shown via hover effects.
@@ -38,7 +37,6 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const store = useStore<RootState>(); // Use useStore to get the store instance
-  const {actor} = useAssetManager();
   // Component state
   const [isLoading, setIsLoading] = useState(true);
   const [transaction, setTransaction] = useState<Transaction | undefined>(providedTransaction);
@@ -64,7 +62,6 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
   const transactionDependency = providedTransaction ?? undefined;
 
   const loadNFTData = useCallback(async (mountedChecker: { isMounted: boolean }) => {
-    if(!actor) return;
     if (!tokenId) {
       if (mountedChecker.isMounted) {
         setError('Token ID is missing');
@@ -151,26 +148,26 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
 
         // Directly mutate the ref's current value
         fetchAttemptsRef.current.set(currentArweaveId!, attempts + 1);
-        
+
         console.log(`[NftDisplay] Transaction for Arweave ID ${currentArweaveId} not in Redux/props. Attempt ${attempts + 1}. Requesting fetch via TransactionService for token: ${tokenId}`);
-        
+
         const transactionService = getTransactionService(dispatch, store.getState);
         try {
           // Service updates Redux. We rely on re-render from Redux state change.
-          await transactionService.fetchNftTransactions([currentArweaveId!], actor); // Added non-null assertion for currentArweaveId
+          await transactionService.fetchNftTransactions([currentArweaveId!]);
           // After this, the useEffect dependency on `transactionsFromRedux` should trigger a re-run.
           // For now, we just set loading and wait.
-          if (mountedChecker.isMounted) setIsLoading(true); 
+          if (mountedChecker.isMounted) setIsLoading(true);
           return; // Exit and wait for Redux update
         } catch (serviceError) {
           console.error(`[NftDisplay] TransactionService failed for Arweave ID ${currentArweaveId} (Token: ${tokenId}):`, serviceError);
           throw new Error(`Service failed for ${currentArweaveId}: ${serviceError instanceof Error ? serviceError.message : String(serviceError)}`);
         }
       }
-      
+
       if (!finalTransaction) {
          console.warn(`[NftDisplay] Transaction ${currentArweaveId} still not found after potential service call for token ${tokenId}. Might be transient or actual missing data.`);
-         if (mountedChecker.isMounted) setIsLoading(true); 
+         if (mountedChecker.isMounted) setIsLoading(true);
          return;
       }
 
@@ -183,13 +180,13 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
         const content = await ContentService.loadContent(finalTransaction);
         finalContentUrls = await ContentService.getContentUrls(finalTransaction, content);
         if (mountedChecker.isMounted) {
-          dispatch(setContentData({ 
-              id: finalTransaction.id, 
+          dispatch(setContentData({
+              id: finalTransaction.id,
               content: { ...content, urls: finalContentUrls }
           }));
         }
       }
-      
+
       if (mountedChecker.isMounted) {
         setTransaction(finalTransaction);
         setContentUrls(finalContentUrls);
@@ -200,10 +197,10 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load NFT data';
-      console.error(`[NftDisplay] loadNFTData error for token ${tokenId}:`, errorMessage, err); // Corrected template literal
+      console.error(`[NftDisplay] loadNFTData error for token ${tokenId}:`, errorMessage, err);
       if (mountedChecker.isMounted) {
         setError(errorMessage);
-        setFailedTokens(prev => new Set(prev).add(tokenId!)); 
+        setFailedTokens(prev => new Set(prev).add(tokenId!));
       }
     } finally {
       if (mountedChecker.isMounted) {
@@ -216,14 +213,13 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ 
-    actor,
-    tokenId, initialArweaveId, providedTransaction, //transactionDependency, // Using providedTransaction directly
-    dispatch, 
-    store.getState, // Changed from store (full object) to store.getState (stable function reference)
-    nfts, arweaveToNftId, transactionsFromRedux, contentData, 
-    failedTokens, // currentlyFetchingTokenIds, // This was causing issues, rely on isMounted and outer checks
-    loadingStrategy, isLoading 
+  }, [
+    tokenId, initialArweaveId, providedTransaction,
+    dispatch,
+    store.getState,
+    nfts, arweaveToNftId, transactionsFromRedux, contentData,
+    failedTokens,
+    loadingStrategy, isLoading
   ]);
 
   useEffect(() => {
@@ -271,12 +267,12 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
        console.warn(`[NftDisplay] Content rendering failed for token ${tokenId}. Marking as failed.`);
        setFailedTokens(prev => new Set(prev).add(tokenId));
        setError("Content rendering failed for this NFT.");
-       setIsLoading(false); 
+       setIsLoading(false);
     }
   }, [transaction, tokenId]);
 
   const handleClick = useCallback(() => {
-    if (failedTokens.has(tokenId!)) return; 
+    if (failedTokens.has(tokenId!)) return;
     if (onClick) {
       onClick();
     } else if (onViewDetails) {
@@ -289,10 +285,10 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
   }, [onClick, onViewDetails, tokenId, failedTokens]);
 
   // This is the section you added/modified, I will integrate the original logic here:
-  const displayErrorFromFailedTokens = failedTokens.has(tokenId!) 
-    ? `Previously failed to load NFT: ${tokenId}. Data may not be available.` 
+  const displayErrorFromFailedTokens = failedTokens.has(tokenId!)
+    ? `Previously failed to load NFT: ${tokenId}. Data may not be available.`
     : null;
-  
+
   // Combine error from props/state with error from failed tokens
   const finalDisplayError = displayErrorFromFailedTokens || error;
 
@@ -325,7 +321,7 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
   // This can happen if transaction is present but ContentService is still fetching URLs.
   if (!transaction || !currentContent || !contentUrls) {
     // If arweaveId was provided and we are presumably waiting for parent, this state is more likely.
-    const waitingMessage = initialArweaveId && !transaction 
+    const waitingMessage = initialArweaveId && !transaction
         ? `Preparing NFT data for ${tokenId}... (Waiting for transaction)`
         : `Preparing NFT content for ${tokenId}...`;
     return (
@@ -334,7 +330,7 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
       </div>
     );
   }
-  
+
   // Original renderContent function (inline or separate)
   const renderActualContent = () => {
     switch (variant) {
@@ -378,16 +374,16 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
 
   // Main return structure you provided, now with renderActualContent
   return (
-    <div 
+    <div
       className={`flex flex-col ${variant === 'full' ? 'p-4' : ''}`}
       onClick={handleClick}
       style={{ cursor: (onClick || onViewDetails && !failedTokens.has(tokenId!)) ? 'pointer' : 'default' }}
     >
-      <div 
+      <div
         className={`relative overflow-hidden rounded-md border border-border ${variant === 'full' ? 'w-full max-w-3xl mx-auto' : ''}`}
         style={{ aspectRatio: aspectRatio.toString() }}
       >
-        {renderActualContent()} 
+        {renderActualContent()}
       </div>
 
       {/* Owner Information Display (from original) */}

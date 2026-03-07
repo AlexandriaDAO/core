@@ -58,21 +58,6 @@ const DashboardSidebar = () => {
 						<span>Arweave Assets</span>
 					</Link>
 
-					<Link
-						to="/dashboard/icp-assets"
-						activeOptions={{ exact: true }}
-						activeProps={{
-							className: "text-primary-foreground bg-primary",
-						}}
-						inactiveProps={{
-							className:
-								"text-primary/75 bg-muted hover:border-border hover:text-primary",
-						}}
-						className="px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border border-border/75"
-					>
-						<Boxes size={18} />
-						<span>ICP Assets</span>
-					</Link>
 				</div>
 			</div>
 

@@ -18,10 +18,6 @@ import {
   setLoading,
   setError,
 } from "../state/transactions/transactionSlice";
-import { getAssetCanister } from "../state/assetManager/utlis";
-import { fetchAssetFromUserCanister } from "../state/assetManager/assetManagerThunks";
-import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE } from "../../../../../../declarations/asset_manager/asset_manager.did";
 
 export class TransactionService {
   private dispatch: AppDispatch;
@@ -32,7 +28,7 @@ export class TransactionService {
     this.getState = getState;
   }
 
-  async fetchNftTransactions(arweaveIds: string[], actor: ActorSubclass<_SERVICE>): Promise<Transaction[]> {
+  async fetchNftTransactions(arweaveIds: string[]): Promise<Transaction[]> {
     const operationStart = performance.now();
     const arweaveIdsString = arweaveIds.join(",");
     console.log(`[BENCH] NFT_TX_FETCH_START: ${arweaveIds.length} IDs (${arweaveIdsString})`);
@@ -41,9 +37,6 @@ export class TransactionService {
     this.dispatch(setError(null));
 
     try {
-      const state = this.getState() as RootState;
-      const { selectedPrincipals } = state.library;
-      
       const arweaveFetchStart = performance.now();
       console.log(`[BENCH] ARWEAVE_METADATA_FETCH_ALEXANDRIAN_START: ${arweaveIds.length} IDs (${arweaveIdsString})`);
       let transactions = await fetchTransactionsForAlexandrian(arweaveIds);
@@ -56,55 +49,8 @@ export class TransactionService {
         throw new Error("No Arweave metadata found for the NFTs.");
       }
 
-      const userAssetCanisterPrincipal = selectedPrincipals[0]; 
-      if (userAssetCanisterPrincipal && userAssetCanisterPrincipal !== 'new') {
-        console.log(`[TransactionService] Checking user ${userAssetCanisterPrincipal}'s asset canister for ${transactions.length} transactions.`);
-        const icpCheckOverallStart = performance.now();
-        try {
-          const userAssetCanisterId = await getAssetCanister(userAssetCanisterPrincipal, actor);
-
-          if (userAssetCanisterId) {
-            console.log(`[TransactionService] User ${userAssetCanisterPrincipal} has asset canister ${userAssetCanisterId}. Fetching assets...`);
-            
-            const icpAssetFetchAllStart = performance.now();
-            let assetsFoundOnICP = 0;
-            const assetFetchPromises = transactions.map(async (transaction) => {
-              try {
-                const result = await fetchAssetFromUserCanister(transaction.id, userAssetCanisterId);
-
-                if (result?.blob) {
-                  assetsFoundOnICP++;
-                  const assetUrl = URL.createObjectURL(result.blob);
-                  console.log(`[TransactionService] SUCCESS: Asset ${transaction.id} found in user canister ${userAssetCanisterId}.`);
-                  return { ...transaction, assetUrl };
-                } else {
-                  return transaction;
-                }
-              } catch (individualAssetError) {
-                const errorMessage = individualAssetError instanceof Error && individualAssetError.message.includes("asset not found") 
-                                   ? "Asset explicitly not found by canister" 
-                                   : String(individualAssetError);
-                console.warn(
-                  `[TransactionService] ERROR fetching asset ${transaction.id} from user canister ${userAssetCanisterId}: ${errorMessage}`
-                );
-                return transaction;
-              }
-            });
-            transactions = await Promise.all(assetFetchPromises);
-            console.log(`[BENCH] ICP_ASSET_FETCH_ALL_ATTEMPTED: User ${userAssetCanisterPrincipal}, Canister ${userAssetCanisterId} - ${assetsFoundOnICP}/${transactions.length} found - ${(performance.now() - icpAssetFetchAllStart).toFixed(2)}ms`);
-          } else {
-            console.log(`[TransactionService] User ${userAssetCanisterPrincipal} has no assigned asset canister. Skipping ICP asset check.`);
-          }
-        } catch (setupError) {
-          console.error(`[TransactionService] Error during asset canister setup for user ${userAssetCanisterPrincipal}:`, setupError);
-        }
-        console.log(`[BENCH] ICP_CANISTER_CHECK_DURATION: User ${userAssetCanisterPrincipal} - ${(performance.now() - icpCheckOverallStart).toFixed(2)}ms`);
-      } else {
-        console.log("[TransactionService] No specific user principal for asset canister check, or principal is 'new'. Skipping ICP asset check.");
-      }
-
       this.dispatch(setTransactions(transactions));
-      
+
       const loadContentStart = performance.now();
       console.log(`[BENCH] CONTENT_PREPARATION_START: ${transactions.length} txs (NFT flow)`);
       await this.loadContentForTransactions(transactions);
@@ -148,10 +94,10 @@ export class TransactionService {
       const permasearchFetchEnd = performance.now();
       const permasearchStatus = transactions && transactions.length > 0 ? 'success' : 'not_found_or_empty';
       console.log(`[BENCH] ARWEAVE_METADATA_FETCH_PERMASEARCH_END: ${logIdentifier} - ${permasearchStatus} - ${(permasearchFetchEnd - permasearchFetchStart).toFixed(2)}ms`);
-      
+
       if (transactions && transactions.length > 0) {
         this.dispatch(setTransactions(transactions));
-        
+
         const loadContentStart = performance.now();
         console.log(`[BENCH] CONTENT_PREPARATION_START: ${transactions.length} txs (Permasearch flow)`);
         await this.loadContentForTransactions(transactions);
@@ -194,14 +140,13 @@ export class TransactionService {
   async loadContentForTransactions(transactions: Transaction[]): Promise<void> {
     await Promise.all(
       transactions.map(async (transaction) => {
-        const sourceForDataItem = transaction.assetUrl ? 'ic_canister' : 'arweave'; 
         try {
           const contentMetadata = await ContentService.loadContent(transaction);
           const urls = await ContentService.getContentUrls(transaction, contentMetadata);
           this.dispatch(
             setContentData({
               id: transaction.id,
-              content: { ...contentMetadata, urls, source: sourceForDataItem }, 
+              content: { ...contentMetadata, urls },
             })
           );
         } catch (error) {

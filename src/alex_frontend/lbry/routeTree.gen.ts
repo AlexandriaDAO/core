@@ -43,9 +43,6 @@ const AuthDashboardSettingsLazyRouteImport = createFileRoute(
 const AuthDashboardProfileLazyRouteImport = createFileRoute(
   '/_auth/dashboard/profile',
 )()
-const AuthDashboardIcpAssetsLazyRouteImport = createFileRoute(
-  '/_auth/dashboard/icp-assets',
-)()
 const AuthDashboardArweaveAssetsLazyRouteImport = createFileRoute(
   '/_auth/dashboard/arweave-assets',
 )()
@@ -245,14 +242,6 @@ const AuthDashboardProfileLazyRoute =
   } as any).lazy(() =>
     import('./src/routes/_auth/dashboard/profile.lazy').then((d) => d.Route),
   )
-const AuthDashboardIcpAssetsLazyRoute =
-  AuthDashboardIcpAssetsLazyRouteImport.update({
-    id: '/icp-assets',
-    path: '/icp-assets',
-    getParentRoute: () => AuthDashboardRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./src/routes/_auth/dashboard/icp-assets.lazy').then((d) => d.Route),
-  )
 const AuthDashboardArweaveAssetsLazyRoute =
   AuthDashboardArweaveAssetsLazyRouteImport.update({
     id: '/arweave-assets',
@@ -385,9 +374,9 @@ const AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute =
     path: '/app/perpetua/user/$userId/shelf/$shelfId',
     getParentRoute: () => AuthRouteLazyRoute,
   } as any).lazy(() =>
-    import(
-      './src/routes/_auth/app/perpetua/user/$userId/shelf.$shelfId.lazy'
-    ).then((d) => d.Route),
+    import('./src/routes/_auth/app/perpetua/user/$userId/shelf.$shelfId.lazy').then(
+      (d) => d.Route,
+    ),
   )
 const AuthAppPerpetuaUserUserIdItemItemIdLazyRoute =
   AuthAppPerpetuaUserUserIdItemItemIdLazyRouteImport.update({
@@ -395,9 +384,9 @@ const AuthAppPerpetuaUserUserIdItemItemIdLazyRoute =
     path: '/app/perpetua/user/$userId/item/$itemId',
     getParentRoute: () => AuthRouteLazyRoute,
   } as any).lazy(() =>
-    import(
-      './src/routes/_auth/app/perpetua/user/$userId/item.$itemId.lazy'
-    ).then((d) => d.Route),
+    import('./src/routes/_auth/app/perpetua/user/$userId/item.$itemId.lazy').then(
+      (d) => d.Route,
+    ),
   )
 
 export interface FileRoutesByFullPath {
@@ -422,7 +411,6 @@ export interface FileRoutesByFullPath {
   '/app/emporium': typeof AuthAppEmporiumRouteLazyRouteWithChildren
   '/app/pinax': typeof AuthAppPinaxLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
-  '/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
   '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/swap/burn': typeof AuthSwapBurnLazyRoute
@@ -460,7 +448,6 @@ export interface FileRoutesByTo {
   '/info': typeof InfoIndexLazyRoute
   '/app/pinax': typeof AuthAppPinaxLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
-  '/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
   '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/swap/burn': typeof AuthSwapBurnLazyRoute
@@ -502,7 +489,6 @@ export interface FileRoutesById {
   '/_auth/dashboard/_librarian': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   '/_auth/app/pinax': typeof AuthAppPinaxLazyRoute
   '/_auth/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
-  '/_auth/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
   '/_auth/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/_auth/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/_auth/swap/burn': typeof AuthSwapBurnLazyRoute
@@ -544,7 +530,6 @@ export interface FileRouteTypes {
     | '/app/emporium'
     | '/app/pinax'
     | '/dashboard/arweave-assets'
-    | '/dashboard/icp-assets'
     | '/dashboard/profile'
     | '/dashboard/settings'
     | '/swap/burn'
@@ -582,7 +567,6 @@ export interface FileRouteTypes {
     | '/info'
     | '/app/pinax'
     | '/dashboard/arweave-assets'
-    | '/dashboard/icp-assets'
     | '/dashboard/profile'
     | '/dashboard/settings'
     | '/swap/burn'
@@ -623,7 +607,6 @@ export interface FileRouteTypes {
     | '/_auth/dashboard/_librarian'
     | '/_auth/app/pinax'
     | '/_auth/dashboard/arweave-assets'
-    | '/_auth/dashboard/icp-assets'
     | '/_auth/dashboard/profile'
     | '/_auth/dashboard/settings'
     | '/_auth/swap/burn'
@@ -825,13 +808,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardProfileLazyRouteImport
       parentRoute: typeof AuthDashboardRouteLazyRoute
     }
-    '/_auth/dashboard/icp-assets': {
-      id: '/_auth/dashboard/icp-assets'
-      path: '/icp-assets'
-      fullPath: '/dashboard/icp-assets'
-      preLoaderRoute: typeof AuthDashboardIcpAssetsLazyRouteImport
-      parentRoute: typeof AuthDashboardRouteLazyRoute
-    }
     '/_auth/dashboard/arweave-assets': {
       id: '/_auth/dashboard/arweave-assets'
       path: '/arweave-assets'
@@ -981,7 +957,6 @@ const AuthDashboardProfileLazyRouteWithChildren =
 interface AuthDashboardRouteLazyRouteChildren {
   AuthDashboardLibrarianRouteLazyRoute: typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   AuthDashboardArweaveAssetsLazyRoute: typeof AuthDashboardArweaveAssetsLazyRoute
-  AuthDashboardIcpAssetsLazyRoute: typeof AuthDashboardIcpAssetsLazyRoute
   AuthDashboardProfileLazyRoute: typeof AuthDashboardProfileLazyRouteWithChildren
   AuthDashboardSettingsLazyRoute: typeof AuthDashboardSettingsLazyRoute
 }
@@ -991,7 +966,6 @@ const AuthDashboardRouteLazyRouteChildren: AuthDashboardRouteLazyRouteChildren =
     AuthDashboardLibrarianRouteLazyRoute:
       AuthDashboardLibrarianRouteLazyRouteWithChildren,
     AuthDashboardArweaveAssetsLazyRoute: AuthDashboardArweaveAssetsLazyRoute,
-    AuthDashboardIcpAssetsLazyRoute: AuthDashboardIcpAssetsLazyRoute,
     AuthDashboardProfileLazyRoute: AuthDashboardProfileLazyRouteWithChildren,
     AuthDashboardSettingsLazyRoute: AuthDashboardSettingsLazyRoute,
   }

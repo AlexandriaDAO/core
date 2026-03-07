@@ -16,7 +16,6 @@ import {
 	useStripe,
 	useAuthentication,
 	useAlexBackend,
-	useAssetManager,
 	useUser,
 	useAlexWallet,
 	useIcpLedger,
@@ -40,7 +39,6 @@ export default function ActorProvider() {
 	const stripe = useStripe();
 	const authentication = useAuthentication();
 	const alexBackend = useAlexBackend();
-	const assetManager = useAssetManager();
 	const user = useUser();
 	const alexWallet = useAlexWallet();
 	const icpLedger = useIcpLedger();
@@ -115,7 +113,6 @@ export default function ActorProvider() {
 			stripe.setInterceptors(interceptors);
 			authentication.setInterceptors(interceptors);
 			alexBackend.setInterceptors(interceptors);
-			assetManager.setInterceptors(interceptors);
 			user.setInterceptors(interceptors);
 			alexWallet.setInterceptors(interceptors);
 			icpLedger.setInterceptors(interceptors);

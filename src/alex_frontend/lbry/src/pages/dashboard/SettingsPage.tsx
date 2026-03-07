@@ -1,6 +1,5 @@
 import React from "react";
 import LibrarianCard from "@/components/LibrarianCard";
-import CanisterCard from "@/components/CanisterCard";
 
 function SettingsPage() {
 	return (
@@ -13,7 +12,6 @@ function SettingsPage() {
 
 				<div className="flex flex-col gap-4">
 					<LibrarianCard />
-					<CanisterCard />
 				</div>
 			</div>
 		</>

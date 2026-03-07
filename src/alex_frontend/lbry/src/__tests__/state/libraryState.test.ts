@@ -226,7 +226,7 @@ describe('Library State', () => {
       expect(initialState.library.sortAsc).toBe(true);
       const actor = {} as ActorSubclass<_SERVICE>;
       // Call the toggleSort thunk
-      await store.dispatch(toggleSort(actor) as unknown as AnyAction);
+      await store.dispatch(toggleSort() as unknown as AnyAction);
       
       // Verify sort direction is toggled
       const updatedState = store.getState() as RootState;

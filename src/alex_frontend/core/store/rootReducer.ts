@@ -27,10 +27,8 @@ import transactionsReducer from "@/apps/Modules/shared/state/transactions/transa
 import arweaveReducer from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import libraryReducer from "@/apps/Modules/shared/state/librarySearch/librarySlice";
 import nftDataReducer from "@/apps/Modules/shared/state/nftData/nftDataSlice";
-import assetManagerReducer from "@/apps/Modules/shared/state/assetManager/assetManagerSlice";
 
 import arweaveAssetsReducer from '@/features/arweave-assets/arweaveAssetsSlice';
-import icpAssetsReducer from '@/features/icp-assets/icpAssetsSlice';
 import marketplaceReducer from '@/features/marketplace/marketplaceSlice';
 import userDisplayReducer from './slices/userDisplaySlice';
 import balanceReducer from '@/features/balance/balanceSlice';
@@ -74,11 +72,9 @@ const rootReducer = combineReducers({
 	transactions: transactionsReducer,
 	library: libraryReducer,
 	nftData: nftDataReducer,
-	assetManager: assetManagerReducer,
 	marketplace: marketplaceReducer,
 
 	arweaveAssets: arweaveAssetsReducer,
-	icpAssets: icpAssetsReducer,
 	userDisplay: userDisplayReducer,
 	balance: balanceReducer,
 	insights: insightsReducer,

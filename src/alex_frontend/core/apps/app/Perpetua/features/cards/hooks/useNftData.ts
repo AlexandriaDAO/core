@@ -27,7 +27,6 @@ export const useNftData = (tokenId: string | undefined) => {
   const dispatch = useDispatch<AppDispatch>();
 
   // --- Selectors ---
-  const { canisters: allUserAssetCanistersMap, canisterLoading: authCanisterMapLoading } = useSelector((state: RootState) => state.auth);
   const nftStaticDataFromCache = useSelector((state: RootState) => tokenId ? state.nftData.nfts[tokenId] : null);
   const arweaveTxFromCache = useSelector((state: RootState) => {
     if (!tokenId) return null;
@@ -50,7 +49,7 @@ export const useNftData = (tokenId: string | undefined) => {
   const [ownerPrincipal, setOwnerPrincipal] = useState<Principal | null>(null);
   const [derivedArweaveId, setDerivedArweaveId] = useState<string | null>(null);
   const [assetContentUrls, setAssetContentUrls] = useState<ContentUrlInfo | null>(null);
-  const [assetSource, setAssetSource] = useState<'ic_canister' | 'arweave' | 'unknown' | null>(null);
+  const [assetSource, setAssetSource] = useState<'arweave' | 'unknown' | null>(null);
   const [currentArweaveTx, setCurrentArweaveTx] = useState<ArweaveTransaction | null>(null);
 
 
@@ -179,162 +178,8 @@ export const useNftData = (tokenId: string | undefined) => {
       }
 
 
-      // 3. Attempt to load from ICP Asset Canister
-      let assetLoadedFromICP = false;
-      if (currentOwner && localDerivedArweaveId && allUserAssetCanistersMap) {
-          const ownerText = currentOwner.toText();
-          const userAssetCanisterIdString = allUserAssetCanistersMap[ownerText];
-          console.log(`[useNftData ${tokenId}] Owner: ${ownerText}, Asset canisters available: ${Object.keys(allUserAssetCanistersMap).length}, Has canister: ${!!userAssetCanisterIdString}`);
-          
-          if (userAssetCanisterIdString) {
-              console.log(`[useNftData ${tokenId}] User ${ownerText} has asset canister ${userAssetCanisterIdString}. Attempting ICP load for /arweave/${localDerivedArweaveId}`);
-              const icpLoadAttemptStart = performance.now();
-              
-              // Helper function to attempt ICP fetch with timeout and retries
-              const fetchWithRetry = async (url: string, maxRetries = 2, timeoutMs = 10000): Promise<Response> => {
-                  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                      console.log(`[useNftData ${tokenId}] ICP fetch attempt ${attempt}/${maxRetries}: ${url}`);
-                      
-                      let timeoutId: NodeJS.Timeout | undefined;
-                      
-                      try {
-                          const controller = new AbortController();
-                          timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-                          
-                          const response = await fetch(url, {
-                              signal: controller.signal,
-                              cache: 'no-cache', // Prevent aggressive caching that might cause inconsistencies
-                              headers: {
-                                  'Cache-Control': 'no-cache, no-store, must-revalidate',
-                                  'Pragma': 'no-cache'
-                              }
-                          });
-                          
-                          clearTimeout(timeoutId);
-                          console.log(`[useNftData ${tokenId}] ICP fetch attempt ${attempt} response: ${response.status} ${response.statusText}`);
-                          
-                          if (response.ok) {
-                              return response;
-                          } else if (response.status === 404) {
-                              // Don't retry 404s - asset doesn't exist
-                              throw new Error(`Asset not found (404): ${url}`);
-                          } else if (attempt === maxRetries) {
-                              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                          }
-                          // For other errors (5xx, network issues), continue to retry
-                          console.warn(`[useNftData ${tokenId}] ICP fetch attempt ${attempt} failed with ${response.status}, retrying...`);
-                          
-                      } catch (error: any) {
-                          if (timeoutId) {
-                              clearTimeout(timeoutId);
-                          }
-                          if (error.name === 'AbortError') {
-                              console.warn(`[useNftData ${tokenId}] ICP fetch attempt ${attempt} timed out after ${timeoutMs}ms`);
-                          } else if (error.message.includes('404')) {
-                              throw error; // Don't retry 404s
-                          }
-                          
-                          if (attempt === maxRetries) {
-                              throw error;
-                          }
-                          
-                          console.warn(`[useNftData ${tokenId}] ICP fetch attempt ${attempt} error:`, error.message, '- retrying...');
-                          // Brief delay before retry
-                          await new Promise(resolve => setTimeout(resolve, 500 * attempt));
-                      }
-                  }
-                  throw new Error('All retry attempts failed');
-              };
-              
-              try {
-                  // Use the same URL construction approach as useInit.ts
-                  const isLocal = process.env.DFX_NETWORK == "local";
-                  const baseUrl = isLocal ? `http://${userAssetCanisterIdString}.localhost:4943` : `https://${userAssetCanisterIdString}.raw.icp0.io`;
-                  const canisterAssetUrl = `${baseUrl}/arweave/${localDerivedArweaveId}`;
-
-                  console.log(`[useNftData ${tokenId}] Attempting to fetch: ${canisterAssetUrl}`);
-                  const response = await fetchWithRetry(canisterAssetUrl);
-                  
-                  if (!mounted) {
-                      console.log(`[useNftData ${tokenId}] Component unmounted during ICP fetch, aborting`);
-                      return;
-                  }
-                  
-                  const contentType = response.headers.get('Content-Type') ?? undefined;
-                  const contentLength = response.headers.get('Content-Length');
-                  console.log(`[useNftData ${tokenId}] ICP response headers - Content-Type: ${contentType}, Content-Length: ${contentLength}`);
-                  
-                  const blob = await response.blob();
-                  console.log(`[useNftData ${tokenId}] ICP blob created - size: ${blob.size} bytes, type: ${blob.type}`);
-                  
-                  if (blob.size === 0) {
-                      throw new Error('Received empty blob from ICP canister');
-                  }
-                  
-                  const objectUrl = URL.createObjectURL(blob);
-                  console.log(`[useNftData ${tokenId}] ICP object URL created: ${objectUrl}`);
-                  
-                  const icpUrls: ContentUrlInfo = {
-                      thumbnailUrl: null,
-                      coverUrl: null,
-                      fullUrl: objectUrl,
-                  };
-                  setAssetContentUrls(icpUrls);
-                  setAssetSource('ic_canister');
-                  
-                  // Create a minimal transaction object for ICP-loaded content
-                  const icpTransaction: ArweaveTransaction = {
-                      id: localDerivedArweaveId,
-                      owner: currentOwner.toText(),
-                      tags: []
-                  };
-                  setCurrentArweaveTx(icpTransaction);
-                  
-                  // For text content, extract the text
-                  let textContent = null;
-                  if (contentType?.includes('text/') || contentType?.includes('application/json')) {
-                      textContent = await blob.text();
-                      console.log(`[useNftData ${tokenId}] ICP text content extracted - length: ${textContent?.length || 0} chars`);
-                  }
-                  
-                  const contentDataItem: ContentDataItem = {
-                      url: canisterAssetUrl,
-                      textContent: textContent,
-                      imageObjectUrl: objectUrl,
-                      thumbnailUrl: null,
-                      error: null,
-                      data: blob,
-                      source: 'ic_canister',
-                      contentType: contentType,
-                      urls: icpUrls
-                  };
-                  dispatch(setContentData({ id: localDerivedArweaveId, content: contentDataItem }));
-                  console.log(`[useNftData ${tokenId}] SUCCESS: Asset ${localDerivedArweaveId} loaded from ICP canister ${userAssetCanisterIdString} (${contentType}, ${blob.size} bytes).`);
-                  assetLoadedFromICP = true;
-                  
-                  if (mounted) {
-                      setIsAssetLoading(false);
-                      setIsNftDetailsLoading(false);
-                      setError(null);
-                  }
-                  
-              } catch (icpError: any) {
-                  console.error(`[useNftData ${tokenId}] FAILED: Error fetching asset ${localDerivedArweaveId} from ICP canister ${userAssetCanisterIdString}:`, {
-                      error: icpError.message,
-                      stack: icpError.stack,
-                      name: icpError.name
-                  });
-                  // Don't set error state here - let it fall back to Arweave
-              }
-              console.log(`[BENCH] ICP_LOAD_ATTEMPT: ${localDerivedArweaveId} for token ${tokenId} - ${assetLoadedFromICP ? 'success' : 'failed_or_not_found'} - ${(performance.now() - icpLoadAttemptStart).toFixed(2)}ms`);
-          } else {
-              console.log(`[useNftData ${tokenId}] No asset canister found for owner ${ownerText}. Skipping ICP asset check.`);
-          }
-      }
-
-
-      // 4. Fallback to Arweave if not loaded from ICP
-      if (!assetLoadedFromICP && localDerivedArweaveId && mounted) {
+      // 3. Load from Arweave
+      if (localDerivedArweaveId && mounted) {
         console.log(`[useNftData ${tokenId}] Proceeding to Arweave fallback for ${localDerivedArweaveId}.`);
         const arweaveFallbackStart = performance.now();
         if (mounted) setAssetSource('arweave');
@@ -421,13 +266,9 @@ export const useNftData = (tokenId: string | undefined) => {
              setIsNftDetailsLoading(false);
         }
         console.log(`[BENCH] ARWEAVE_FALLBACK_PROCESSING: Token ${tokenId} - ${(performance.now() - arweaveFallbackStart).toFixed(2)}ms`);
-      } else if (assetLoadedFromICP && mounted) {
-        setIsAssetLoading(false);
-        setIsNftDetailsLoading(false);
       }
 
-
-      // 5. Load Balances
+      // 4. Load Balances
       const needsBalanceFetch = currentOwner && (!nftStaticDataFromCache?.balances || (nftStaticDataFromCache.balances.alex === '0' && nftStaticDataFromCache.balances.lbry === '0'));
       if (needsBalanceFetch && currentOwner && localDerivedArweaveId) {
         if (mounted) setIsBalanceLoading(true);

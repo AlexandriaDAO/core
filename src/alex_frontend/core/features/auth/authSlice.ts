@@ -14,33 +14,23 @@ export interface SerializedUser {
 // Define the interface for our auth state
 export interface AuthState {
 	user: SerializedUser | null,
-	canister: string | undefined,
-	canisters: Record<string, string>,
 
 	loading: boolean;
 	error: string | null;
 
 	librarianLoading: boolean
 	librarianError: string | null;
-
-	canisterLoading: boolean
-	canisterError: string | null;
 }
 
 // Define the initial state using the AuthState interface
 const initialState: AuthState = {
 	user: null,
-	canister: undefined,
-	canisters: {},
 
 	loading: false,
 	error: null,
 
 	librarianLoading: false,
 	librarianError: null,
-
-	canisterLoading: false,
-	canisterError: null,
 };
 
 
