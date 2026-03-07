@@ -1,0 +1,340 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Principal } from "@dfinity/principal";
+import usePerpetua from "@/hooks/actors/usePerpetua";
+import { valoraKeys } from "../types";
+import type { Shelf } from "../types";
+import { unwrapResult } from "../utils";
+import type { ItemContent } from "../../../../../declarations/perpetua/perpetua.did";
+
+export function useCreateShelf() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ title, description, tags }: {
+			title: string;
+			description?: string;
+			tags?: string[];
+		}) => {
+			const desc: [] | [string] = description ? [description] : [];
+			const tagList: [] | [string[]] = tags ? [tags] : [];
+			const result = await actor!.store_shelf(title, desc, [], tagList);
+			return unwrapResult(result);
+		},
+		onSuccess: () => {
+			qc.invalidateQueries({ queryKey: valoraKeys.shelves() });
+			qc.invalidateQueries({ queryKey: valoraKeys.recentFeed() });
+		},
+	});
+}
+
+export function useUpdateShelfMetadata() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ shelfId, title, description }: {
+			shelfId: string;
+			title?: string;
+			description?: string;
+		}) => {
+			const t: [] | [string] = title ? [title] : [];
+			const d: [] | [string] = description !== undefined ? [description] : [];
+			const result = await actor!.update_shelf_metadata(shelfId, t, d);
+			unwrapResult(result);
+		},
+		onMutate: async ({ shelfId, title, description }) => {
+			await qc.cancelQueries({ queryKey: valoraKeys.shelf(shelfId) });
+			const prev = qc.getQueryData<Shelf>(valoraKeys.shelf(shelfId));
+			if (prev) {
+				qc.setQueryData<Shelf>(valoraKeys.shelf(shelfId), {
+					...prev,
+					...(title !== undefined && { title }),
+					...(description !== undefined && { description: description || null }),
+				});
+			}
+			return { prev };
+		},
+		onError: (_, { shelfId }, ctx) => {
+			if (ctx?.prev) qc.setQueryData(valoraKeys.shelf(shelfId), ctx.prev);
+		},
+		onSettled: (_, __, { shelfId }) => {
+			qc.invalidateQueries({ queryKey: valoraKeys.shelf(shelfId) });
+		},
+	});
+}
+
+export function useAddItem() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ shelfId, content, referenceItemId, before = false }: {
+			shelfId: string;
+			content: ItemContent;
+			referenceItemId?: number;
+			before?: boolean;
+		}) => {
+			const ref: [] | [number] = referenceItemId !== undefined ? [referenceItemId] : [];
+			const result = await actor!.add_item_to_shelf(shelfId, { content, reference_item_id: ref, before });
+			unwrapResult(result);
+		},
+		onSuccess: (_, { shelfId }) => {
+			qc.invalidateQueries({ queryKey: valoraKeys.shelf(shelfId) });
+		},
+	});
+}
+
+export function useRemoveItem() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ shelfId, itemId }: { shelfId: string; itemId: number }) => {
+			const result = await actor!.remove_item_from_shelf(shelfId, itemId);
+			unwrapResult(result);
+		},
+		onMutate: async ({ shelfId, itemId }) => {
+			await qc.cancelQueries({ queryKey: valoraKeys.shelf(shelfId) });
+			const prev = qc.getQueryData<Shelf>(valoraKeys.shelf(shelfId));
+			if (prev) {
+				qc.setQueryData<Shelf>(valoraKeys.shelf(shelfId), {
+					...prev,
+					items: prev.items.filter(([, item]) => item.id !== itemId),
+				});
+			}
+			return { prev };
+		},
+		onError: (_, { shelfId }, ctx) => {
+			if (ctx?.prev) qc.setQueryData(valoraKeys.shelf(shelfId), ctx.prev);
+		},
+		onSettled: (_, __, { shelfId }) => {
+			qc.invalidateQueries({ queryKey: valoraKeys.shelf(shelfId) });
+		},
+	});
+}
+
+export function useSetItemOrder() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ shelfId, itemIds }: { shelfId: string; itemIds: number[] }) => {
+			const result = await actor!.set_item_order(shelfId, itemIds);
+			unwrapResult(result);
+		},
+		onSuccess: (_, { shelfId }) => {
+			qc.invalidateQueries({ queryKey: valoraKeys.shelf(shelfId) });
+		},
+	});
+}
+
+export function useReorderProfileShelf() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ shelfId, referenceShelfId, before }: {
+			shelfId: string;
+			referenceShelfId?: string;
+			before: boolean;
+		}) => {
+			const ref: [] | [string] = referenceShelfId ? [referenceShelfId] : [];
+			const result = await actor!.reorder_profile_shelf(shelfId, ref, before);
+			unwrapResult(result);
+		},
+		onSuccess: () => {
+			qc.invalidateQueries({ queryKey: valoraKeys.shelves() });
+		},
+	});
+}
+
+export function useTogglePublicAccess() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ shelfId, publicEditing }: { shelfId: string; publicEditing: boolean }) => {
+			const result = await actor!.toggle_shelf_public_access(shelfId, publicEditing);
+			unwrapResult(result);
+		},
+		onMutate: async ({ shelfId, publicEditing }) => {
+			await qc.cancelQueries({ queryKey: valoraKeys.shelf(shelfId) });
+			const prev = qc.getQueryData<Shelf>(valoraKeys.shelf(shelfId));
+			if (prev) {
+				qc.setQueryData<Shelf>(valoraKeys.shelf(shelfId), { ...prev, publicEditing });
+			}
+			return { prev };
+		},
+		onError: (_, { shelfId }, ctx) => {
+			if (ctx?.prev) qc.setQueryData(valoraKeys.shelf(shelfId), ctx.prev);
+		},
+		onSettled: (_, __, { shelfId }) => {
+			qc.invalidateQueries({ queryKey: valoraKeys.shelf(shelfId) });
+		},
+	});
+}
+
+export function useAddTag() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ shelfId, tag }: { shelfId: string; tag: string }) => {
+			const result = await actor!.add_tag_to_shelf({ shelf_id: shelfId, tag });
+			unwrapResult(result);
+		},
+		onMutate: async ({ shelfId, tag }) => {
+			await qc.cancelQueries({ queryKey: valoraKeys.shelf(shelfId) });
+			const prev = qc.getQueryData<Shelf>(valoraKeys.shelf(shelfId));
+			if (prev && !prev.tags.includes(tag)) {
+				qc.setQueryData<Shelf>(valoraKeys.shelf(shelfId), {
+					...prev,
+					tags: [...prev.tags, tag],
+				});
+			}
+			return { prev };
+		},
+		onError: (_, { shelfId }, ctx) => {
+			if (ctx?.prev) qc.setQueryData(valoraKeys.shelf(shelfId), ctx.prev);
+		},
+		onSettled: (_, __, { shelfId }) => {
+			qc.invalidateQueries({ queryKey: valoraKeys.shelf(shelfId) });
+			qc.invalidateQueries({ queryKey: valoraKeys.popularTags() });
+		},
+	});
+}
+
+export function useRemoveTag() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async ({ shelfId, tag }: { shelfId: string; tag: string }) => {
+			const result = await actor!.remove_tag_from_shelf({ shelf_id: shelfId, tag });
+			unwrapResult(result);
+		},
+		onMutate: async ({ shelfId, tag }) => {
+			await qc.cancelQueries({ queryKey: valoraKeys.shelf(shelfId) });
+			const prev = qc.getQueryData<Shelf>(valoraKeys.shelf(shelfId));
+			if (prev) {
+				qc.setQueryData<Shelf>(valoraKeys.shelf(shelfId), {
+					...prev,
+					tags: prev.tags.filter((t) => t !== tag),
+				});
+			}
+			return { prev };
+		},
+		onError: (_, { shelfId }, ctx) => {
+			if (ctx?.prev) qc.setQueryData(valoraKeys.shelf(shelfId), ctx.prev);
+		},
+		onSettled: (_, __, { shelfId }) => {
+			qc.invalidateQueries({ queryKey: valoraKeys.shelf(shelfId) });
+			qc.invalidateQueries({ queryKey: valoraKeys.popularTags() });
+		},
+	});
+}
+
+export function useFollowTag() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (tag: string) => {
+			const result = await actor!.follow_tag(tag);
+			unwrapResult(result);
+		},
+		onMutate: async (tag) => {
+			await qc.cancelQueries({ queryKey: valoraKeys.followedTags() });
+			const prev = qc.getQueryData<string[]>(valoraKeys.followedTags());
+			if (prev && !prev.includes(tag)) {
+				qc.setQueryData<string[]>(valoraKeys.followedTags(), [...prev, tag]);
+			}
+			return { prev };
+		},
+		onError: (_, __, ctx) => {
+			if (ctx?.prev) qc.setQueryData(valoraKeys.followedTags(), ctx.prev);
+		},
+		onSettled: () => {
+			qc.invalidateQueries({ queryKey: valoraKeys.followedTags() });
+		},
+	});
+}
+
+export function useUnfollowTag() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (tag: string) => {
+			const result = await actor!.unfollow_tag(tag);
+			unwrapResult(result);
+		},
+		onMutate: async (tag) => {
+			await qc.cancelQueries({ queryKey: valoraKeys.followedTags() });
+			const prev = qc.getQueryData<string[]>(valoraKeys.followedTags());
+			if (prev) {
+				qc.setQueryData<string[]>(valoraKeys.followedTags(), prev.filter((t) => t !== tag));
+			}
+			return { prev };
+		},
+		onError: (_, __, ctx) => {
+			if (ctx?.prev) qc.setQueryData(valoraKeys.followedTags(), ctx.prev);
+		},
+		onSettled: () => {
+			qc.invalidateQueries({ queryKey: valoraKeys.followedTags() });
+		},
+	});
+}
+
+export function useFollowUser() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (principalStr: string) => {
+			const result = await actor!.follow_user(Principal.fromText(principalStr));
+			unwrapResult(result);
+		},
+		onMutate: async (principalStr) => {
+			await qc.cancelQueries({ queryKey: valoraKeys.followedUsers() });
+			const prev = qc.getQueryData<string[]>(valoraKeys.followedUsers());
+			if (prev && !prev.includes(principalStr)) {
+				qc.setQueryData<string[]>(valoraKeys.followedUsers(), [...prev, principalStr]);
+			}
+			return { prev };
+		},
+		onError: (_, __, ctx) => {
+			if (ctx?.prev) qc.setQueryData(valoraKeys.followedUsers(), ctx.prev);
+		},
+		onSettled: () => {
+			qc.invalidateQueries({ queryKey: valoraKeys.followedUsers() });
+		},
+	});
+}
+
+export function useUnfollowUser() {
+	const { actor } = usePerpetua();
+	const qc = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (principalStr: string) => {
+			const result = await actor!.unfollow_user(Principal.fromText(principalStr));
+			unwrapResult(result);
+		},
+		onMutate: async (principalStr) => {
+			await qc.cancelQueries({ queryKey: valoraKeys.followedUsers() });
+			const prev = qc.getQueryData<string[]>(valoraKeys.followedUsers());
+			if (prev) {
+				qc.setQueryData<string[]>(valoraKeys.followedUsers(), prev.filter((u) => u !== principalStr));
+			}
+			return { prev };
+		},
+		onError: (_, __, ctx) => {
+			if (ctx?.prev) qc.setQueryData(valoraKeys.followedUsers(), ctx.prev);
+		},
+		onSettled: () => {
+			qc.invalidateQueries({ queryKey: valoraKeys.followedUsers() });
+		},
+	});
+}

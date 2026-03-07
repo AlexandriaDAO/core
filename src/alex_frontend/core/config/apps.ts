@@ -8,6 +8,7 @@ export interface App {
 }
 
 export const appsData: App[] = [
+	{ name: 'Valora', description: 'Curate', path: '/app/valora', logo: '/logos/Perpetua.svg', comingSoon: false },
 	{ name: 'Perpetua', description: 'Write', path: '/app/perpetua', logo: '/logos/Perpetua.svg', comingSoon: false },
 	{ name: 'Alexandrian', description: 'Library', path: '/app/alexandrian', logo: '/logos/Alexandrian.svg' },
 	{ name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/Permasearch.svg' },
