@@ -84,6 +84,7 @@ export function useAddItem() {
 		},
 		onSuccess: (_, { shelfId }) => {
 			qc.invalidateQueries({ queryKey: valoraKeys.shelf(shelfId) });
+			qc.invalidateQueries({ queryKey: valoraKeys.recentFeed() });
 		},
 	});
 }
@@ -96,7 +97,7 @@ export function useRemoveItem() {
 		mutationFn: async ({ shelfId, itemId }: { shelfId: string; itemId: number }) => {
 			if (!actor) throw new Error("Not authenticated");
 			const result = await actor.remove_item_from_shelf(shelfId, itemId);
-			unwrapResult(result);
+			return unwrapResult(result);
 		},
 		onMutate: async ({ shelfId, itemId }) => {
 			await qc.cancelQueries({ queryKey: valoraKeys.shelf(shelfId) });
@@ -126,7 +127,7 @@ export function useSetItemOrder() {
 		mutationFn: async ({ shelfId, itemIds }: { shelfId: string; itemIds: number[] }) => {
 			if (!actor) throw new Error("Not authenticated");
 			const result = await actor.set_item_order(shelfId, itemIds);
-			unwrapResult(result);
+			return unwrapResult(result);
 		},
 		onSuccess: (_, { shelfId }) => {
 			qc.invalidateQueries({ queryKey: valoraKeys.shelf(shelfId) });
@@ -147,7 +148,7 @@ export function useReorderProfileShelf() {
 			const ref: [] | [string] = referenceShelfId ? [referenceShelfId] : [];
 			if (!actor) throw new Error("Not authenticated");
 			const result = await actor.reorder_profile_shelf(shelfId, ref, before);
-			unwrapResult(result);
+			return unwrapResult(result);
 		},
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: valoraKeys.shelves() });
