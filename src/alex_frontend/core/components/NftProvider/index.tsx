@@ -14,7 +14,7 @@ interface NftContextType {
 	setModal: (value: Modal | null) => void;
 }
 
-const NftContext = createContext<NftContextType | undefined>(undefined);
+export const NftContext = createContext<NftContextType | undefined>(undefined);
 
 export const useNftContext = () => {
 	const context = useContext(NftContext);

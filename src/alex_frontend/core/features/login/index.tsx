@@ -109,7 +109,7 @@ const Login:React.FC<LoginProps> = ({ fullpage = false }) => {
 									<Button
 										onClick={() =>
 											ii.login({
-												derivationOrigin: "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io",
+												...(process.env.DFX_NETWORK !== "local" && { derivationOrigin: "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io" }),
 												identityProvider: process.env.DFX_NETWORK === "local" ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`: "https://id.ai",
 											})
 										}
@@ -129,7 +129,7 @@ const Login:React.FC<LoginProps> = ({ fullpage = false }) => {
 									<Button
 										onClick={() =>
 											ii.login({
-												derivationOrigin: "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io",
+												...(process.env.DFX_NETWORK !== "local" && { derivationOrigin: "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io" }),
 												identityProvider: process.env.DFX_NETWORK === "local" ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`: "https://identity.ic0.app",
 											})
 										}

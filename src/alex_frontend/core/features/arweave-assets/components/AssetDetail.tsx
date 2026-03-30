@@ -1,7 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { ArweaveAssetItem } from "../types";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { toast } from "sonner";
 import { Button } from "@/lib/components/button";
 import {
 	Dialog,
@@ -10,63 +8,18 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/lib/components/dialog";
-import { Clock, Download, ExternalLink, FileType, Trash2, X } from "lucide-react";
+import { Clock, Download, ExternalLink, FileType, X } from "lucide-react";
 import { getFileTypeInfo, getFileTypeName } from "@/features/pinax/constants";
 import Copy from "@/components/Copy";
 import { selectAsset } from "../arweaveAssetsSlice";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { checkAssetAvailability } from "../thunks/checkAssetAvailability";
-import { pullAssetToCanister } from "../thunks/pullAssetToCanister";
-import { deleteAssetFromCanister } from "../thunks/deleteAssetFromCanister";
-import { AssetManager } from "@dfinity/assets";
-
-const isLocal = process.env.DFX_NETWORK == "local";
 
 interface AssetDetailProps {
 	asset: ArweaveAssetItem;
-	assetManager: AssetManager | null;
 }
 
-const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
+const AssetDetail: React.FC<AssetDetailProps> = ({ asset }) => {
 	const dispatch = useAppDispatch();
-	const { canister } = useAppSelector(state => state.auth);
-	const {pulling, pullError, deleting, deleteError} = useAppSelector((state) => state.arweaveAssets);
-	const { assets: icpAssets } = useAppSelector((state) => state.icpAssets);
-
-	// Check if asset is in canister
-	useEffect(() => {
-		if(assetManager){
-			dispatch(checkAssetAvailability({ asset, assetManager }));
-		}
-
-	}, [assetManager, asset]);
-
-	// Function to pull asset to user's canister
-	const handlePullAsset = async () => {
-		if (!assetManager) {
-			toast.error("No asset canister available. Please create one first.");
-			return;
-		}
-
-		dispatch(pullAssetToCanister({ asset, assetManager }));
-	};
-
-	// Function to delete asset from user's canister
-	const handleDeleteAsset = async () => {
-		if (!assetManager) {
-			toast.error("No asset canister available.");
-			return;
-		}
-
-		// Confirm deletion
-		if (!window.confirm(
-			`Are you sure you want to delete this asset from your canister?\nThis won't delete it from Arweave.`
-		)) {
-			return;
-		}
-
-		dispatch(deleteAssetFromCanister({ asset, assetManager }));
-	};
 
 	// Helper function to format timestamp
 	const formatDate = (timestamp?: number) => {
@@ -100,25 +53,9 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 		return "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-900/40 dark:text-gray-300 dark:border-gray-800";
 	};
 
-	// Generate canister asset URL
-	const getCanisterAssetUrl = () => {
-		if (!canister) return "";
-		const baseUrl = isLocal
-			? `http://${canister}.localhost:4943`
-			// : `https://${canister}.ic0.app`;
-			: `https://${canister}.raw.icp0.io`;
-		return `${baseUrl}/arweave/${asset.id}`;
-	};
-
-	const canisterAssetUrl = getCanisterAssetUrl();
-
 	const handleClose = () => {
 		dispatch(selectAsset(null));
 	};
-
-	const isAvailableInCanister = (asset: ArweaveAssetItem) => {
-		return icpAssets.find((icpAsset) => icpAsset.key === `/arweave/${asset.id}`) ? true : false;
-	}
 
 	return (
 		<Dialog open onOpenChange={() => handleClose()}>
@@ -156,14 +93,14 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 						{isImage && (
 							<div className="relative group">
 								<img
-									src={isAvailableInCanister(asset) && canisterAssetUrl ? canisterAssetUrl : asset.url}
+									src={asset.url}
 									alt="Asset preview"
 									className="max-h-[300px] w-full mx-auto object-contain bg-[repeating-conic-gradient(#f5f5f5_0deg,#f5f5f5_8deg,#ffffff_8deg,#ffffff_15deg)] dark:bg-[repeating-conic-gradient(#1f1f1f_0deg,#1f1f1f_8deg,#171717_8deg,#171717_15deg)] p-4"
 								/>
 								<div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 dark:group-hover:bg-white/5 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-									<a 
-										href={isAvailableInCanister(asset) && canisterAssetUrl ? canisterAssetUrl : asset.url} 
-										target="_blank" 
+									<a
+										href={asset.url}
+										target="_blank"
 										rel="noopener noreferrer"
 										className="bg-black/70 text-white hover:bg-black/90 px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-all"
 									>
@@ -176,7 +113,7 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 						{isVideo && (
 							<div className="relative bg-black">
 								<video
-									src={isAvailableInCanister(asset) && canisterAssetUrl ? canisterAssetUrl : asset.url}
+									src={asset.url}
 									controls
 									className="max-h-[300px] w-full mx-auto"
 								>
@@ -190,7 +127,7 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 									{fileTypeInfo?.icon || <FileType className="h-6 w-6" />}
 								</div>
 								<audio
-									src={isAvailableInCanister(asset) && canisterAssetUrl ? canisterAssetUrl : asset.url}
+									src={asset.url}
 									controls
 									className="w-full mx-auto"
 								>
@@ -204,10 +141,10 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 									{fileTypeInfo?.icon || <FileType className="h-12 w-12" />}
 								</div>
 								<p className="text-gray-700 dark:text-gray-300 mb-3">PDF Document</p>
-								<a 
-									href={isAvailableInCanister(asset) && canisterAssetUrl ? canisterAssetUrl : asset.url} 
-									target="_blank" 
-									rel="noopener noreferrer" 
+								<a
+									href={asset.url}
+									target="_blank"
+									rel="noopener noreferrer"
 									className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors duration-200 text-sm"
 								>
 									<ExternalLink className="h-4 w-4" />
@@ -221,10 +158,10 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 									{fileTypeInfo?.icon || <FileType className="h-12 w-12" />}
 								</div>
 								<p className="text-gray-700 dark:text-gray-300 mb-3">{fileTypeName} File</p>
-								<a 
-									href={isAvailableInCanister(asset) && canisterAssetUrl ? canisterAssetUrl : asset.url} 
-									target="_blank" 
-									rel="noopener noreferrer" 
+								<a
+									href={asset.url}
+									target="_blank"
+									rel="noopener noreferrer"
 									className="bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-3 py-1.5 rounded-lg flex items-center gap-2 transition-colors duration-200 text-sm"
 								>
 									<Download className="h-4 w-4" />
@@ -233,25 +170,6 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 							</div>
 						)}
 					</div>
-
-					{/* Divider before Canister URL section */}
-					<hr className="my-6 border-gray-200 dark:border-gray-800" />
-
-					{/* Canister URL section */}
-					{isAvailableInCanister(asset) && canisterAssetUrl && (
-						<div className="mb-4">
-							<h3 className="font-medium text-gray-900 dark:text-gray-50 mb-2 flex items-center gap-2 text-sm">
-								<span className="w-1 h-4 bg-purple-500 rounded-full"></span>
-								Canister URL
-							</h3>
-							<div className="flex items-start justify-between gap-2 bg-white dark:bg-gray-850 p-3 rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
-								<div className="self-center font-mono text-xs break-all text-gray-700 dark:text-gray-300 overflow-x-auto">
-									{canisterAssetUrl}
-								</div>
-								<Copy text={canisterAssetUrl} />
-							</div>
-						</div>
-					)}
 
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div>
@@ -291,40 +209,6 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 											</span>
 										</div>
 									</li>
-
-									<li className="flex items-start gap-2">
-										<div className="p-1.5 bg-green-50 dark:bg-green-900/20 rounded-md text-green-600 dark:text-green-400">
-											{pulling === asset.id ? (
-												<div className="h-4 w-4 border-2 border-green-300 border-t-green-600 rounded-full animate-spin" />
-											) : (
-												<div className="h-4 w-4 flex items-center justify-center">
-													{isAvailableInCanister(asset) ? (
-														<div className="h-2.5 w-2.5 bg-green-500 rounded-full" />
-													) : (
-														<div className="h-2.5 w-2.5 bg-yellow-500 rounded-full" />
-													)}
-												</div>
-											)}
-										</div>
-										<div>
-											<span className="block text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-medium">
-												Storage
-											</span>
-											{pulling === asset.id ? (
-												<span className="text-gray-400">
-													Checking...
-												</span>
-											) : isAvailableInCanister(asset) ? (
-												<span className="text-green-600 dark:text-green-500 font-medium">
-													Available in your canister
-												</span>
-											) : (
-												<span className="text-yellow-600 dark:text-yellow-500 font-medium">
-													Arweave only
-												</span>
-											)}
-										</div>
-									</li>
 								</ul>
 
 								<div className="flex gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-800">
@@ -343,28 +227,10 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 											Arweave
 										</a>
 									</Button>
-
-									{isAvailableInCanister(asset) && canisterAssetUrl && (
-										<Button
-											variant="outline"
-											scale="sm"
-											className="justify-start hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:text-teal-700 dark:hover:text-teal-300 transition-all duration-200 text-xs"
-											asChild
-										>
-											<a
-												href={canisterAssetUrl}
-												target="_blank"
-												rel="noopener noreferrer"
-											>
-												<ExternalLink className="h-3 w-3 mr-1" />
-												Canister
-											</a>
-										</Button>
-									)}
 								</div>
 							</div>
 						</div>
-						
+
 						{asset.tags && asset.tags.length > 0 && (
 							<div>
 								<h3 className="font-medium text-gray-900 dark:text-gray-50 mb-2 flex items-center gap-2 text-sm">
@@ -387,86 +253,6 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 							</div>
 						)}
 					</div>
-				</div>
-
-				{/* Fixed footer for actions */}
-				<div className="border-t border-gray-200 dark:border-gray-800 p-4 bg-gray-50 dark:bg-gray-900 sticky bottom-0 z-10">
-					{canister && !isAvailableInCanister(asset) && (
-						<div className="bg-info/25 rounded p-3 shadow-sm flex items-center gap-3">
-							<div className="p-1.5 rounded text-info-foreground bg-info/40 flex-shrink-0">
-								<Download className="h-5 w-5" />
-							</div>
-							<div className="flex-1 min-w-0">
-								<h4 className="font-medium text-info text-sm">
-									Speed Up Access
-								</h4>
-								<p className="text-info/80 text-xs truncate">
-									Pull to your canister for faster loading
-								</p>
-							</div>
-							<Button
-								onClick={handlePullAsset}
-								disabled={pulling === asset.id}
-								variant="info"
-								scale="sm"
-							>
-								{pulling === asset.id ? (
-									<>
-										<div className="h-3 w-3 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mr-1" />
-										Pulling...
-									</>
-								) : (
-									<>
-										<Download className="h-3 w-3 mr-1" />
-										Pull to Canister
-									</>
-								)}
-							</Button>
-						</div>
-					)}
-
-					{canister && isAvailableInCanister(asset) && (
-						<div className="bg-constructive/10 rounded border border-constructive/50 p-3 flex justify-between items-center shadow-sm">
-							<div className="flex items-center gap-3">
-								<div className="bg-constructive/20 p-1.5 rounded text-constructive">
-									<svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-									</svg>
-								</div>
-								<div>
-									<h3 className="font-medium text-constructive/80 text-sm">
-										Canister Storage Active
-									</h3>
-									<p className="text-constructive/60 text-xs">
-										Stored in your canister for faster access
-									</p>
-								</div>
-							</div>
-							<Button
-								onClick={handleDeleteAsset}
-								disabled={deleting === asset.id}
-								variant="outline"
-								scale="sm"
-								className={
-									deleting === asset.id
-										? "cursor-not-allowed"
-										: "border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300 transition-all"
-								}
-							>
-								{deleting === asset.id ? (
-									<>
-										<div className="h-3 w-3 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mr-1" />
-										Removing...
-									</>
-								) : (
-									<>
-										<Trash2 className="h-3 w-3 mr-1" />
-										Remove
-									</>
-								)}
-							</Button>
-						</div>
-					)}
 				</div>
 			</DialogContent>
 		</Dialog>

@@ -449,7 +449,7 @@ describe('Transaction State', () => {
       jest.spyOn(ContentService, 'getContentUrls').mockResolvedValue(mockUrls);
       const actor = {} as ActorSubclass<_SERVICE>;
       // Call the updateTransactions thunk with arweave IDs
-      await store.dispatch(updateTransactions({arweaveIds: ['tx1', 'tx2'], actor}) as unknown as AnyAction);
+      await store.dispatch(updateTransactions({arweaveIds: ['tx1', 'tx2']}) as unknown as AnyAction);
       
       // Verify transactions are an empty array (per the current implementation)
       const updatedState = store.getState() as RootState;
@@ -473,7 +473,7 @@ describe('Transaction State', () => {
       const actor = {} as ActorSubclass<_SERVICE>;
       
       // Call the updateTransactions thunk with empty array
-      await store.dispatch(updateTransactions({arweaveIds: [], actor: {} as ActorSubclass<_SERVICE>}) as unknown as AnyAction);
+      await store.dispatch(updateTransactions({arweaveIds: []}) as unknown as AnyAction);
       
       // Verify transactions from initial state are returned (since no change for empty array)
       const updatedState = store.getState() as RootState;

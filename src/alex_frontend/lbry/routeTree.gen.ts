@@ -43,9 +43,6 @@ const AuthDashboardSettingsLazyRouteImport = createFileRoute(
 const AuthDashboardProfileLazyRouteImport = createFileRoute(
   '/_auth/dashboard/profile',
 )()
-const AuthDashboardIcpAssetsLazyRouteImport = createFileRoute(
-  '/_auth/dashboard/icp-assets',
-)()
 const AuthDashboardArweaveAssetsLazyRouteImport = createFileRoute(
   '/_auth/dashboard/arweave-assets',
 )()
@@ -59,6 +56,8 @@ const AuthAppEmporiumRouteLazyRouteImport = createFileRoute(
 const AuthDashboardLibrarianIndexLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian/',
 )()
+const AuthAppValoraIndexLazyRouteImport =
+  createFileRoute('/_auth/app/valora/')()
 const AuthAppPerpetuaIndexLazyRouteImport = createFileRoute(
   '/_auth/app/perpetua/',
 )()
@@ -68,14 +67,23 @@ const AuthDashboardProfileUpgradeLazyRouteImport = createFileRoute(
 const AuthDashboardLibrarianWalletsLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian/wallets',
 )()
+const AuthAppValoraShelfShelfIdLazyRouteImport = createFileRoute(
+  '/_auth/app/valora/shelf/$shelfId',
+)()
 const AuthAppPerpetuaShelfShelfIdLazyRouteImport = createFileRoute(
   '/_auth/app/perpetua/shelf/$shelfId',
 )()
 const AuthAppPerpetuaItemItemIdLazyRouteImport = createFileRoute(
   '/_auth/app/perpetua/item/$itemId',
 )()
+const AuthAppValoraUserUserIdIndexLazyRouteImport = createFileRoute(
+  '/_auth/app/valora/user/$userId/',
+)()
 const AuthAppPerpetuaUserUserIdIndexLazyRouteImport = createFileRoute(
   '/_auth/app/perpetua/user/$userId/',
+)()
+const AuthAppValoraUserUserIdShelfShelfIdLazyRouteImport = createFileRoute(
+  '/_auth/app/valora/user/$userId/shelf/$shelfId',
 )()
 const AuthAppPerpetuaUserUserIdShelfShelfIdLazyRouteImport = createFileRoute(
   '/_auth/app/perpetua/user/$userId/shelf/$shelfId',
@@ -245,14 +253,6 @@ const AuthDashboardProfileLazyRoute =
   } as any).lazy(() =>
     import('./src/routes/_auth/dashboard/profile.lazy').then((d) => d.Route),
   )
-const AuthDashboardIcpAssetsLazyRoute =
-  AuthDashboardIcpAssetsLazyRouteImport.update({
-    id: '/icp-assets',
-    path: '/icp-assets',
-    getParentRoute: () => AuthDashboardRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./src/routes/_auth/dashboard/icp-assets.lazy').then((d) => d.Route),
-  )
 const AuthDashboardArweaveAssetsLazyRoute =
   AuthDashboardArweaveAssetsLazyRouteImport.update({
     id: '/arweave-assets',
@@ -297,6 +297,13 @@ const AuthDashboardLibrarianIndexLazyRoute =
       (d) => d.Route,
     ),
   )
+const AuthAppValoraIndexLazyRoute = AuthAppValoraIndexLazyRouteImport.update({
+  id: '/app/valora/',
+  path: '/app/valora/',
+  getParentRoute: () => AuthRouteLazyRoute,
+} as any).lazy(() =>
+  import('./src/routes/_auth/app/valora/index.lazy').then((d) => d.Route),
+)
 const AuthAppPerpetuaIndexLazyRoute =
   AuthAppPerpetuaIndexLazyRouteImport.update({
     id: '/app/perpetua/',
@@ -349,6 +356,16 @@ const AuthAppEmporiumMarketLogsRoute =
       (d) => d.Route,
     ),
   )
+const AuthAppValoraShelfShelfIdLazyRoute =
+  AuthAppValoraShelfShelfIdLazyRouteImport.update({
+    id: '/app/valora/shelf/$shelfId',
+    path: '/app/valora/shelf/$shelfId',
+    getParentRoute: () => AuthRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./src/routes/_auth/app/valora/shelf.$shelfId.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const AuthAppPerpetuaShelfShelfIdLazyRoute =
   AuthAppPerpetuaShelfShelfIdLazyRouteImport.update({
     id: '/app/perpetua/shelf/$shelfId',
@@ -369,6 +386,16 @@ const AuthAppPerpetuaItemItemIdLazyRoute =
       (d) => d.Route,
     ),
   )
+const AuthAppValoraUserUserIdIndexLazyRoute =
+  AuthAppValoraUserUserIdIndexLazyRouteImport.update({
+    id: '/app/valora/user/$userId/',
+    path: '/app/valora/user/$userId/',
+    getParentRoute: () => AuthRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./src/routes/_auth/app/valora/user/$userId/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const AuthAppPerpetuaUserUserIdIndexLazyRoute =
   AuthAppPerpetuaUserUserIdIndexLazyRouteImport.update({
     id: '/app/perpetua/user/$userId/',
@@ -379,15 +406,25 @@ const AuthAppPerpetuaUserUserIdIndexLazyRoute =
       (d) => d.Route,
     ),
   )
+const AuthAppValoraUserUserIdShelfShelfIdLazyRoute =
+  AuthAppValoraUserUserIdShelfShelfIdLazyRouteImport.update({
+    id: '/app/valora/user/$userId/shelf/$shelfId',
+    path: '/app/valora/user/$userId/shelf/$shelfId',
+    getParentRoute: () => AuthRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./src/routes/_auth/app/valora/user/$userId/shelf.$shelfId.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 const AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute =
   AuthAppPerpetuaUserUserIdShelfShelfIdLazyRouteImport.update({
     id: '/app/perpetua/user/$userId/shelf/$shelfId',
     path: '/app/perpetua/user/$userId/shelf/$shelfId',
     getParentRoute: () => AuthRouteLazyRoute,
   } as any).lazy(() =>
-    import(
-      './src/routes/_auth/app/perpetua/user/$userId/shelf.$shelfId.lazy'
-    ).then((d) => d.Route),
+    import('./src/routes/_auth/app/perpetua/user/$userId/shelf.$shelfId.lazy').then(
+      (d) => d.Route,
+    ),
   )
 const AuthAppPerpetuaUserUserIdItemItemIdLazyRoute =
   AuthAppPerpetuaUserUserIdItemItemIdLazyRouteImport.update({
@@ -395,9 +432,9 @@ const AuthAppPerpetuaUserUserIdItemItemIdLazyRoute =
     path: '/app/perpetua/user/$userId/item/$itemId',
     getParentRoute: () => AuthRouteLazyRoute,
   } as any).lazy(() =>
-    import(
-      './src/routes/_auth/app/perpetua/user/$userId/item.$itemId.lazy'
-    ).then((d) => d.Route),
+    import('./src/routes/_auth/app/perpetua/user/$userId/item.$itemId.lazy').then(
+      (d) => d.Route,
+    ),
   )
 
 export interface FileRoutesByFullPath {
@@ -422,7 +459,6 @@ export interface FileRoutesByFullPath {
   '/app/emporium': typeof AuthAppEmporiumRouteLazyRouteWithChildren
   '/app/pinax': typeof AuthAppPinaxLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
-  '/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
   '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/swap/burn': typeof AuthSwapBurnLazyRoute
@@ -433,12 +469,16 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/app/emporium/': typeof AuthAppEmporiumIndexRoute
   '/app/perpetua': typeof AuthAppPerpetuaIndexLazyRoute
+  '/app/valora': typeof AuthAppValoraIndexLazyRoute
   '/dashboard/': typeof AuthDashboardLibrarianIndexLazyRoute
   '/app/perpetua/item/$itemId': typeof AuthAppPerpetuaItemItemIdLazyRoute
   '/app/perpetua/shelf/$shelfId': typeof AuthAppPerpetuaShelfShelfIdLazyRoute
+  '/app/valora/shelf/$shelfId': typeof AuthAppValoraShelfShelfIdLazyRoute
   '/app/perpetua/user/$userId': typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
+  '/app/valora/user/$userId': typeof AuthAppValoraUserUserIdIndexLazyRoute
   '/app/perpetua/user/$userId/item/$itemId': typeof AuthAppPerpetuaUserUserIdItemItemIdLazyRoute
   '/app/perpetua/user/$userId/shelf/$shelfId': typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
+  '/app/valora/user/$userId/shelf/$shelfId': typeof AuthAppValoraUserUserIdShelfShelfIdLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -460,7 +500,6 @@ export interface FileRoutesByTo {
   '/info': typeof InfoIndexLazyRoute
   '/app/pinax': typeof AuthAppPinaxLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
-  '/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
   '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/swap/burn': typeof AuthSwapBurnLazyRoute
@@ -470,11 +509,15 @@ export interface FileRoutesByTo {
   '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/app/emporium': typeof AuthAppEmporiumIndexRoute
   '/app/perpetua': typeof AuthAppPerpetuaIndexLazyRoute
+  '/app/valora': typeof AuthAppValoraIndexLazyRoute
   '/app/perpetua/item/$itemId': typeof AuthAppPerpetuaItemItemIdLazyRoute
   '/app/perpetua/shelf/$shelfId': typeof AuthAppPerpetuaShelfShelfIdLazyRoute
+  '/app/valora/shelf/$shelfId': typeof AuthAppValoraShelfShelfIdLazyRoute
   '/app/perpetua/user/$userId': typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
+  '/app/valora/user/$userId': typeof AuthAppValoraUserUserIdIndexLazyRoute
   '/app/perpetua/user/$userId/item/$itemId': typeof AuthAppPerpetuaUserUserIdItemItemIdLazyRoute
   '/app/perpetua/user/$userId/shelf/$shelfId': typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
+  '/app/valora/user/$userId/shelf/$shelfId': typeof AuthAppValoraUserUserIdShelfShelfIdLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -502,7 +545,6 @@ export interface FileRoutesById {
   '/_auth/dashboard/_librarian': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   '/_auth/app/pinax': typeof AuthAppPinaxLazyRoute
   '/_auth/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
-  '/_auth/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
   '/_auth/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/_auth/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/_auth/swap/burn': typeof AuthSwapBurnLazyRoute
@@ -513,12 +555,16 @@ export interface FileRoutesById {
   '/_auth/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/_auth/app/emporium/': typeof AuthAppEmporiumIndexRoute
   '/_auth/app/perpetua/': typeof AuthAppPerpetuaIndexLazyRoute
+  '/_auth/app/valora/': typeof AuthAppValoraIndexLazyRoute
   '/_auth/dashboard/_librarian/': typeof AuthDashboardLibrarianIndexLazyRoute
   '/_auth/app/perpetua/item/$itemId': typeof AuthAppPerpetuaItemItemIdLazyRoute
   '/_auth/app/perpetua/shelf/$shelfId': typeof AuthAppPerpetuaShelfShelfIdLazyRoute
+  '/_auth/app/valora/shelf/$shelfId': typeof AuthAppValoraShelfShelfIdLazyRoute
   '/_auth/app/perpetua/user/$userId/': typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
+  '/_auth/app/valora/user/$userId/': typeof AuthAppValoraUserUserIdIndexLazyRoute
   '/_auth/app/perpetua/user/$userId/item/$itemId': typeof AuthAppPerpetuaUserUserIdItemItemIdLazyRoute
   '/_auth/app/perpetua/user/$userId/shelf/$shelfId': typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
+  '/_auth/app/valora/user/$userId/shelf/$shelfId': typeof AuthAppValoraUserUserIdShelfShelfIdLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -544,7 +590,6 @@ export interface FileRouteTypes {
     | '/app/emporium'
     | '/app/pinax'
     | '/dashboard/arweave-assets'
-    | '/dashboard/icp-assets'
     | '/dashboard/profile'
     | '/dashboard/settings'
     | '/swap/burn'
@@ -555,12 +600,16 @@ export interface FileRouteTypes {
     | '/dashboard/profile/upgrade'
     | '/app/emporium/'
     | '/app/perpetua'
+    | '/app/valora'
     | '/dashboard/'
     | '/app/perpetua/item/$itemId'
     | '/app/perpetua/shelf/$shelfId'
+    | '/app/valora/shelf/$shelfId'
     | '/app/perpetua/user/$userId'
+    | '/app/valora/user/$userId'
     | '/app/perpetua/user/$userId/item/$itemId'
     | '/app/perpetua/user/$userId/shelf/$shelfId'
+    | '/app/valora/user/$userId/shelf/$shelfId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -582,7 +631,6 @@ export interface FileRouteTypes {
     | '/info'
     | '/app/pinax'
     | '/dashboard/arweave-assets'
-    | '/dashboard/icp-assets'
     | '/dashboard/profile'
     | '/dashboard/settings'
     | '/swap/burn'
@@ -592,11 +640,15 @@ export interface FileRouteTypes {
     | '/dashboard/profile/upgrade'
     | '/app/emporium'
     | '/app/perpetua'
+    | '/app/valora'
     | '/app/perpetua/item/$itemId'
     | '/app/perpetua/shelf/$shelfId'
+    | '/app/valora/shelf/$shelfId'
     | '/app/perpetua/user/$userId'
+    | '/app/valora/user/$userId'
     | '/app/perpetua/user/$userId/item/$itemId'
     | '/app/perpetua/user/$userId/shelf/$shelfId'
+    | '/app/valora/user/$userId/shelf/$shelfId'
   id:
     | '__root__'
     | '/'
@@ -623,7 +675,6 @@ export interface FileRouteTypes {
     | '/_auth/dashboard/_librarian'
     | '/_auth/app/pinax'
     | '/_auth/dashboard/arweave-assets'
-    | '/_auth/dashboard/icp-assets'
     | '/_auth/dashboard/profile'
     | '/_auth/dashboard/settings'
     | '/_auth/swap/burn'
@@ -634,12 +685,16 @@ export interface FileRouteTypes {
     | '/_auth/dashboard/profile/upgrade'
     | '/_auth/app/emporium/'
     | '/_auth/app/perpetua/'
+    | '/_auth/app/valora/'
     | '/_auth/dashboard/_librarian/'
     | '/_auth/app/perpetua/item/$itemId'
     | '/_auth/app/perpetua/shelf/$shelfId'
+    | '/_auth/app/valora/shelf/$shelfId'
     | '/_auth/app/perpetua/user/$userId/'
+    | '/_auth/app/valora/user/$userId/'
     | '/_auth/app/perpetua/user/$userId/item/$itemId'
     | '/_auth/app/perpetua/user/$userId/shelf/$shelfId'
+    | '/_auth/app/valora/user/$userId/shelf/$shelfId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -825,13 +880,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardProfileLazyRouteImport
       parentRoute: typeof AuthDashboardRouteLazyRoute
     }
-    '/_auth/dashboard/icp-assets': {
-      id: '/_auth/dashboard/icp-assets'
-      path: '/icp-assets'
-      fullPath: '/dashboard/icp-assets'
-      preLoaderRoute: typeof AuthDashboardIcpAssetsLazyRouteImport
-      parentRoute: typeof AuthDashboardRouteLazyRoute
-    }
     '/_auth/dashboard/arweave-assets': {
       id: '/_auth/dashboard/arweave-assets'
       path: '/arweave-assets'
@@ -866,6 +914,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthDashboardLibrarianIndexLazyRouteImport
       parentRoute: typeof AuthDashboardLibrarianRouteLazyRoute
+    }
+    '/_auth/app/valora/': {
+      id: '/_auth/app/valora/'
+      path: '/app/valora'
+      fullPath: '/app/valora'
+      preLoaderRoute: typeof AuthAppValoraIndexLazyRouteImport
+      parentRoute: typeof AuthRouteLazyRoute
     }
     '/_auth/app/perpetua/': {
       id: '/_auth/app/perpetua/'
@@ -909,6 +964,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAppEmporiumMarketLogsRouteImport
       parentRoute: typeof AuthAppEmporiumRouteLazyRoute
     }
+    '/_auth/app/valora/shelf/$shelfId': {
+      id: '/_auth/app/valora/shelf/$shelfId'
+      path: '/app/valora/shelf/$shelfId'
+      fullPath: '/app/valora/shelf/$shelfId'
+      preLoaderRoute: typeof AuthAppValoraShelfShelfIdLazyRouteImport
+      parentRoute: typeof AuthRouteLazyRoute
+    }
     '/_auth/app/perpetua/shelf/$shelfId': {
       id: '/_auth/app/perpetua/shelf/$shelfId'
       path: '/app/perpetua/shelf/$shelfId'
@@ -923,11 +985,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAppPerpetuaItemItemIdLazyRouteImport
       parentRoute: typeof AuthRouteLazyRoute
     }
+    '/_auth/app/valora/user/$userId/': {
+      id: '/_auth/app/valora/user/$userId/'
+      path: '/app/valora/user/$userId'
+      fullPath: '/app/valora/user/$userId'
+      preLoaderRoute: typeof AuthAppValoraUserUserIdIndexLazyRouteImport
+      parentRoute: typeof AuthRouteLazyRoute
+    }
     '/_auth/app/perpetua/user/$userId/': {
       id: '/_auth/app/perpetua/user/$userId/'
       path: '/app/perpetua/user/$userId'
       fullPath: '/app/perpetua/user/$userId'
       preLoaderRoute: typeof AuthAppPerpetuaUserUserIdIndexLazyRouteImport
+      parentRoute: typeof AuthRouteLazyRoute
+    }
+    '/_auth/app/valora/user/$userId/shelf/$shelfId': {
+      id: '/_auth/app/valora/user/$userId/shelf/$shelfId'
+      path: '/app/valora/user/$userId/shelf/$shelfId'
+      fullPath: '/app/valora/user/$userId/shelf/$shelfId'
+      preLoaderRoute: typeof AuthAppValoraUserUserIdShelfShelfIdLazyRouteImport
       parentRoute: typeof AuthRouteLazyRoute
     }
     '/_auth/app/perpetua/user/$userId/shelf/$shelfId': {
@@ -981,7 +1057,6 @@ const AuthDashboardProfileLazyRouteWithChildren =
 interface AuthDashboardRouteLazyRouteChildren {
   AuthDashboardLibrarianRouteLazyRoute: typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   AuthDashboardArweaveAssetsLazyRoute: typeof AuthDashboardArweaveAssetsLazyRoute
-  AuthDashboardIcpAssetsLazyRoute: typeof AuthDashboardIcpAssetsLazyRoute
   AuthDashboardProfileLazyRoute: typeof AuthDashboardProfileLazyRouteWithChildren
   AuthDashboardSettingsLazyRoute: typeof AuthDashboardSettingsLazyRoute
 }
@@ -991,7 +1066,6 @@ const AuthDashboardRouteLazyRouteChildren: AuthDashboardRouteLazyRouteChildren =
     AuthDashboardLibrarianRouteLazyRoute:
       AuthDashboardLibrarianRouteLazyRouteWithChildren,
     AuthDashboardArweaveAssetsLazyRoute: AuthDashboardArweaveAssetsLazyRoute,
-    AuthDashboardIcpAssetsLazyRoute: AuthDashboardIcpAssetsLazyRoute,
     AuthDashboardProfileLazyRoute: AuthDashboardProfileLazyRouteWithChildren,
     AuthDashboardSettingsLazyRoute: AuthDashboardSettingsLazyRoute,
   }
@@ -1038,11 +1112,15 @@ interface AuthRouteLazyRouteChildren {
   AuthAppEmporiumRouteLazyRoute: typeof AuthAppEmporiumRouteLazyRouteWithChildren
   AuthAppPinaxLazyRoute: typeof AuthAppPinaxLazyRoute
   AuthAppPerpetuaIndexLazyRoute: typeof AuthAppPerpetuaIndexLazyRoute
+  AuthAppValoraIndexLazyRoute: typeof AuthAppValoraIndexLazyRoute
   AuthAppPerpetuaItemItemIdLazyRoute: typeof AuthAppPerpetuaItemItemIdLazyRoute
   AuthAppPerpetuaShelfShelfIdLazyRoute: typeof AuthAppPerpetuaShelfShelfIdLazyRoute
+  AuthAppValoraShelfShelfIdLazyRoute: typeof AuthAppValoraShelfShelfIdLazyRoute
   AuthAppPerpetuaUserUserIdIndexLazyRoute: typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
+  AuthAppValoraUserUserIdIndexLazyRoute: typeof AuthAppValoraUserUserIdIndexLazyRoute
   AuthAppPerpetuaUserUserIdItemItemIdLazyRoute: typeof AuthAppPerpetuaUserUserIdItemItemIdLazyRoute
   AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute: typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
+  AuthAppValoraUserUserIdShelfShelfIdLazyRoute: typeof AuthAppValoraUserUserIdShelfShelfIdLazyRoute
 }
 
 const AuthRouteLazyRouteChildren: AuthRouteLazyRouteChildren = {
@@ -1051,14 +1129,19 @@ const AuthRouteLazyRouteChildren: AuthRouteLazyRouteChildren = {
   AuthAppEmporiumRouteLazyRoute: AuthAppEmporiumRouteLazyRouteWithChildren,
   AuthAppPinaxLazyRoute: AuthAppPinaxLazyRoute,
   AuthAppPerpetuaIndexLazyRoute: AuthAppPerpetuaIndexLazyRoute,
+  AuthAppValoraIndexLazyRoute: AuthAppValoraIndexLazyRoute,
   AuthAppPerpetuaItemItemIdLazyRoute: AuthAppPerpetuaItemItemIdLazyRoute,
   AuthAppPerpetuaShelfShelfIdLazyRoute: AuthAppPerpetuaShelfShelfIdLazyRoute,
+  AuthAppValoraShelfShelfIdLazyRoute: AuthAppValoraShelfShelfIdLazyRoute,
   AuthAppPerpetuaUserUserIdIndexLazyRoute:
     AuthAppPerpetuaUserUserIdIndexLazyRoute,
+  AuthAppValoraUserUserIdIndexLazyRoute: AuthAppValoraUserUserIdIndexLazyRoute,
   AuthAppPerpetuaUserUserIdItemItemIdLazyRoute:
     AuthAppPerpetuaUserUserIdItemItemIdLazyRoute,
   AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute:
     AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute,
+  AuthAppValoraUserUserIdShelfShelfIdLazyRoute:
+    AuthAppValoraUserUserIdShelfShelfIdLazyRoute,
 }
 
 const AuthRouteLazyRouteWithChildren = AuthRouteLazyRoute._addFileChildren(

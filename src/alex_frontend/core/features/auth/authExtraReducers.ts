@@ -5,8 +5,6 @@ import signup from "../signup/thunks/signup";
 import login from "../login/thunks/login";
 import update from "./thunks/update";
 import { toast } from "sonner";
-import getCanisters from "./thunks/getCanisters";
-import { createCanister } from "./thunks/createCanister";
 
 export const buildAuthExtraReducers = (builder: ActionReducerMapBuilder<AuthState>) => {
     builder
@@ -58,62 +56,6 @@ export const buildAuthExtraReducers = (builder: ActionReducerMapBuilder<AuthStat
         })
         .addCase(login.rejected, (state, action) => {
             state.user = null;
-        })
-
-        // getCanisters slice
-        // getCanisters.ts
-        .addCase(getCanisters.pending, (state) => {
-            state.canister = undefined;
-            state.canisters = {};
-            state.canisterLoading = true;
-        })
-        .addCase(getCanisters.fulfilled, (state, action) => {
-            state.canisters = action.payload;
-            if(state.user && state.user.principal in action.payload){
-                state.canister = action.payload[state.user.principal];
-            }
-            state.canisterLoading = false;
-            state.canisterError = null;
-        })
-        .addCase(getCanisters.rejected, (state, action) => {
-            state.canister = undefined;
-            state.canisters = {};
-            state.canisterLoading = false;
-            state.canisterError = action.payload as string;
-        })
-
-        // createCanister slice
-        // createCanister.ts
-        .addCase(createCanister.pending, (state) => {
-            state.canister = undefined;
-            if (state.user) {
-                const {[state.user.principal]: _, ...remainingCanisters} = state.canisters;
-                state.canisters = remainingCanisters;
-            }
-            state.canisterError = null;
-            state.canisterLoading = true;
-        })
-        .addCase(createCanister.fulfilled, (state, action) => {
-            // Set the user's canister key when fulfilled
-            if (state.user) {
-                state.canister = action.payload;
-                state.canisters = {
-                    ...state.canisters,
-                    [state.user.principal]: action.payload
-                }
-            }
-            state.canisterError = null;
-            state.canisterLoading = false;
-        })
-        .addCase(createCanister.rejected, (state, action) => {
-            state.canister = undefined;
-
-            if (state.user) {
-                const {[state.user.principal]: _, ...remainingCanisters} = state.canisters;
-                state.canisters = remainingCanisters;
-            }
-            state.canisterError = action.payload as string;
-            state.canisterLoading = false;
         })
 
         // signup slice

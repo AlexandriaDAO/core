@@ -13,12 +13,6 @@ export interface ArweaveAssetsState {
 
 	selected: ArweaveAssetItem | null;
 
-	pulling: string | null;
-	pullError: string | null;
-
-	deleting: string | null;
-	deleteError: string | null;
-
 	loading: boolean;
 	error: string | null;
 }

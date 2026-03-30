@@ -33,7 +33,6 @@ import {
 	useTokenomics,
 	useUser,
 	useAlexWallet,
-	useAssetManager,
 	usePerpetua,
 	useLogs,
 	useEmporium,
@@ -87,7 +86,6 @@ const StatusPage: React.FC = () => {
 	const { actor: tokenomicsActor } = useTokenomics();
 	const { actor: userActor } = useUser();
 	const { actor: alexWalletActor } = useAlexWallet();
-	const { actor: assetManagerActor } = useAssetManager();
 	const { actor: perpetuaActor } = usePerpetua();
 	const { actor: logsActor } = useLogs();
 	const { actor: emporiumActor } = useEmporium();
@@ -114,7 +112,6 @@ const StatusPage: React.FC = () => {
 			{ name: "Tokenomics", status: "pending", message: "Checking...", category: "canister" },
 			{ name: "User", status: "pending", message: "Checking...", category: "canister" },
 			{ name: "Alex Wallet", status: "pending", message: "Checking...", category: "canister" },
-			{ name: "Asset Manager", status: "pending", message: "Checking...", category: "canister" },
 			{ name: "Perpetua", status: "pending", message: "Checking...", category: "canister" },
 			{ name: "Logs", status: "pending", message: "Checking...", category: "canister" },
 			{ name: "Emporium", status: "pending", message: "Checking...", category: "canister" },
@@ -212,11 +209,6 @@ const StatusPage: React.FC = () => {
 			// Alex Wallet - use get_my_wallets (returns empty array for anon)
 			checkCanister("Alex Wallet", alexWalletActor, async () => {
 				return await alexWalletActor.get_my_wallets();
-			}, () => "Connected"),
-
-			// Asset Manager - use get_caller_asset_canister
-			checkCanister("Asset Manager", assetManagerActor, async () => {
-				return await assetManagerActor.get_caller_asset_canister();
 			}, () => "Connected"),
 
 			// Perpetua - use get_recent_shelves
@@ -488,7 +480,7 @@ const StatusPage: React.FC = () => {
 	}, [
 		alexBackendActor, alexActor, lbryActor, icpLedgerActor, icpSwapActor,
 		nftManagerActor, tokenomicsActor, userActor, alexWalletActor,
-		assetManagerActor, perpetuaActor, logsActor, emporiumActor,
+		perpetuaActor, logsActor, emporiumActor,
 		updateCheck
 	]);
 
@@ -525,7 +517,6 @@ const StatusPage: React.FC = () => {
 			"Tokenomics": <Activity className="h-5 w-5" />,
 			"User": <Users className="h-5 w-5" />,
 			"Alex Wallet": <Wallet className="h-5 w-5" />,
-			"Asset Manager": <Box className="h-5 w-5" />,
 			"Perpetua": <BookOpen className="h-5 w-5" />,
 			"Logs": <FileText className="h-5 w-5" />,
 			"Emporium": <Box className="h-5 w-5" />,

@@ -2,7 +2,6 @@ export { default as useStripe } from "./useStripe";
 export { default as useAuthentication } from "./useAuthentication";
 export { default as useAlexBackend } from "./useAlexBackend";
 export { default as useAlex } from "./useAlex";
-export { default as useAssetManager } from "./useAssetManager";
 export { default as useUser } from "./useUser";
 export { default as useAlexWallet } from "./useAlexWallet";
 export { default as useIcpLedger } from "./useIcpLedger";

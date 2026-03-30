@@ -7,7 +7,6 @@ import {
 	useStripe,
 	useAuthentication,
 	useAlexBackend,
-	useAssetManager,
 	useUser,
 	useAlexWallet,
 	useIcpLedger,
@@ -31,7 +30,6 @@ export function useLogout() {
 	const stripe = useStripe();
 	const authentication = useAuthentication();
 	const alexBackend = useAlexBackend();
-	const assetManager = useAssetManager();
 	const user = useUser();
 	const alexWallet = useAlexWallet();
 	const icpLedger = useIcpLedger();
@@ -55,7 +53,6 @@ export function useLogout() {
 		stripe.reset();
 		authentication.reset();
 		alexBackend.reset();
-		assetManager.reset();
 		user.reset();
 		alexWallet.reset();
 		icpLedger.reset();

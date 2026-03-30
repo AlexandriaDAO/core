@@ -21,16 +21,15 @@ import addWalletReducer from "@/features/add-wallet/addWalletSlice";
 import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import pinaxReducer from "@/features/pinax/pinaxSlice";
 import perpetuaReducer from "@/apps/app/Perpetua/state/perpetuaSlice";
+import valoraReducer from "@/features/valora/store/slice";
 
 import transactionsReducer from "@/apps/Modules/shared/state/transactions/transactionSlice";
 
 import arweaveReducer from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import libraryReducer from "@/apps/Modules/shared/state/librarySearch/librarySlice";
 import nftDataReducer from "@/apps/Modules/shared/state/nftData/nftDataSlice";
-import assetManagerReducer from "@/apps/Modules/shared/state/assetManager/assetManagerSlice";
 
 import arweaveAssetsReducer from '@/features/arweave-assets/arweaveAssetsSlice';
-import icpAssetsReducer from '@/features/icp-assets/icpAssetsSlice';
 import marketplaceReducer from '@/features/marketplace/marketplaceSlice';
 import userDisplayReducer from './slices/userDisplaySlice';
 import balanceReducer from '@/features/balance/balanceSlice';
@@ -69,16 +68,15 @@ const rootReducer = combineReducers({
 	icpLedger: icpLedgerReducer,
 	portal: portalReducer,
 	perpetua: perpetuaReducer,
+	valora: valoraReducer,
 
 	arweave: arweaveReducer,
 	transactions: transactionsReducer,
 	library: libraryReducer,
 	nftData: nftDataReducer,
-	assetManager: assetManagerReducer,
 	marketplace: marketplaceReducer,
 
 	arweaveAssets: arweaveAssetsReducer,
-	icpAssets: icpAssetsReducer,
 	userDisplay: userDisplayReducer,
 	balance: balanceReducer,
 	insights: insightsReducer,

@@ -59,16 +59,6 @@ import {
   createActor as createActorIcpSwapFactory,
 } from "../../../../../icp_swap_factory";
 import {
-  createActor as createActorAssetCanister,
-  // asset_canister, // We will not use the potentially undefined global default
-} from "../../../../../asset_canister"; 
-
-import {
-  asset_manager,
-  createActor as createActorAssetManager,
-} from "../../../../../declarations/asset_manager";
-
-import {
   perpetua,
   createActor as createActorPerpetua,
 } from "../../../../../declarations/perpetua";
@@ -98,8 +88,6 @@ const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 const log_canister_id = process.env.CANISTER_ID_LOGS!;
 const perpetua_canister_id = process.env.CANISTER_ID_PERPETUA!;
 const icp_swap_factory_canister_id = "ggzvv-5qaaa-aaaag-qck7a-cai";
-const asset_manager_canister_id = process.env.CANISTER_ID_ASSET_MANAGER!;
-
 export const getPrincipal = (client: AuthClient): string =>
   client.getIdentity().getPrincipal().toString();
 
@@ -222,8 +210,3 @@ export const getIcpSwapFactoryCanister = () =>
     createActorIcpSwapFactory,
   );
 
-export const getActorUserAssetCanister = (canisterId: string) =>
-  getActor(canisterId, createActorAssetCanister);
-
-export const getActorAssetManager = () =>
-  getActor(asset_manager_canister_id, createActorAssetManager);
