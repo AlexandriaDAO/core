@@ -35,7 +35,9 @@ export function unwrapResult<T>(result: { Ok: T } | { Err: any }): T {
 	const err = result.Err;
 	if (typeof err === "string") throw new Error(err);
 	const key = Object.keys(err)[0];
-	throw new Error(key || "Unknown error");
+	const val = err[key];
+	const detail = val !== null && val !== undefined ? `: ${JSON.stringify(val)}` : "";
+	throw new Error(key ? `${key}${detail}` : "Unknown error");
 }
 
 export function getHourlySeed(): bigint {

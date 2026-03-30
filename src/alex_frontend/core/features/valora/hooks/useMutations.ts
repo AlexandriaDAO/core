@@ -18,7 +18,8 @@ export function useCreateShelf() {
 		}) => {
 			const desc: [] | [string] = description ? [description] : [];
 			const tagList: [] | [string[]] = tags ? [tags] : [];
-			const result = await actor!.store_shelf(title, desc, [], tagList);
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.store_shelf(title, desc, [], tagList);
 			return unwrapResult(result);
 		},
 		onSuccess: () => {
@@ -40,8 +41,9 @@ export function useUpdateShelfMetadata() {
 		}) => {
 			const t: [] | [string] = title ? [title] : [];
 			const d: [] | [string] = description !== undefined ? [description] : [];
-			const result = await actor!.update_shelf_metadata(shelfId, t, d);
-			unwrapResult(result);
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.update_shelf_metadata(shelfId, t, d);
+			return unwrapResult(result);
 		},
 		onMutate: async ({ shelfId, title, description }) => {
 			await qc.cancelQueries({ queryKey: valoraKeys.shelf(shelfId) });
@@ -76,8 +78,9 @@ export function useAddItem() {
 			before?: boolean;
 		}) => {
 			const ref: [] | [number] = referenceItemId !== undefined ? [referenceItemId] : [];
-			const result = await actor!.add_item_to_shelf(shelfId, { content, reference_item_id: ref, before });
-			unwrapResult(result);
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.add_item_to_shelf(shelfId, { content, reference_item_id: ref, before });
+			return unwrapResult(result);
 		},
 		onSuccess: (_, { shelfId }) => {
 			qc.invalidateQueries({ queryKey: valoraKeys.shelf(shelfId) });
@@ -91,7 +94,8 @@ export function useRemoveItem() {
 
 	return useMutation({
 		mutationFn: async ({ shelfId, itemId }: { shelfId: string; itemId: number }) => {
-			const result = await actor!.remove_item_from_shelf(shelfId, itemId);
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.remove_item_from_shelf(shelfId, itemId);
 			unwrapResult(result);
 		},
 		onMutate: async ({ shelfId, itemId }) => {
@@ -120,7 +124,8 @@ export function useSetItemOrder() {
 
 	return useMutation({
 		mutationFn: async ({ shelfId, itemIds }: { shelfId: string; itemIds: number[] }) => {
-			const result = await actor!.set_item_order(shelfId, itemIds);
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.set_item_order(shelfId, itemIds);
 			unwrapResult(result);
 		},
 		onSuccess: (_, { shelfId }) => {
@@ -140,7 +145,8 @@ export function useReorderProfileShelf() {
 			before: boolean;
 		}) => {
 			const ref: [] | [string] = referenceShelfId ? [referenceShelfId] : [];
-			const result = await actor!.reorder_profile_shelf(shelfId, ref, before);
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.reorder_profile_shelf(shelfId, ref, before);
 			unwrapResult(result);
 		},
 		onSuccess: () => {
@@ -155,7 +161,8 @@ export function useTogglePublicAccess() {
 
 	return useMutation({
 		mutationFn: async ({ shelfId, publicEditing }: { shelfId: string; publicEditing: boolean }) => {
-			const result = await actor!.toggle_shelf_public_access(shelfId, publicEditing);
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.toggle_shelf_public_access(shelfId, publicEditing);
 			unwrapResult(result);
 		},
 		onMutate: async ({ shelfId, publicEditing }) => {
@@ -181,7 +188,8 @@ export function useAddTag() {
 
 	return useMutation({
 		mutationFn: async ({ shelfId, tag }: { shelfId: string; tag: string }) => {
-			const result = await actor!.add_tag_to_shelf({ shelf_id: shelfId, tag });
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.add_tag_to_shelf({ shelf_id: shelfId, tag });
 			unwrapResult(result);
 		},
 		onMutate: async ({ shelfId, tag }) => {
@@ -211,7 +219,8 @@ export function useRemoveTag() {
 
 	return useMutation({
 		mutationFn: async ({ shelfId, tag }: { shelfId: string; tag: string }) => {
-			const result = await actor!.remove_tag_from_shelf({ shelf_id: shelfId, tag });
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.remove_tag_from_shelf({ shelf_id: shelfId, tag });
 			unwrapResult(result);
 		},
 		onMutate: async ({ shelfId, tag }) => {
@@ -241,7 +250,8 @@ export function useFollowTag() {
 
 	return useMutation({
 		mutationFn: async (tag: string) => {
-			const result = await actor!.follow_tag(tag);
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.follow_tag(tag);
 			unwrapResult(result);
 		},
 		onMutate: async (tag) => {
@@ -267,7 +277,8 @@ export function useUnfollowTag() {
 
 	return useMutation({
 		mutationFn: async (tag: string) => {
-			const result = await actor!.unfollow_tag(tag);
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.unfollow_tag(tag);
 			unwrapResult(result);
 		},
 		onMutate: async (tag) => {
@@ -293,7 +304,8 @@ export function useFollowUser() {
 
 	return useMutation({
 		mutationFn: async (principalStr: string) => {
-			const result = await actor!.follow_user(Principal.fromText(principalStr));
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.follow_user(Principal.fromText(principalStr));
 			unwrapResult(result);
 		},
 		onMutate: async (principalStr) => {
@@ -319,7 +331,8 @@ export function useUnfollowUser() {
 
 	return useMutation({
 		mutationFn: async (principalStr: string) => {
-			const result = await actor!.unfollow_user(Principal.fromText(principalStr));
+			if (!actor) throw new Error("Not authenticated");
+			const result = await actor.unfollow_user(Principal.fromText(principalStr));
 			unwrapResult(result);
 		},
 		onMutate: async (principalStr) => {
