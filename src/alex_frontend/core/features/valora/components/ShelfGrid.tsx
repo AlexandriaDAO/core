@@ -1,4 +1,5 @@
 import React from "react";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { Inbox } from "lucide-react";
 import type { Shelf } from "../types";
 import ShelfCard from "./ShelfCard";
@@ -21,16 +22,18 @@ export default function ShelfGrid({ shelves, basePath }: ShelfGridProps) {
 	}
 
 	return (
-		<div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
-			{shelves.map((shelf, index) => (
-				<div
-					key={shelf.shelfId}
-					className="animate-fade break-inside-avoid mb-5"
-					style={{ animationDelay: `${index * 50}ms`, animationFillMode: "both" }}
-				>
-					<ShelfCard shelf={shelf} basePath={basePath} />
-				</div>
-			))}
-		</div>
+		<ResponsiveMasonry columnsCountBreakPoints={{ 0: 1, 640: 2, 1024: 3, 1280: 4 }}>
+			<Masonry gutter="1.25rem">
+				{shelves.map((shelf, index) => (
+					<div
+						key={shelf.shelfId}
+						className="animate-fade w-full"
+						style={{ animationDelay: `${index * 50}ms`, animationFillMode: "both" }}
+					>
+						<ShelfCard shelf={shelf} basePath={basePath} />
+					</div>
+				))}
+			</Masonry>
+		</ResponsiveMasonry>
 	);
 }
