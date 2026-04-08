@@ -1,4 +1,5 @@
 import React, { Suspense, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import fetchPublicEngines from "@/features/public-engines/thunks/fetchPublicEngines";
 import { useUser } from "@/hooks/actors";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -16,6 +17,10 @@ function PublicEnginesPage() {
 
 	return (
 		<>
+			<Helmet>
+				<title>Public Engines | Alexandria</title>
+				<meta name="description" content="Explore public search engines created by Alexandria users." />
+			</Helmet>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">Public Engines</h1>
 			</div>

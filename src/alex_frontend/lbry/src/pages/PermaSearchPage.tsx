@@ -1,4 +1,5 @@
 import React from "react";
+import { Helmet } from "react-helmet-async";
 import { LoaderPinwheel } from "lucide-react";
 import { Alert } from "@/components/Alert";
 import { NFTCard } from "@/features/nft";
@@ -37,6 +38,10 @@ function PermaSearchPage() {
 
     return (
         <div className="py-10 px-4 flex-grow flex gap-8 flex-col items-center justify-center">
+            <Helmet>
+                <title>PermaSearch | Alexandria</title>
+                <meta name="description" content="Search Arweave transactions and content on Alexandria." />
+            </Helmet>
             <div className="max-w-5xl w-full flex flex-col gap-8">
                 <div className="flex flex-col justify-center items-center gap-6 text-center">
                     <div className="space-y-4">

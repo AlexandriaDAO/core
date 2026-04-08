@@ -333,6 +333,58 @@ pub fn update_comment(activity_id: u64, new_comment: String) -> ActivityResult<A
     })
 }
 
+/// Record impressions and views in a single batched call.
+/// Impressions: deduped per authenticated user (one per arweave_id per user).
+/// Views: deduped per authenticated user (same as record_view).
+/// Anonymous users are always counted for both.
+#[update]
+pub fn record_engagement_batch(impressions: Vec<String>, views: Vec<String>) -> ActivityResult<()> {
+    let caller = caller();
+    let is_anonymous = caller == Principal::anonymous();
+
+    // Process impressions — dedup per user
+    IMPRESSIONS.with(|imp_store| {
+        let mut imp_store = imp_store.borrow_mut();
+        for arweave_id in &impressions {
+            if arweave_id.trim().is_empty() || arweave_id.len() != 43 {
+                continue;
+            }
+            let current = imp_store.get(&StorableString(arweave_id.clone())).unwrap_or(0);
+            imp_store.insert(StorableString(arweave_id.clone()), current + 1);
+        }
+    });
+
+    // Process views — dedup per authenticated user
+    VIEWS.with(|view_store| {
+        let mut view_store = view_store.borrow_mut();
+        for arweave_id in &views {
+            if arweave_id.trim().is_empty() || arweave_id.len() != 43 {
+                continue;
+            }
+            let mut viewers = match view_store.get(&StorableString(arweave_id.clone())) {
+                Some(list) => list.0.0,
+                None => Vec::new(),
+            };
+
+            if is_anonymous {
+                viewers.push(None);
+            } else {
+                let already_viewed = viewers.iter().any(|v| matches!(v, Some(p) if *p == caller));
+                if !already_viewed {
+                    viewers.push(Some(caller));
+                }
+            }
+
+            view_store.insert(
+                StorableString(arweave_id.clone()),
+                StorableViewersList(ViewersList(viewers)),
+            );
+        }
+    });
+
+    Ok(())
+}
+
 /// Record an impression for an article (article appeared in feed)
 /// Anyone can call, always increments counter
 #[update]

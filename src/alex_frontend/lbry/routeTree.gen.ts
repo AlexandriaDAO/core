@@ -14,6 +14,7 @@ import { Route as rootRouteImport } from './src/routes/__root'
 import { Route as TokenomicsRouteImport } from './src/routes/tokenomics'
 import { Route as StatusRouteImport } from './src/routes/status'
 import { Route as IndexRouteImport } from './src/routes/index'
+import { Route as UserPrincipalRouteImport } from './src/routes/user.$principal'
 import { Route as SwapInsightsRouteImport } from './src/routes/swap/insights'
 import { Route as NftTokenIdRouteImport } from './src/routes/nft.$tokenId'
 import { Route as AppPermasearchRouteImport } from './src/routes/app/permasearch'
@@ -46,6 +47,9 @@ const AuthDashboardProfileLazyRouteImport = createFileRoute(
 const AuthDashboardArweaveAssetsLazyRouteImport = createFileRoute(
   '/_auth/dashboard/arweave-assets',
 )()
+const AuthDashboardAnalyticsLazyRouteImport = createFileRoute(
+  '/_auth/dashboard/analytics',
+)()
 const AuthAppPinaxLazyRouteImport = createFileRoute('/_auth/app/pinax')()
 const AuthDashboardLibrarianRouteLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian',
@@ -56,8 +60,6 @@ const AuthAppEmporiumRouteLazyRouteImport = createFileRoute(
 const AuthDashboardLibrarianIndexLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian/',
 )()
-const AuthAppValoraIndexLazyRouteImport =
-  createFileRoute('/_auth/app/valora/')()
 const AuthAppPerpetuaIndexLazyRouteImport = createFileRoute(
   '/_auth/app/perpetua/',
 )()
@@ -67,29 +69,14 @@ const AuthDashboardProfileUpgradeLazyRouteImport = createFileRoute(
 const AuthDashboardLibrarianWalletsLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian/wallets',
 )()
-const AuthAppValoraShelfShelfIdLazyRouteImport = createFileRoute(
-  '/_auth/app/valora/shelf/$shelfId',
-)()
 const AuthAppPerpetuaShelfShelfIdLazyRouteImport = createFileRoute(
   '/_auth/app/perpetua/shelf/$shelfId',
-)()
-const AuthAppPerpetuaItemItemIdLazyRouteImport = createFileRoute(
-  '/_auth/app/perpetua/item/$itemId',
-)()
-const AuthAppValoraUserUserIdIndexLazyRouteImport = createFileRoute(
-  '/_auth/app/valora/user/$userId/',
 )()
 const AuthAppPerpetuaUserUserIdIndexLazyRouteImport = createFileRoute(
   '/_auth/app/perpetua/user/$userId/',
 )()
-const AuthAppValoraUserUserIdShelfShelfIdLazyRouteImport = createFileRoute(
-  '/_auth/app/valora/user/$userId/shelf/$shelfId',
-)()
 const AuthAppPerpetuaUserUserIdShelfShelfIdLazyRouteImport = createFileRoute(
   '/_auth/app/perpetua/user/$userId/shelf/$shelfId',
-)()
-const AuthAppPerpetuaUserUserIdItemItemIdLazyRouteImport = createFileRoute(
-  '/_auth/app/perpetua/user/$userId/item/$itemId',
 )()
 
 const ManagerLazyRoute = ManagerLazyRouteImport.update({
@@ -195,6 +182,13 @@ const AuthDashboardRouteLazyRoute = AuthDashboardRouteLazyRouteImport.update({
 } as any).lazy(() =>
   import('./src/routes/_auth/dashboard/route.lazy').then((d) => d.Route),
 )
+const UserPrincipalRoute = UserPrincipalRouteImport.update({
+  id: '/user/$principal',
+  path: '/user/$principal',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() =>
+  import('./src/routes/user.$principal.lazy').then((d) => d.Route),
+)
 const SwapInsightsRoute = SwapInsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
@@ -263,6 +257,14 @@ const AuthDashboardArweaveAssetsLazyRoute =
       (d) => d.Route,
     ),
   )
+const AuthDashboardAnalyticsLazyRoute =
+  AuthDashboardAnalyticsLazyRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthDashboardRouteLazyRoute,
+  } as any).lazy(() =>
+    import('./src/routes/_auth/dashboard/analytics.lazy').then((d) => d.Route),
+  )
 const AuthAppPinaxLazyRoute = AuthAppPinaxLazyRouteImport.update({
   id: '/app/pinax',
   path: '/app/pinax',
@@ -297,13 +299,6 @@ const AuthDashboardLibrarianIndexLazyRoute =
       (d) => d.Route,
     ),
   )
-const AuthAppValoraIndexLazyRoute = AuthAppValoraIndexLazyRouteImport.update({
-  id: '/app/valora/',
-  path: '/app/valora/',
-  getParentRoute: () => AuthRouteLazyRoute,
-} as any).lazy(() =>
-  import('./src/routes/_auth/app/valora/index.lazy').then((d) => d.Route),
-)
 const AuthAppPerpetuaIndexLazyRoute =
   AuthAppPerpetuaIndexLazyRouteImport.update({
     id: '/app/perpetua/',
@@ -356,16 +351,6 @@ const AuthAppEmporiumMarketLogsRoute =
       (d) => d.Route,
     ),
   )
-const AuthAppValoraShelfShelfIdLazyRoute =
-  AuthAppValoraShelfShelfIdLazyRouteImport.update({
-    id: '/app/valora/shelf/$shelfId',
-    path: '/app/valora/shelf/$shelfId',
-    getParentRoute: () => AuthRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./src/routes/_auth/app/valora/shelf.$shelfId.lazy').then(
-      (d) => d.Route,
-    ),
-  )
 const AuthAppPerpetuaShelfShelfIdLazyRoute =
   AuthAppPerpetuaShelfShelfIdLazyRouteImport.update({
     id: '/app/perpetua/shelf/$shelfId',
@@ -373,26 +358,6 @@ const AuthAppPerpetuaShelfShelfIdLazyRoute =
     getParentRoute: () => AuthRouteLazyRoute,
   } as any).lazy(() =>
     import('./src/routes/_auth/app/perpetua/shelf.$shelfId.lazy').then(
-      (d) => d.Route,
-    ),
-  )
-const AuthAppPerpetuaItemItemIdLazyRoute =
-  AuthAppPerpetuaItemItemIdLazyRouteImport.update({
-    id: '/app/perpetua/item/$itemId',
-    path: '/app/perpetua/item/$itemId',
-    getParentRoute: () => AuthRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./src/routes/_auth/app/perpetua/item.$itemId.lazy').then(
-      (d) => d.Route,
-    ),
-  )
-const AuthAppValoraUserUserIdIndexLazyRoute =
-  AuthAppValoraUserUserIdIndexLazyRouteImport.update({
-    id: '/app/valora/user/$userId/',
-    path: '/app/valora/user/$userId/',
-    getParentRoute: () => AuthRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./src/routes/_auth/app/valora/user/$userId/index.lazy').then(
       (d) => d.Route,
     ),
   )
@@ -406,16 +371,6 @@ const AuthAppPerpetuaUserUserIdIndexLazyRoute =
       (d) => d.Route,
     ),
   )
-const AuthAppValoraUserUserIdShelfShelfIdLazyRoute =
-  AuthAppValoraUserUserIdShelfShelfIdLazyRouteImport.update({
-    id: '/app/valora/user/$userId/shelf/$shelfId',
-    path: '/app/valora/user/$userId/shelf/$shelfId',
-    getParentRoute: () => AuthRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./src/routes/_auth/app/valora/user/$userId/shelf.$shelfId.lazy').then(
-      (d) => d.Route,
-    ),
-  )
 const AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute =
   AuthAppPerpetuaUserUserIdShelfShelfIdLazyRouteImport.update({
     id: '/app/perpetua/user/$userId/shelf/$shelfId',
@@ -423,16 +378,6 @@ const AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute =
     getParentRoute: () => AuthRouteLazyRoute,
   } as any).lazy(() =>
     import('./src/routes/_auth/app/perpetua/user/$userId/shelf.$shelfId.lazy').then(
-      (d) => d.Route,
-    ),
-  )
-const AuthAppPerpetuaUserUserIdItemItemIdLazyRoute =
-  AuthAppPerpetuaUserUserIdItemItemIdLazyRouteImport.update({
-    id: '/app/perpetua/user/$userId/item/$itemId',
-    path: '/app/perpetua/user/$userId/item/$itemId',
-    getParentRoute: () => AuthRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./src/routes/_auth/app/perpetua/user/$userId/item.$itemId.lazy').then(
       (d) => d.Route,
     ),
   )
@@ -448,6 +393,7 @@ export interface FileRoutesByFullPath {
   '/app/permasearch': typeof AppPermasearchRoute
   '/nft/$tokenId': typeof NftTokenIdRoute
   '/swap/insights': typeof SwapInsightsRoute
+  '/user/$principal': typeof UserPrincipalRoute
   '/dashboard': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   '/info/audit': typeof InfoAuditLazyRoute
   '/info/faq': typeof InfoFaqLazyRoute
@@ -458,6 +404,7 @@ export interface FileRoutesByFullPath {
   '/info/': typeof InfoIndexLazyRoute
   '/app/emporium': typeof AuthAppEmporiumRouteLazyRouteWithChildren
   '/app/pinax': typeof AuthAppPinaxLazyRoute
+  '/dashboard/analytics': typeof AuthDashboardAnalyticsLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
   '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
@@ -469,16 +416,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/app/emporium/': typeof AuthAppEmporiumIndexRoute
   '/app/perpetua': typeof AuthAppPerpetuaIndexLazyRoute
-  '/app/valora': typeof AuthAppValoraIndexLazyRoute
   '/dashboard/': typeof AuthDashboardLibrarianIndexLazyRoute
-  '/app/perpetua/item/$itemId': typeof AuthAppPerpetuaItemItemIdLazyRoute
   '/app/perpetua/shelf/$shelfId': typeof AuthAppPerpetuaShelfShelfIdLazyRoute
-  '/app/valora/shelf/$shelfId': typeof AuthAppValoraShelfShelfIdLazyRoute
   '/app/perpetua/user/$userId': typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
-  '/app/valora/user/$userId': typeof AuthAppValoraUserUserIdIndexLazyRoute
-  '/app/perpetua/user/$userId/item/$itemId': typeof AuthAppPerpetuaUserUserIdItemItemIdLazyRoute
   '/app/perpetua/user/$userId/shelf/$shelfId': typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
-  '/app/valora/user/$userId/shelf/$shelfId': typeof AuthAppValoraUserUserIdShelfShelfIdLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -490,6 +431,7 @@ export interface FileRoutesByTo {
   '/app/permasearch': typeof AppPermasearchRoute
   '/nft/$tokenId': typeof NftTokenIdRoute
   '/swap/insights': typeof SwapInsightsRoute
+  '/user/$principal': typeof UserPrincipalRoute
   '/dashboard': typeof AuthDashboardLibrarianIndexLazyRoute
   '/info/audit': typeof InfoAuditLazyRoute
   '/info/faq': typeof InfoFaqLazyRoute
@@ -499,6 +441,7 @@ export interface FileRoutesByTo {
   '/swap/stake': typeof SwapStakeLazyRoute
   '/info': typeof InfoIndexLazyRoute
   '/app/pinax': typeof AuthAppPinaxLazyRoute
+  '/dashboard/analytics': typeof AuthDashboardAnalyticsLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
   '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
@@ -509,15 +452,9 @@ export interface FileRoutesByTo {
   '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/app/emporium': typeof AuthAppEmporiumIndexRoute
   '/app/perpetua': typeof AuthAppPerpetuaIndexLazyRoute
-  '/app/valora': typeof AuthAppValoraIndexLazyRoute
-  '/app/perpetua/item/$itemId': typeof AuthAppPerpetuaItemItemIdLazyRoute
   '/app/perpetua/shelf/$shelfId': typeof AuthAppPerpetuaShelfShelfIdLazyRoute
-  '/app/valora/shelf/$shelfId': typeof AuthAppValoraShelfShelfIdLazyRoute
   '/app/perpetua/user/$userId': typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
-  '/app/valora/user/$userId': typeof AuthAppValoraUserUserIdIndexLazyRoute
-  '/app/perpetua/user/$userId/item/$itemId': typeof AuthAppPerpetuaUserUserIdItemItemIdLazyRoute
   '/app/perpetua/user/$userId/shelf/$shelfId': typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
-  '/app/valora/user/$userId/shelf/$shelfId': typeof AuthAppValoraUserUserIdShelfShelfIdLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -532,6 +469,7 @@ export interface FileRoutesById {
   '/app/permasearch': typeof AppPermasearchRoute
   '/nft/$tokenId': typeof NftTokenIdRoute
   '/swap/insights': typeof SwapInsightsRoute
+  '/user/$principal': typeof UserPrincipalRoute
   '/_auth/dashboard': typeof AuthDashboardRouteLazyRouteWithChildren
   '/_auth/swap': typeof AuthSwapRouteLazyRouteWithChildren
   '/info/audit': typeof InfoAuditLazyRoute
@@ -544,6 +482,7 @@ export interface FileRoutesById {
   '/_auth/app/emporium': typeof AuthAppEmporiumRouteLazyRouteWithChildren
   '/_auth/dashboard/_librarian': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   '/_auth/app/pinax': typeof AuthAppPinaxLazyRoute
+  '/_auth/dashboard/analytics': typeof AuthDashboardAnalyticsLazyRoute
   '/_auth/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
   '/_auth/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/_auth/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
@@ -555,16 +494,10 @@ export interface FileRoutesById {
   '/_auth/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/_auth/app/emporium/': typeof AuthAppEmporiumIndexRoute
   '/_auth/app/perpetua/': typeof AuthAppPerpetuaIndexLazyRoute
-  '/_auth/app/valora/': typeof AuthAppValoraIndexLazyRoute
   '/_auth/dashboard/_librarian/': typeof AuthDashboardLibrarianIndexLazyRoute
-  '/_auth/app/perpetua/item/$itemId': typeof AuthAppPerpetuaItemItemIdLazyRoute
   '/_auth/app/perpetua/shelf/$shelfId': typeof AuthAppPerpetuaShelfShelfIdLazyRoute
-  '/_auth/app/valora/shelf/$shelfId': typeof AuthAppValoraShelfShelfIdLazyRoute
   '/_auth/app/perpetua/user/$userId/': typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
-  '/_auth/app/valora/user/$userId/': typeof AuthAppValoraUserUserIdIndexLazyRoute
-  '/_auth/app/perpetua/user/$userId/item/$itemId': typeof AuthAppPerpetuaUserUserIdItemItemIdLazyRoute
   '/_auth/app/perpetua/user/$userId/shelf/$shelfId': typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
-  '/_auth/app/valora/user/$userId/shelf/$shelfId': typeof AuthAppValoraUserUserIdShelfShelfIdLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -579,6 +512,7 @@ export interface FileRouteTypes {
     | '/app/permasearch'
     | '/nft/$tokenId'
     | '/swap/insights'
+    | '/user/$principal'
     | '/dashboard'
     | '/info/audit'
     | '/info/faq'
@@ -589,6 +523,7 @@ export interface FileRouteTypes {
     | '/info/'
     | '/app/emporium'
     | '/app/pinax'
+    | '/dashboard/analytics'
     | '/dashboard/arweave-assets'
     | '/dashboard/profile'
     | '/dashboard/settings'
@@ -600,16 +535,10 @@ export interface FileRouteTypes {
     | '/dashboard/profile/upgrade'
     | '/app/emporium/'
     | '/app/perpetua'
-    | '/app/valora'
     | '/dashboard/'
-    | '/app/perpetua/item/$itemId'
     | '/app/perpetua/shelf/$shelfId'
-    | '/app/valora/shelf/$shelfId'
     | '/app/perpetua/user/$userId'
-    | '/app/valora/user/$userId'
-    | '/app/perpetua/user/$userId/item/$itemId'
     | '/app/perpetua/user/$userId/shelf/$shelfId'
-    | '/app/valora/user/$userId/shelf/$shelfId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -621,6 +550,7 @@ export interface FileRouteTypes {
     | '/app/permasearch'
     | '/nft/$tokenId'
     | '/swap/insights'
+    | '/user/$principal'
     | '/dashboard'
     | '/info/audit'
     | '/info/faq'
@@ -630,6 +560,7 @@ export interface FileRouteTypes {
     | '/swap/stake'
     | '/info'
     | '/app/pinax'
+    | '/dashboard/analytics'
     | '/dashboard/arweave-assets'
     | '/dashboard/profile'
     | '/dashboard/settings'
@@ -640,15 +571,9 @@ export interface FileRouteTypes {
     | '/dashboard/profile/upgrade'
     | '/app/emporium'
     | '/app/perpetua'
-    | '/app/valora'
-    | '/app/perpetua/item/$itemId'
     | '/app/perpetua/shelf/$shelfId'
-    | '/app/valora/shelf/$shelfId'
     | '/app/perpetua/user/$userId'
-    | '/app/valora/user/$userId'
-    | '/app/perpetua/user/$userId/item/$itemId'
     | '/app/perpetua/user/$userId/shelf/$shelfId'
-    | '/app/valora/user/$userId/shelf/$shelfId'
   id:
     | '__root__'
     | '/'
@@ -662,6 +587,7 @@ export interface FileRouteTypes {
     | '/app/permasearch'
     | '/nft/$tokenId'
     | '/swap/insights'
+    | '/user/$principal'
     | '/_auth/dashboard'
     | '/_auth/swap'
     | '/info/audit'
@@ -674,6 +600,7 @@ export interface FileRouteTypes {
     | '/_auth/app/emporium'
     | '/_auth/dashboard/_librarian'
     | '/_auth/app/pinax'
+    | '/_auth/dashboard/analytics'
     | '/_auth/dashboard/arweave-assets'
     | '/_auth/dashboard/profile'
     | '/_auth/dashboard/settings'
@@ -685,16 +612,10 @@ export interface FileRouteTypes {
     | '/_auth/dashboard/profile/upgrade'
     | '/_auth/app/emporium/'
     | '/_auth/app/perpetua/'
-    | '/_auth/app/valora/'
     | '/_auth/dashboard/_librarian/'
-    | '/_auth/app/perpetua/item/$itemId'
     | '/_auth/app/perpetua/shelf/$shelfId'
-    | '/_auth/app/valora/shelf/$shelfId'
     | '/_auth/app/perpetua/user/$userId/'
-    | '/_auth/app/valora/user/$userId/'
-    | '/_auth/app/perpetua/user/$userId/item/$itemId'
     | '/_auth/app/perpetua/user/$userId/shelf/$shelfId'
-    | '/_auth/app/valora/user/$userId/shelf/$shelfId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -708,6 +629,7 @@ export interface RootRouteChildren {
   AppAlexandrianRoute: typeof AppAlexandrianRoute
   AppPermasearchRoute: typeof AppPermasearchRoute
   NftTokenIdRoute: typeof NftTokenIdRoute
+  UserPrincipalRoute: typeof UserPrincipalRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -824,6 +746,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardRouteLazyRouteImport
       parentRoute: typeof AuthRouteLazyRoute
     }
+    '/user/$principal': {
+      id: '/user/$principal'
+      path: '/user/$principal'
+      fullPath: '/user/$principal'
+      preLoaderRoute: typeof UserPrincipalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/swap/insights': {
       id: '/swap/insights'
       path: '/insights'
@@ -887,6 +816,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardArweaveAssetsLazyRouteImport
       parentRoute: typeof AuthDashboardRouteLazyRoute
     }
+    '/_auth/dashboard/analytics': {
+      id: '/_auth/dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof AuthDashboardAnalyticsLazyRouteImport
+      parentRoute: typeof AuthDashboardRouteLazyRoute
+    }
     '/_auth/app/pinax': {
       id: '/_auth/app/pinax'
       path: '/app/pinax'
@@ -914,13 +850,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthDashboardLibrarianIndexLazyRouteImport
       parentRoute: typeof AuthDashboardLibrarianRouteLazyRoute
-    }
-    '/_auth/app/valora/': {
-      id: '/_auth/app/valora/'
-      path: '/app/valora'
-      fullPath: '/app/valora'
-      preLoaderRoute: typeof AuthAppValoraIndexLazyRouteImport
-      parentRoute: typeof AuthRouteLazyRoute
     }
     '/_auth/app/perpetua/': {
       id: '/_auth/app/perpetua/'
@@ -964,32 +893,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAppEmporiumMarketLogsRouteImport
       parentRoute: typeof AuthAppEmporiumRouteLazyRoute
     }
-    '/_auth/app/valora/shelf/$shelfId': {
-      id: '/_auth/app/valora/shelf/$shelfId'
-      path: '/app/valora/shelf/$shelfId'
-      fullPath: '/app/valora/shelf/$shelfId'
-      preLoaderRoute: typeof AuthAppValoraShelfShelfIdLazyRouteImport
-      parentRoute: typeof AuthRouteLazyRoute
-    }
     '/_auth/app/perpetua/shelf/$shelfId': {
       id: '/_auth/app/perpetua/shelf/$shelfId'
       path: '/app/perpetua/shelf/$shelfId'
       fullPath: '/app/perpetua/shelf/$shelfId'
       preLoaderRoute: typeof AuthAppPerpetuaShelfShelfIdLazyRouteImport
-      parentRoute: typeof AuthRouteLazyRoute
-    }
-    '/_auth/app/perpetua/item/$itemId': {
-      id: '/_auth/app/perpetua/item/$itemId'
-      path: '/app/perpetua/item/$itemId'
-      fullPath: '/app/perpetua/item/$itemId'
-      preLoaderRoute: typeof AuthAppPerpetuaItemItemIdLazyRouteImport
-      parentRoute: typeof AuthRouteLazyRoute
-    }
-    '/_auth/app/valora/user/$userId/': {
-      id: '/_auth/app/valora/user/$userId/'
-      path: '/app/valora/user/$userId'
-      fullPath: '/app/valora/user/$userId'
-      preLoaderRoute: typeof AuthAppValoraUserUserIdIndexLazyRouteImport
       parentRoute: typeof AuthRouteLazyRoute
     }
     '/_auth/app/perpetua/user/$userId/': {
@@ -999,25 +907,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAppPerpetuaUserUserIdIndexLazyRouteImport
       parentRoute: typeof AuthRouteLazyRoute
     }
-    '/_auth/app/valora/user/$userId/shelf/$shelfId': {
-      id: '/_auth/app/valora/user/$userId/shelf/$shelfId'
-      path: '/app/valora/user/$userId/shelf/$shelfId'
-      fullPath: '/app/valora/user/$userId/shelf/$shelfId'
-      preLoaderRoute: typeof AuthAppValoraUserUserIdShelfShelfIdLazyRouteImport
-      parentRoute: typeof AuthRouteLazyRoute
-    }
     '/_auth/app/perpetua/user/$userId/shelf/$shelfId': {
       id: '/_auth/app/perpetua/user/$userId/shelf/$shelfId'
       path: '/app/perpetua/user/$userId/shelf/$shelfId'
       fullPath: '/app/perpetua/user/$userId/shelf/$shelfId'
       preLoaderRoute: typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRouteImport
-      parentRoute: typeof AuthRouteLazyRoute
-    }
-    '/_auth/app/perpetua/user/$userId/item/$itemId': {
-      id: '/_auth/app/perpetua/user/$userId/item/$itemId'
-      path: '/app/perpetua/user/$userId/item/$itemId'
-      fullPath: '/app/perpetua/user/$userId/item/$itemId'
-      preLoaderRoute: typeof AuthAppPerpetuaUserUserIdItemItemIdLazyRouteImport
       parentRoute: typeof AuthRouteLazyRoute
     }
   }
@@ -1056,6 +950,7 @@ const AuthDashboardProfileLazyRouteWithChildren =
 
 interface AuthDashboardRouteLazyRouteChildren {
   AuthDashboardLibrarianRouteLazyRoute: typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
+  AuthDashboardAnalyticsLazyRoute: typeof AuthDashboardAnalyticsLazyRoute
   AuthDashboardArweaveAssetsLazyRoute: typeof AuthDashboardArweaveAssetsLazyRoute
   AuthDashboardProfileLazyRoute: typeof AuthDashboardProfileLazyRouteWithChildren
   AuthDashboardSettingsLazyRoute: typeof AuthDashboardSettingsLazyRoute
@@ -1065,6 +960,7 @@ const AuthDashboardRouteLazyRouteChildren: AuthDashboardRouteLazyRouteChildren =
   {
     AuthDashboardLibrarianRouteLazyRoute:
       AuthDashboardLibrarianRouteLazyRouteWithChildren,
+    AuthDashboardAnalyticsLazyRoute: AuthDashboardAnalyticsLazyRoute,
     AuthDashboardArweaveAssetsLazyRoute: AuthDashboardArweaveAssetsLazyRoute,
     AuthDashboardProfileLazyRoute: AuthDashboardProfileLazyRouteWithChildren,
     AuthDashboardSettingsLazyRoute: AuthDashboardSettingsLazyRoute,
@@ -1112,15 +1008,9 @@ interface AuthRouteLazyRouteChildren {
   AuthAppEmporiumRouteLazyRoute: typeof AuthAppEmporiumRouteLazyRouteWithChildren
   AuthAppPinaxLazyRoute: typeof AuthAppPinaxLazyRoute
   AuthAppPerpetuaIndexLazyRoute: typeof AuthAppPerpetuaIndexLazyRoute
-  AuthAppValoraIndexLazyRoute: typeof AuthAppValoraIndexLazyRoute
-  AuthAppPerpetuaItemItemIdLazyRoute: typeof AuthAppPerpetuaItemItemIdLazyRoute
   AuthAppPerpetuaShelfShelfIdLazyRoute: typeof AuthAppPerpetuaShelfShelfIdLazyRoute
-  AuthAppValoraShelfShelfIdLazyRoute: typeof AuthAppValoraShelfShelfIdLazyRoute
   AuthAppPerpetuaUserUserIdIndexLazyRoute: typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
-  AuthAppValoraUserUserIdIndexLazyRoute: typeof AuthAppValoraUserUserIdIndexLazyRoute
-  AuthAppPerpetuaUserUserIdItemItemIdLazyRoute: typeof AuthAppPerpetuaUserUserIdItemItemIdLazyRoute
   AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute: typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
-  AuthAppValoraUserUserIdShelfShelfIdLazyRoute: typeof AuthAppValoraUserUserIdShelfShelfIdLazyRoute
 }
 
 const AuthRouteLazyRouteChildren: AuthRouteLazyRouteChildren = {
@@ -1129,19 +1019,11 @@ const AuthRouteLazyRouteChildren: AuthRouteLazyRouteChildren = {
   AuthAppEmporiumRouteLazyRoute: AuthAppEmporiumRouteLazyRouteWithChildren,
   AuthAppPinaxLazyRoute: AuthAppPinaxLazyRoute,
   AuthAppPerpetuaIndexLazyRoute: AuthAppPerpetuaIndexLazyRoute,
-  AuthAppValoraIndexLazyRoute: AuthAppValoraIndexLazyRoute,
-  AuthAppPerpetuaItemItemIdLazyRoute: AuthAppPerpetuaItemItemIdLazyRoute,
   AuthAppPerpetuaShelfShelfIdLazyRoute: AuthAppPerpetuaShelfShelfIdLazyRoute,
-  AuthAppValoraShelfShelfIdLazyRoute: AuthAppValoraShelfShelfIdLazyRoute,
   AuthAppPerpetuaUserUserIdIndexLazyRoute:
     AuthAppPerpetuaUserUserIdIndexLazyRoute,
-  AuthAppValoraUserUserIdIndexLazyRoute: AuthAppValoraUserUserIdIndexLazyRoute,
-  AuthAppPerpetuaUserUserIdItemItemIdLazyRoute:
-    AuthAppPerpetuaUserUserIdItemItemIdLazyRoute,
   AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute:
     AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute,
-  AuthAppValoraUserUserIdShelfShelfIdLazyRoute:
-    AuthAppValoraUserUserIdShelfShelfIdLazyRoute,
 }
 
 const AuthRouteLazyRouteWithChildren = AuthRouteLazyRoute._addFileChildren(
@@ -1195,6 +1077,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppAlexandrianRoute: AppAlexandrianRoute,
   AppPermasearchRoute: AppPermasearchRoute,
   NftTokenIdRoute: NftTokenIdRoute,
+  UserPrincipalRoute: UserPrincipalRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

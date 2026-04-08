@@ -21,7 +21,7 @@ import addWalletReducer from "@/features/add-wallet/addWalletSlice";
 import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import pinaxReducer from "@/features/pinax/pinaxSlice";
 import perpetuaReducer from "@/apps/app/Perpetua/state/perpetuaSlice";
-import valoraReducer from "@/features/valora/store/slice";
+import valoraReducer from "@/features/perpetua/store/slice";
 
 import transactionsReducer from "@/apps/Modules/shared/state/transactions/transactionSlice";
 

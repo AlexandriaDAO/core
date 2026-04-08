@@ -1,4 +1,5 @@
 import React, { lazy, Suspense, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useAlexWallet } from "@/hooks/actors";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -27,6 +28,10 @@ function WalletsPageCore() {
 
 	return (
 		<>
+			<Helmet>
+				<title>Wallets | Alexandria</title>
+				<meta name="description" content="Manage your Arweave wallets on Alexandria." />
+			</Helmet>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">My Arweave Wallets</h1>
 				<div className="flex items-center gap-2">

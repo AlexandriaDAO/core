@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getUnlockedLBRY from "@/features/balance/lbry/thunks/unlocked";
@@ -70,6 +71,10 @@ const ExchangePage: React.FC = () => {
 
 	return (
 		<div className="max-w-7xl mx-auto">
+			<Helmet>
+				<title>Swap | Alexandria</title>
+				<meta name="description" content="Swap ICP for LBRY tokens on Alexandria." />
+			</Helmet>
 			{/* Error Alert */}
 			{swapError && (
 				<div className="relative mb-6">

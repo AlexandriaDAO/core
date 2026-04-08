@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { Alert } from "@/components/Alert";
@@ -43,6 +44,10 @@ const EmporiumPage = () => {
 
 	return (
 		<div className="sm:w-10/12 flex flex-col gap-4">
+			<Helmet>
+				<title>Emporium | Alexandria</title>
+				<meta name="description" content="Browse and trade NFTs on the Alexandria marketplace." />
+			</Helmet>
 			<UnauthenticatedWarning />
 
 			<TopupBalanceWarning minimumBalance={15} />

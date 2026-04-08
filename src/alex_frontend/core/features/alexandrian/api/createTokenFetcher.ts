@@ -6,6 +6,7 @@ import { convertTokenData } from "../utils/convertTokenData";
 import { sortTokensByBalance } from "../utils/sortTokens";
 import { fetchBalances } from "./fetchBalances";
 import { calculatePagination } from "../utils/calculatePagination";
+import { alex_backend } from "../../../../../declarations/alex_backend";
 
 // Create the main fetcher function with type-safe parameters
 export const createTokenFetcher = () => {
@@ -56,6 +57,21 @@ export const createTokenFetcher = () => {
 			if (signal?.aborted) throw new Error('Request cancelled');
 
 			sortedTokens = sortTokensByBalance(tokens, balances, params.sortBy, params.sortOrder);
+		} else if (params.sortBy === 'trending') {
+			// Fetch trending arweave IDs sorted by views
+			const trendingEntries = await alex_backend.get_trending(BigInt(100));
+			const trendingOrder = new Map(
+				trendingEntries.map(([arweaveId, viewCount]: [string, bigint], index: number) => [arweaveId, index])
+			);
+
+			const tokenEntries = Object.entries(tokens);
+			tokenEntries.sort(([, a], [, b]) => {
+				const aIndex = trendingOrder.has(a.arweaveId) ? trendingOrder.get(a.arweaveId)! : Infinity;
+				const bIndex = trendingOrder.has(b.arweaveId) ? trendingOrder.get(b.arweaveId)! : Infinity;
+				return aIndex - bIndex;
+			});
+
+			sortedTokens = Object.fromEntries(tokenEntries);
 		}
 		// For 'default' sorting, tokens are already sorted by the API, so no action needed
 

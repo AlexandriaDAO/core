@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
-import SingleTokenView from '@/apps/Modules/AppModules/blinks/SingleTokenView'
+import NftPage from '../pages/NftPage'
 
 export const Route = createLazyFileRoute('/nft/$tokenId')({
-  component: SingleTokenView
+  component: NftPage
 })

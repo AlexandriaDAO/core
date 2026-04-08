@@ -51,7 +51,7 @@ const NftProvider = <T,>({ safe, loading, items, children, empty }: NftProviderP
 		if (currentIndex > 0) {
 			const prevItem = items[currentIndex - 1] as any;
 			const prevArweaveId = prevItem.arweaveId || prevItem.arweave_id || prevItem.id;
-			setModal({ id: prevArweaveId });
+			setModal({ id: prevArweaveId, token: prevItem });
 		}
 	};
 
@@ -61,7 +61,7 @@ const NftProvider = <T,>({ safe, loading, items, children, empty }: NftProviderP
 		if (currentIndex < items.length - 1) {
 			const nextItem = items[currentIndex + 1] as any;
 			const nextArweaveId = nextItem.arweaveId || nextItem.arweave_id || nextItem.id;
-			setModal({ id: nextArweaveId });
+			setModal({ id: nextArweaveId, token: nextItem });
 		}
 	};
 

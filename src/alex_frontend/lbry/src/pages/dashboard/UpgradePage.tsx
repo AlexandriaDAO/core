@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -38,6 +39,10 @@ const UpgradePage = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Upgrade | Alexandria</title>
+				<meta name="description" content="Upgrade your Alexandria account to become a librarian." />
+			</Helmet>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">Upgrade Profile</h1>
 			</div>

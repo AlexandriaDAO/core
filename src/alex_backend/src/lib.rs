@@ -11,11 +11,18 @@ pub use nft_users::{UserNFTInfo, get_stored_nft_users};
 // Dialectica module - social features (reactions, comments, views, impressions)
 pub mod dialectica;
 
+// Similarity module - NFT image similarity search using CLIP embeddings
+pub mod similarity;
+
 // Re-export dialectica types for candid export
 pub use dialectica::{
     Activity, ActivityType, ActivityError, ActivityResult,
     ReactionType, ReactionCounts, CommentInfo,
     AddCommentRequest, AddReactionRequest, ActivityResponse, UpdateCommentRequest,
+};
+
+pub use similarity::{
+    SimilarityResult, EmbeddingEntry, StoreResult,
 };
 
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
@@ -27,7 +34,7 @@ pub const ALEX_TOKEN_CANISTER_ID: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";
 type Memory = ic_stable_structures::memory_manager::VirtualMemory<DefaultMemoryImpl>;
 
 thread_local! {
-    static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
+    pub static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
         MemoryManager::init(DefaultMemoryImpl::default())
     );
     

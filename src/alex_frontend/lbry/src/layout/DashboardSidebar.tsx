@@ -1,5 +1,5 @@
 import React from "react";
-import { Boxes, Home, LayoutList, LogOut, Settings, User } from "lucide-react";
+import { Boxes, BarChart3, Home, LayoutList, LogOut, Settings, User } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useLogout } from "@/hooks/useLogout";
 
@@ -56,6 +56,22 @@ const DashboardSidebar = () => {
 					>
 						<Boxes size={18} />
 						<span>Arweave Assets</span>
+					</Link>
+
+					<Link
+						to="/dashboard/analytics"
+						activeOptions={{ exact: true }}
+						activeProps={{
+							className: "text-primary-foreground bg-primary",
+						}}
+						inactiveProps={{
+							className:
+								"text-primary/75 bg-muted hover:border-border hover:text-primary",
+						}}
+						className="px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border border-border/75"
+					>
+						<BarChart3 size={18} />
+						<span>Analytics</span>
 					</Link>
 
 				</div>

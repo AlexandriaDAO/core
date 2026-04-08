@@ -1,17 +1,15 @@
 use candid::{CandidType, Deserialize, Principal};
-use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
+use ic_stable_structures::memory_manager::{MemoryId, VirtualMemory};
 use ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap, Storable};
 use ic_stable_structures::storable::Bound;
 use std::cell::RefCell;
 use ic_cdk::api::call::CallResult;
 
+use crate::MEMORY_MANAGER;
+
 const MAX_VALUE_SIZE: u32 = 256;
 
 thread_local! {
-    static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
-        MemoryManager::init(DefaultMemoryImpl::default())
-    );
-
     static NFT_USERS: RefCell<StableBTreeMap<Principal, UserNFTInfo, VirtualMemory<DefaultMemoryImpl>>> =
         RefCell::new(StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(0))),
@@ -135,3 +133,4 @@ pub fn get_stored_nft_users() -> Vec<UserNFTInfo> {
             .collect()
     })
 }
+

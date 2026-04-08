@@ -141,10 +141,11 @@ class NFTAdapter implements TokenAdapter {
 			};
 
 			// Fetch all data concurrently
-			const [alexBalance, lbryBalance, rarityResult] = await Promise.allSettled([
+			const [alexBalance, lbryBalance, rarityResult, scionCountResult] = await Promise.allSettled([
 				ALEX.icrc1_balance_of(balanceParams),
 				LBRY.icrc1_balance_of(balanceParams),
 				feed.get_rarity_percentages_for_og_nfts([tokenId]),
+				feed.get_sbt_counts_for_og_nfts([tokenId]),
 			]);
 
 			// Process results
@@ -159,7 +160,15 @@ class NFTAdapter implements TokenAdapter {
 					rank = Number(rarityData[1]) || undefined;
 				}
 			}
-			return { alex: alexBalanceValue, lbry: lbryBalanceValue, rank };
+
+			let scionCount: number | undefined = undefined;
+			if (scionCountResult.status === "fulfilled" && scionCountResult.value.length > 0) {
+				const countData = scionCountResult.value[0];
+				if (countData && countData.length > 0) {
+					scionCount = Number(countData[1]) || undefined;
+				}
+			}
+			return { alex: alexBalanceValue, lbry: lbryBalanceValue, rank, scionCount };
 		} catch (error) {
 			console.warn(`Error fetching ICP info for NFT ${tokenId}:`, error);
 			return { alex: 0, lbry: 0 };

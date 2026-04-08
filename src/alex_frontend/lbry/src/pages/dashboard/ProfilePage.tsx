@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { LoaderCircle, Save } from "lucide-react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -155,6 +156,10 @@ function ProfilePage() {
 
 	return (
 		<>
+			<Helmet>
+				<title>Profile | Alexandria</title>
+				<meta name="description" content="Manage your Alexandria profile and account settings." />
+			</Helmet>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">Profile</h1>
 			</div>

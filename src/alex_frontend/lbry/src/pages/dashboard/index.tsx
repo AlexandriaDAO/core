@@ -1,8 +1,13 @@
 import React from "react";
+import { Helmet } from "react-helmet-async";
 
 function DashboardPage() {
 	return (
 		<>
+			<Helmet>
+				<title>Dashboard | Alexandria</title>
+				<meta name="description" content="Your Alexandria dashboard — manage your account and content." />
+			</Helmet>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">Home</h1>
 			</div>

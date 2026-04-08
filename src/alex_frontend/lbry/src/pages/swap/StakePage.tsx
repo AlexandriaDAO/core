@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { Alert } from '@/components/Alert';
@@ -22,6 +23,10 @@ const StakePage: React.FC = () => {
 
   return (
     <div className="px-4 py-8">
+      <Helmet>
+        <title>Stake | Alexandria</title>
+        <meta name="description" content="Stake ALEX tokens to earn ICP rewards on Alexandria." />
+      </Helmet>
       <div className="max-w-7xl mx-auto">
 
         {/* Error Alert */}

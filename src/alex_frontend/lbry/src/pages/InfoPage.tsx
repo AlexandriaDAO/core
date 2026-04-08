@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from "react-helmet-async";
 import { useNavigate, useLocation } from '@tanstack/react-router';
 import FAQPage from './FAQPage';
 import WhitepaperPage from './WhitepaperPage';
@@ -19,6 +20,10 @@ function InfoPage() {
 
     return (
         <div className="flex-grow bg-background p-4 md:p-8 overflow-auto">
+            <Helmet>
+                <title>Info | Alexandria</title>
+                <meta name="description" content="Information about the Alexandria platform and its features." />
+            </Helmet>
             <div className="max-w-4xl mx-auto">
                 <div className="flex justify-center mb-6">
                     <div className="inline-flex bg-balancebox rounded-lg p-1">

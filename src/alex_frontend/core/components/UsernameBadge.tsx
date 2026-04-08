@@ -4,6 +4,7 @@ import { AtSign } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { user } from "../../../declarations/user";
 import { Principal } from "@dfinity/principal";
+import { Link } from "@tanstack/react-router";
 
 interface UsernameBadgeProps {
 	principal: string;
@@ -28,13 +29,15 @@ const UsernameBadge: React.FC<UsernameBadgeProps> = ({ principal, className = ""
 	}
 
 	return (
-		<Badge 
-			variant="outline" 
-			className={`px-2 flex items-center gap-1 bg-purple-500/10 text-purple-700 border-purple-500/30 hover:bg-purple-500/20 hover:text-purple-800 transition-colors cursor-default ${className}`}
-		>
-			<AtSign size={12} />
-			{data.Ok.username}
-		</Badge>
+		<Link to="/user/$principal" params={{ principal }}>
+			<Badge
+				variant="outline"
+				className={`px-2 flex items-center gap-1 bg-purple-500/10 text-purple-700 border-purple-500/30 hover:bg-purple-500/20 hover:text-purple-800 transition-colors cursor-pointer ${className}`}
+			>
+				<AtSign size={12} />
+				{data.Ok.username}
+			</Badge>
+		</Link>
 	);
 };
 

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import TransactionHistory from '@/features/history/components/TransactionHistory';
 import TransactionPreview from '@/features/history/components/TransactionPreview';
@@ -44,6 +45,10 @@ const HistoryPage: React.FC = () => {
 
   return (
     <div className='p-6 bg-card rounded-bordertb shadow'>
+      <Helmet>
+        <title>History | Alexandria</title>
+        <meta name="description" content="View your transaction history on Alexandria." />
+      </Helmet>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
         <div className="lg:col-span-2">
           <TransactionHistory />

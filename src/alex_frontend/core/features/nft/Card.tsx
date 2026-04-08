@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Badge } from "@/lib/components/badge";
 import Preview from "./components/Asset/Preview";
 import useInit from "./hooks/useInit";
@@ -8,6 +8,7 @@ import { AlexandrianToken } from "../alexandrian/types";
 import { useNftContext } from "@/components/NftProvider";
 import { Loader } from 'lucide-react';
 import { useInView } from "react-intersection-observer";
+import { trackImpression } from "@/services/engagementService";
 interface NftProps {
 	id: string;
 	action?: React.ReactNode;
@@ -19,12 +20,18 @@ interface NftProps {
 
 const NFTCard: React.FC<NftProps> = ({ id, action, price, token }) => {
 	const { ref, inView } = useInView({
-		triggerOnce: false, // Only render once, never unmount
+		triggerOnce: false,
 		threshold: 0,
-		rootMargin: '1500px', // Start loading 1500px before entering viewport
+		rootMargin: '1500px',
     });
 
 	const { safe, setModal} = useNftContext();
+
+	useEffect(() => {
+		if (inView && token) {
+			trackImpression(id);
+		}
+	}, [inView, token, id]);
 
 	return (
 		<ErrorBoundary fallback={<Preview title="Asset failed to load" />}>

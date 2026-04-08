@@ -14,7 +14,7 @@ export interface AlexandrianState {
 	totalItems: number;
 
 	// Sorting
-	sortBy: "default" | "alex" | "lbry";
+	sortBy: "default" | "alex" | "lbry" | "trending";
 
 	// Loading states
 	loading: boolean;

@@ -19,7 +19,7 @@ export function SortBySelector({ disabled }: SortBySelectorProps) {
 	const { sortBy } = useAppSelector((state) => state.alexandrian);
 
 	const handleSortByChange = (value: string) => {
-		if (value === "default" || value === "alex" || value === "lbry") {
+		if (value === "default" || value === "alex" || value === "lbry" || value === "trending") {
 			dispatch(setSortBy(value));
 		}
 	};
@@ -29,9 +29,10 @@ export function SortBySelector({ disabled }: SortBySelectorProps) {
 			disabled={disabled}
 			onValueChange={handleSortByChange}
 		>
-			<SelectTrigger className="w-20 h-7 text-xs font-roboto-condensed"><SelectValue /></SelectTrigger>
+			<SelectTrigger className="w-24 h-7 text-xs font-roboto-condensed"><SelectValue /></SelectTrigger>
 			<SelectContent>
 				<SelectItem value="default">Sort By</SelectItem>
+				<SelectItem value="trending">Trending</SelectItem>
 				<SelectItem value="alex">ALEX</SelectItem>
 				<SelectItem value="lbry">LBRY</SelectItem>
 			</SelectContent>
