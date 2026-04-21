@@ -17,31 +17,28 @@ import { fetchAudios } from "@/features/sonora/browse/thunks/fetchAudios";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { ArweaveAudio, Audio } from "@/features/sonora/types";
 
+const convertToAudio = (arweaveAudio: ArweaveAudio): Audio => {
+	let contentType = arweaveAudio.data?.type;
+	if (!contentType) {
+		const contentTypeTag = arweaveAudio.tags?.find(
+			(tag) => tag.name === "Content-Type"
+		);
+		contentType = contentTypeTag?.value || "";
+	}
+	return {
+		id: arweaveAudio.id,
+		type: contentType,
+		size: arweaveAudio.data?.size || null,
+		timestamp: new Date(
+			arweaveAudio.block.timestamp * 1000
+		).toISOString(),
+	};
+};
+
 const BrowsePage: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const { audios, loading, error, hasNext, loadMore, isEmpty } =
 		useArweaveAudios();
-
-	// Convert ArweaveAudio to Audio format for AudioCard
-	const convertToAudio = (arweaveAudio: ArweaveAudio): Audio => {
-		// Try to get content type from data.type or Content-Type tag
-		let contentType = arweaveAudio.data?.type;
-		if (!contentType) {
-			const contentTypeTag = arweaveAudio.tags?.find(
-				(tag) => tag.name === "Content-Type"
-			);
-			contentType = contentTypeTag?.value || "";
-		}
-
-		return {
-			id: arweaveAudio.id,
-			type: contentType,
-			size: arweaveAudio.data?.size || null,
-			timestamp: new Date(
-				arweaveAudio.block.timestamp * 1000
-			).toISOString(),
-		};
-	};
 
 	// Fetch initial data on mount
 	useEffect(() => {

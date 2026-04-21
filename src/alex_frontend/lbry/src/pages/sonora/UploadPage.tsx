@@ -1,5 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { toast } from "sonner";
 import { Button } from "@/lib/components/button";
 import { Upload, Mic, X, LoaderPinwheel } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -29,10 +30,18 @@ const SonoraUploadPage: React.FC = () => {
 		resetUpload,
 	} = useUploadAndMint();
 
+	useEffect(() => {
+		return () => {
+			if (audioUrl.startsWith("blob:")) {
+				URL.revokeObjectURL(audioUrl);
+			}
+		};
+	}, [audioUrl]);
+
 	const handleFileSelect = (file: File) => {
 		// Validate audio file
 		if (!file.type.startsWith("audio/")) {
-			alert("Please select an audio file");
+			toast.error("Please select an audio file");
 			return;
 		}
 
@@ -115,142 +124,142 @@ const SonoraUploadPage: React.FC = () => {
 
 	return (
 		<>
-		<Helmet>
-			<title>Upload Audio | Sonora | Alexandria</title>
-			<meta name="description" content="Upload your audio files and mint them as NFTs on Alexandria's permanent web." />
-		</Helmet>
-		<div className="flex-grow flex flex-col justify-center">
-			<div className="max-w-4xl mx-auto space-y-8">
-				<div className="text-center space-y-4">
-					<p className="text-lg text-muted-foreground">
-						Share your audio content with the world
-					</p>
-				</div>
-
-				{/* File Upload Area */}
-				<div>
-					<div
-						className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-							isDragging
-								? "border-primary bg-primary/5"
-								: "border-muted-foreground/25 hover:border-primary/50"
-						}`}
-						onDragOver={handleDragOver}
-						onDragLeave={handleDragLeave}
-						onDrop={handleDrop}
-					>
-						<input
-							ref={fileInputRef}
-							type="file"
-							accept="audio/*"
-							onChange={handleFileInput}
-							className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-						/>
-
-						<div className="space-y-4">
-							<Upload className="w-12 h-12 text-muted-foreground mx-auto" />
-							<div className="space-y-2">
-								<p className="text-lg font-medium">
-									{selectedFile
-										? selectedFile.name
-										: "Drop your audio file here"}
-								</p>
-								<p className="text-sm text-muted-foreground">
-									or click to browse • Supports MP3, WAV, OGG
-								</p>
-							</div>
-						</div>
-					</div>
-
-					{/* Record option below upload box */}
-					<div className="text-center mt-1">
-						<p className="text-sm text-muted-foreground">
-							<Link to="/app/sonora/record">
-								<Button
-									variant="muted"
-									scale="sm"
-									className="gap-1 py-0 px-1 my-0"
-								>
-									or
-									<Mic size={16} className="p-0" />
-									Record a new audio
-								</Button>
-							</Link>
+			<Helmet>
+				<title>Upload Audio | Sonora | Alexandria</title>
+				<meta name="description" content="Upload your audio files and mint them as NFTs on Alexandria's permanent web." />
+			</Helmet>
+			<div className="flex-grow flex flex-col justify-center">
+				<div className="max-w-4xl mx-auto space-y-8">
+					<div className="text-center space-y-4">
+						<p className="text-lg text-muted-foreground">
+							Share your audio content with the world
 						</p>
 					</div>
-				</div>
 
-				{/* Audio Preview */}
-				{selectedFile && selected && (
-					<div className="space-y-4">
-						<div className="flex items-center justify-between">
-							<h3 className="text-lg font-medium">
-								{audioUrl.startsWith("blob:")
-									? "Preview"
-									: "Uploaded to Arweave"}
-							</h3>
+					{/* File Upload Area */}
+					<div>
+						<div
+							className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+								isDragging
+									? "border-primary bg-primary/5"
+									: "border-muted-foreground/25 hover:border-primary/50"
+							}`}
+							onDragOver={handleDragOver}
+							onDragLeave={handleDragLeave}
+							onDrop={handleDrop}
+						>
+							<input
+								ref={fileInputRef}
+								type="file"
+								accept="audio/*"
+								onChange={handleFileInput}
+								className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+							/>
+
+							<div className="space-y-4">
+								<Upload className="w-12 h-12 text-muted-foreground mx-auto" />
+								<div className="space-y-2">
+									<p className="text-lg font-medium">
+										{selectedFile
+											? selectedFile.name
+											: "Drop your audio file here"}
+									</p>
+									<p className="text-sm text-muted-foreground">
+										or click to browse • Supports MP3, WAV, OGG
+									</p>
+								</div>
+							</div>
+						</div>
+
+						{/* Record option below upload box */}
+						<div className="text-center mt-1">
+							<p className="text-sm text-muted-foreground">
+								<Link to="/app/sonora/record">
+									<Button
+										variant="muted"
+										scale="sm"
+										className="gap-1 py-0 px-1 my-0"
+									>
+										or
+										<Mic size={16} className="p-0" />
+										Record a new audio
+									</Button>
+								</Link>
+							</p>
+						</div>
+					</div>
+
+					{/* Audio Preview */}
+					{selectedFile && selected && (
+						<div className="space-y-4">
+							<div className="flex items-center justify-between">
+								<h3 className="text-lg font-medium">
+									{audioUrl.startsWith("blob:")
+										? "Preview"
+										: "Uploaded to Arweave"}
+								</h3>
+								<Button
+									variant="ghost"
+									scale="sm"
+									onClick={handleRemoveFile}
+									className="text-muted-foreground hover:text-foreground"
+								>
+									<X size={16} />
+									{audioUrl.startsWith("blob:")
+										? "Remove"
+										: "Clear"}
+								</Button>
+							</div>
+							<AudioCard item={selected} />
+						</div>
+					)}
+
+					{/* Error and Success Messages */}
+					{error && (
+						<div className="text-center p-4 bg-destructive/10 border border-destructive rounded-lg">
+							<p className="text-destructive font-medium">{error}</p>
+						</div>
+					)}
+
+					{success && (
+						<div className="text-center p-4 bg-green-500/10 border border-green-500 rounded-lg">
+							<p className="text-green-600 font-medium">{success}</p>
+						</div>
+					)}
+
+					{/* Upload Button */}
+					{selectedFile && audioUrl.startsWith("blob:") && (
+						<div className="flex justify-center">
 							<Button
-								variant="ghost"
-								scale="sm"
-								onClick={handleRemoveFile}
-								className="text-muted-foreground hover:text-foreground"
+								onClick={handleUpload}
+								className="gap-2"
+								disabled={isProcessing}
 							>
-								<X size={16} />
-								{audioUrl.startsWith("blob:")
-									? "Remove"
-									: "Clear"}
+								{isProcessing ? (
+									<>
+										<LoaderPinwheel
+											size={16}
+											className="animate-spin"
+										/>
+										{estimating
+											? "Estimating..."
+											: uploading
+												? `Uploading ${Math.round(progress)}%`
+												: minting
+													? "Minting..."
+													: "Processing..."}
+									</>
+								) : (
+									<>
+										<Upload size={16} />
+										Upload & Mint NFT
+									</>
+								)}
 							</Button>
 						</div>
-						<AudioCard item={selected} />
-					</div>
-				)}
-
-				{/* Error and Success Messages */}
-				{error && (
-					<div className="text-center p-4 bg-destructive/10 border border-destructive rounded-lg">
-						<p className="text-destructive font-medium">{error}</p>
-					</div>
-				)}
-
-				{success && (
-					<div className="text-center p-4 bg-green-500/10 border border-green-500 rounded-lg">
-						<p className="text-green-600 font-medium">{success}</p>
-					</div>
-				)}
-
-				{/* Upload Button */}
-				{selectedFile && audioUrl.startsWith("blob:") && (
-					<div className="flex justify-center">
-						<Button
-							onClick={handleUpload}
-							className="gap-2"
-							disabled={isProcessing}
-						>
-							{isProcessing ? (
-								<>
-									<LoaderPinwheel
-										size={16}
-										className="animate-spin"
-									/>
-									{estimating
-										? "Estimating..."
-										: uploading
-											? `Uploading ${Math.round(progress)}%`
-											: minting
-												? "Minting..."
-												: "Processing..."}
-								</>
-							) : (
-								<>
-									<Upload size={16} />
-									Upload & Mint NFT
-								</>
-							)}
-						</Button>
-					</div>
-				)}
+					)}
+				</div>
 			</div>
-		</div>
 		</>
 	);
 };

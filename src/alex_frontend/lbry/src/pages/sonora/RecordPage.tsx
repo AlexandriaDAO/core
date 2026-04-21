@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/lib/components/button";
 import { Mic, Square, Upload, Trash2, LoaderPinwheel } from "lucide-react";
@@ -33,6 +33,26 @@ const SonoraRecordPage: React.FC = () => {
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	const dispatch = useAppDispatch();
 	const { selected } = useAppSelector((state) => state.sonora);
+
+	useEffect(() => {
+		return () => {
+			streamRef.current?.getTracks().forEach((t) => t.stop());
+			if (timerRef.current) clearInterval(timerRef.current);
+			const recorder = mediaRecorderRef.current;
+			if (recorder?.state === "recording") {
+				recorder.onstop = null;
+				recorder.stop();
+			}
+		};
+	}, []);
+
+	useEffect(() => {
+		return () => {
+			if (recordedUrl.startsWith("blob:")) {
+				URL.revokeObjectURL(recordedUrl);
+			}
+		};
+	}, [recordedUrl]);
 
 	const startRecording = async () => {
 		try {
@@ -156,177 +176,177 @@ const SonoraRecordPage: React.FC = () => {
 
 	return (
 		<>
-		<Helmet>
-			<title>Record Audio | Sonora | Alexandria</title>
-			<meta name="description" content="Record audio directly in your browser and mint it as an NFT on Alexandria." />
-		</Helmet>
-		<div className="flex-grow flex flex-col justify-center">
-			<div className="max-w-4xl mx-auto space-y-8">
-				<div className="text-center space-y-4">
-					<p className="text-lg text-muted-foreground">
-						Record audio content directly in your browser
-					</p>
-				</div>
-
-				{/* Recording Interface */}
-				<div>
-					<div className="bg-card rounded-lg border p-8 text-center space-y-6">
-						{/* Recording Status */}
-						<div className="space-y-2">
-							<div
-								className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center ${
-									isRecording
-										? "bg-red-500 animate-pulse"
-										: recordedBlob
-											? "bg-green-500"
-											: "bg-muted"
-								}`}
-							>
-								<Mic size={32} className="text-white" />
-							</div>
-
-							<div className="text-2xl font-mono">
-								{formatTime(recordingTime)}
-							</div>
-
-							{isRecording && (
-								<p className="text-sm text-red-500 animate-pulse">
-									Recording in progress...
-								</p>
-							)}
-
-							{recordedBlob && !isRecording && (
-								<p className="text-sm text-green-600">
-									Recording completed
-								</p>
-							)}
-						</div>
-
-						{/* Error Message */}
-						{recordingError && (
-							<div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-								<p className="text-destructive text-sm">
-									{recordingError}
-								</p>
-							</div>
-						)}
-
-						{/* Control Buttons */}
-						<div className="flex justify-center gap-4">
-							{!isRecording && !recordedBlob && (
-								<Button
-									onClick={startRecording}
-									scale="lg"
-									className="gap-2"
-								>
-									<Mic size={20} />
-									Start Recording
-								</Button>
-							)}
-
-							{isRecording && (
-								<Button
-									onClick={stopRecording}
-									variant="destructive"
-									scale="lg"
-									className="gap-2"
-								>
-									<Square size={20} />
-									Stop Recording
-								</Button>
-							)}
-						</div>
-					</div>
-
-					{/* Upload option below recording box */}
-					<div className="text-center mt-1">
-						<p className="text-sm text-muted-foreground">
-							<Link to="/app/sonora/upload">
-								<Button
-									variant="muted"
-									scale="sm"
-									className="gap-1 py-0 px-1 my-0"
-								>
-									or
-									<Upload size={16} className="p-0" />
-									upload an existing audio file
-								</Button>
-							</Link>
+			<Helmet>
+				<title>Record Audio | Sonora | Alexandria</title>
+				<meta name="description" content="Record audio directly in your browser and mint it as an NFT on Alexandria." />
+			</Helmet>
+			<div className="flex-grow flex flex-col justify-center">
+				<div className="max-w-4xl mx-auto space-y-8">
+					<div className="text-center space-y-4">
+						<p className="text-lg text-muted-foreground">
+							Record audio content directly in your browser
 						</p>
 					</div>
-				</div>
 
-				{/* Audio Preview */}
-				{(recordedBlob || recordedUrl) && selected && !isRecording && (
-					<div className="space-y-4">
-						<div className="flex items-center justify-between">
-							<h3 className="text-lg font-medium">
-								{recordedBlob
-									? "Preview"
-									: "Uploaded to Arweave"}
-							</h3>
+					{/* Recording Interface */}
+					<div>
+						<div className="bg-card rounded-lg border p-8 text-center space-y-6">
+							{/* Recording Status */}
+							<div className="space-y-2">
+								<div
+									className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center ${
+										isRecording
+											? "bg-red-500 animate-pulse"
+											: recordedBlob
+												? "bg-green-500"
+												: "bg-muted"
+									}`}
+								>
+									<Mic size={32} className="text-white" />
+								</div>
+
+								<div className="text-2xl font-mono">
+									{formatTime(recordingTime)}
+								</div>
+
+								{isRecording && (
+									<p className="text-sm text-red-500 animate-pulse">
+										Recording in progress...
+									</p>
+								)}
+
+								{recordedBlob && !isRecording && (
+									<p className="text-sm text-green-600">
+										Recording completed
+									</p>
+								)}
+							</div>
+
+							{/* Error Message */}
+							{recordingError && (
+								<div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+									<p className="text-destructive text-sm">
+										{recordingError}
+									</p>
+								</div>
+							)}
+
+							{/* Control Buttons */}
+							<div className="flex justify-center gap-4">
+								{!isRecording && !recordedBlob && (
+									<Button
+										onClick={startRecording}
+										scale="lg"
+										className="gap-2"
+									>
+										<Mic size={20} />
+										Start Recording
+									</Button>
+								)}
+
+								{isRecording && (
+									<Button
+										onClick={stopRecording}
+										variant="destructive"
+										scale="lg"
+										className="gap-2"
+									>
+										<Square size={20} />
+										Stop Recording
+									</Button>
+								)}
+							</div>
+						</div>
+
+						{/* Upload option below recording box */}
+						<div className="text-center mt-1">
+							<p className="text-sm text-muted-foreground">
+								<Link to="/app/sonora/upload">
+									<Button
+										variant="muted"
+										scale="sm"
+										className="gap-1 py-0 px-1 my-0"
+									>
+										or
+										<Upload size={16} className="p-0" />
+										upload an existing audio file
+									</Button>
+								</Link>
+							</p>
+						</div>
+					</div>
+
+					{/* Audio Preview */}
+					{(recordedBlob || recordedUrl) && selected && !isRecording && (
+						<div className="space-y-4">
+							<div className="flex items-center justify-between">
+								<h3 className="text-lg font-medium">
+									{recordedBlob
+										? "Preview"
+										: "Uploaded to Arweave"}
+								</h3>
+								<Button
+									variant="ghost"
+									scale="sm"
+									onClick={deleteRecording}
+									className="text-muted-foreground hover:text-foreground"
+								>
+									<Trash2 size={16} />
+									{recordedBlob ? "Delete" : "Clear"}
+								</Button>
+							</div>
+							<AudioCard item={selected} />
+						</div>
+					)}
+
+					{/* Upload Error and Success Messages */}
+					{uploadError && (
+						<div className="text-center p-4 bg-destructive/10 border border-destructive rounded-lg">
+							<p className="text-destructive font-medium">
+								{uploadError}
+							</p>
+						</div>
+					)}
+
+					{success && (
+						<div className="text-center p-4 bg-green-500/10 border border-green-500 rounded-lg">
+							<p className="text-green-600 font-medium">{success}</p>
+						</div>
+					)}
+
+					{/* Upload Button */}
+					{recordedBlob && (
+						<div className="flex justify-center">
 							<Button
-								variant="ghost"
-								scale="sm"
-								onClick={deleteRecording}
-								className="text-muted-foreground hover:text-foreground"
+								onClick={handleUpload}
+								className="gap-2"
+								disabled={isProcessing || isRecording}
 							>
-								<Trash2 size={16} />
-								{recordedBlob ? "Delete" : "Clear"}
+								{isProcessing ? (
+									<>
+										<LoaderPinwheel
+											size={16}
+											className="animate-spin"
+										/>
+										{estimating
+											? "Estimating..."
+											: uploading
+												? `Uploading ${Math.round(progress)}%`
+												: minting
+													? "Minting..."
+													: "Processing..."}
+									</>
+								) : (
+									<>
+										<Upload size={16} />
+										Upload & Mint NFT
+									</>
+								)}
 							</Button>
 						</div>
-						<AudioCard item={selected} />
-					</div>
-				)}
-
-				{/* Upload Error and Success Messages */}
-				{uploadError && (
-					<div className="text-center p-4 bg-destructive/10 border border-destructive rounded-lg">
-						<p className="text-destructive font-medium">
-							{uploadError}
-						</p>
-					</div>
-				)}
-
-				{success && (
-					<div className="text-center p-4 bg-green-500/10 border border-green-500 rounded-lg">
-						<p className="text-green-600 font-medium">{success}</p>
-					</div>
-				)}
-
-				{/* Upload Button */}
-				{recordedBlob && (
-					<div className="flex justify-center">
-						<Button
-							onClick={handleUpload}
-							className="gap-2"
-							disabled={isProcessing || isRecording}
-						>
-							{isProcessing ? (
-								<>
-									<LoaderPinwheel
-										size={16}
-										className="animate-spin"
-									/>
-									{estimating
-										? "Estimating..."
-										: uploading
-											? `Uploading ${Math.round(progress)}%`
-											: minting
-												? "Minting..."
-												: "Processing..."}
-								</>
-							) : (
-								<>
-									<Upload size={16} />
-									Upload & Mint NFT
-								</>
-							)}
-						</Button>
-					</div>
-				)}
+					)}
+				</div>
 			</div>
-		</div>
 		</>
 	);
 };

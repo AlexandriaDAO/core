@@ -1,9 +1,16 @@
 import React, { useRef, useState, useEffect } from "react";
 import { FileAudio, HardDrive, Calendar, Play, Pause, Loader2, DollarSign, User } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { setSelected, clearSelected } from "../sonoraSlice";
 import { Audio } from "../types";
+import { shortenPrincipal } from "@/features/perpetua";
+
+const ownerLinks = [
+    { to: "/app/sonora/studio/$principal", label: "listings" },
+    { to: "/app/sonora/archive/$principal", label: "archive" },
+] as const;
 
 interface AudioCardProps {
     item: Audio;
@@ -158,15 +165,6 @@ export const AudioCard: React.FC<AudioCardProps> = ({ item, actions, price, owne
         return type || 'No Type';
     };
 
-    const formatOwner = (ownerPrincipal: string) => {
-        if (!ownerPrincipal) return 'Unknown';
-        // Show first 6 and last 4 characters with ellipsis
-        if (ownerPrincipal.length > 12) {
-            return `${ownerPrincipal.slice(0, 6)}...${ownerPrincipal.slice(-4)}`;
-        }
-        return ownerPrincipal;
-    };
-
     return (
         <div
             onClick={handleCardClick}
@@ -259,7 +257,20 @@ export const AudioCard: React.FC<AudioCardProps> = ({ item, actions, price, owne
                             {owner && (
                                 <div className="flex items-center gap-1">
                                     <User size={12} />
-                                    <span className="font-medium text-foreground">{formatOwner(owner)}</span>
+                                    <span className="font-medium text-foreground">{shortenPrincipal(owner)}</span>
+                                    {ownerLinks.map((link) => (
+                                        <React.Fragment key={link.to}>
+                                            <span className="text-muted-foreground/60">·</span>
+                                            <Link
+                                                to={link.to}
+                                                params={{ principal: owner }}
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="text-primary hover:underline"
+                                            >
+                                                {link.label}
+                                            </Link>
+                                        </React.Fragment>
+                                    ))}
                                 </div>
                             )}
                             {isSelected && duration > 0 && (

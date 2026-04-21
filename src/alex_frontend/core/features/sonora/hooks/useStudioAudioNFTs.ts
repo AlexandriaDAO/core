@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { fetchStudioAudioNFTs } from "../studioSlice";
@@ -8,9 +8,9 @@ export const useStudioAudioNFTs = () => {
     const dispatch = useAppDispatch();
     const { audios, loading, loadingMore, error, pagination } = useAppSelector((state) => state.sonora.studio);
 
-    const refreshStudioAudioNFTs = (userPrincipal: string, page = 1, pageSize = 8, appendMode = false) => {
+    const refreshStudioAudioNFTs = useCallback((userPrincipal: string, page = 1, pageSize = 8, appendMode = false) => {
         dispatch(fetchStudioAudioNFTs({ userPrincipal, page, pageSize, appendMode }));
-    };
+    }, [dispatch]);
 
     return {
         audios,

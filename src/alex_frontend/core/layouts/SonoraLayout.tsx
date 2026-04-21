@@ -1,6 +1,18 @@
 import React from "react";
 import { Link, Outlet } from "@tanstack/react-router";
 
+const tabs = [
+	{ to: "/app/sonora", label: "Browse", exact: true },
+	{ to: "/app/sonora/record", label: "Record" },
+	{ to: "/app/sonora/archive", label: "Archive" },
+	{ to: "/app/sonora/studio", label: "Studio" },
+	{ to: "/app/sonora/market", label: "Market" },
+] as const;
+
+const tabClass = "px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200";
+const activeProps = { className: "bg-primary text-primary-foreground shadow-md" };
+const inactiveProps = { className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary" };
+
 function SonoraLayout() {
 	return (
 		<>
@@ -11,60 +23,18 @@ function SonoraLayout() {
 				</div>
 				<div className="bg-card rounded-bordertb shadow">
 					<nav className="flex justify-center gap-2 p-2" aria-label="Tabs">
-						<Link
-							to="/app/sonora"
-							className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
-							activeProps={{
-								className: "bg-primary text-primary-foreground shadow-md"
-							}}
-							inactiveProps={{
-								className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
-							}}
-							activeOptions={{
-								exact: true
-							}}
-						>
-							Browse
-						</Link>
-
-						<Link
-							to="/app/sonora/record"
-							className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
-							activeProps={{
-								className: "bg-primary text-primary-foreground shadow-md"
-							}}
-							inactiveProps={{
-								className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
-							}}
-						>
-							Record
-						</Link>
-
-						<Link
-							to="/app/sonora/archive"
-							className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
-							activeProps={{
-								className: "bg-primary text-primary-foreground shadow-md"
-							}}
-							inactiveProps={{
-								className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
-							}}
-						>
-							Collection
-						</Link>
-
-						<Link
-							to="/app/sonora/market"
-							className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
-							activeProps={{
-								className: "bg-primary text-primary-foreground shadow-md"
-							}}
-							inactiveProps={{
-								className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
-							}}
-						>
-							Shop
-						</Link>
+						{tabs.map((tab) => (
+							<Link
+								key={tab.to}
+								to={tab.to}
+								className={tabClass}
+								activeProps={activeProps}
+								inactiveProps={inactiveProps}
+								{...("exact" in tab && tab.exact ? { activeOptions: { exact: true } } : {})}
+							>
+								{tab.label}
+							</Link>
+						))}
 					</nav>
 				</div>
 			</div>
