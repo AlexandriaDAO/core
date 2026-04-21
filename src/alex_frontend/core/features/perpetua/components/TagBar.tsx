@@ -10,7 +10,7 @@ import { usePopularTags, useTagSearch } from "../hooks/useTags";
 
 export default function TagBar() {
 	const dispatch = useAppDispatch();
-	const activeTag = useAppSelector((state) => state.valora.tagFilter);
+	const activeTag = useAppSelector((state) => state.perpetua.tagFilter);
 	const { data: popularTags, isLoading } = usePopularTags();
 	const [searchPrefix, setSearchPrefix] = useState("");
 	const { data: searchResults } = useTagSearch(searchPrefix);

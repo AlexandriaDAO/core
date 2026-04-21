@@ -7,7 +7,7 @@ import { ShelfGridSkeleton } from "./ShelfSkeleton";
 import { Loader2 } from "lucide-react";
 
 export default function FilteredShelfList() {
-	const tag = useAppSelector((state) => state.valora.tagFilter);
+	const tag = useAppSelector((state) => state.perpetua.tagFilter);
 	const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useShelvesByTag(tag);
 	const { data: count } = useTagShelfCount(tag);
 	const sentinelRef = useRef<HTMLDivElement>(null);

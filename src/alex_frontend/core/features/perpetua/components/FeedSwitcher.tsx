@@ -7,7 +7,7 @@ import type { FeedType } from "../types";
 
 export default function FeedSwitcher() {
 	const dispatch = useAppDispatch();
-	const feedType = useAppSelector((state) => state.valora.feedType);
+	const feedType = useAppSelector((state) => state.perpetua.feedType);
 	const user = useAppSelector((state) => state.auth.user);
 
 	const handleChange = (value: string) => {

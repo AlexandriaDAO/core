@@ -15,8 +15,8 @@ export default function ActionBar({ onNewShelf }: ActionBarProps) {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const user = useAppSelector((state) => state.auth.user);
-	const showFilters = useAppSelector((state) => state.valora.showFilters);
-	const showFollowing = useAppSelector((state) => state.valora.showFollowing);
+	const showFilters = useAppSelector((state) => state.perpetua.showFilters);
+	const showFollowing = useAppSelector((state) => state.perpetua.showFollowing);
 
 	return (
 		<div className="flex items-center gap-1">

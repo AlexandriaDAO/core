@@ -20,7 +20,7 @@ import walletsReducer from "@/features/wallets/walletsSlice";
 import addWalletReducer from "@/features/add-wallet/addWalletSlice";
 import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import pinaxReducer from "@/features/pinax/pinaxSlice";
-import valoraReducer from "@/features/perpetua/store/slice";
+import perpetuaReducer from "@/features/perpetua/store/slice";
 
 import arweaveAssetsReducer from '@/features/arweave-assets/arweaveAssetsSlice';
 import marketplaceReducer from '@/features/marketplace/marketplaceSlice';
@@ -60,7 +60,7 @@ const rootReducer = combineReducers({
 
 	icpLedger: icpLedgerReducer,
 	portal: portalReducer,
-	valora: valoraReducer,
+	perpetua: perpetuaReducer,
 
 	marketplace: marketplaceReducer,
 
