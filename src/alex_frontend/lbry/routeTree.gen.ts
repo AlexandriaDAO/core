@@ -19,9 +19,17 @@ import { Route as SwapInsightsRouteImport } from './src/routes/swap/insights'
 import { Route as NftTokenIdRouteImport } from './src/routes/nft.$tokenId'
 import { Route as AppPermasearchRouteImport } from './src/routes/app/permasearch'
 import { Route as AppAlexandrianRouteImport } from './src/routes/app/alexandrian'
+import { Route as AuthAppSonoraIndexRouteImport } from './src/routes/_auth/app/sonora/index'
 import { Route as AuthAppEmporiumIndexRouteImport } from './src/routes/_auth/app/emporium/index'
+import { Route as AuthAppSonoraUploadRouteImport } from './src/routes/_auth/app/sonora/upload'
+import { Route as AuthAppSonoraStudioRouteImport } from './src/routes/_auth/app/sonora/studio'
+import { Route as AuthAppSonoraRecordRouteImport } from './src/routes/_auth/app/sonora/record'
+import { Route as AuthAppSonoraMarketRouteImport } from './src/routes/_auth/app/sonora/market'
+import { Route as AuthAppSonoraArchiveRouteImport } from './src/routes/_auth/app/sonora/archive'
 import { Route as AuthAppEmporiumMyLogsRouteImport } from './src/routes/_auth/app/emporium/my-logs'
 import { Route as AuthAppEmporiumMarketLogsRouteImport } from './src/routes/_auth/app/emporium/market-logs'
+import { Route as AuthAppSonoraStudioPrincipalRouteImport } from './src/routes/_auth/app/sonora/studio.$principal'
+import { Route as AuthAppSonoraArchivePrincipalRouteImport } from './src/routes/_auth/app/sonora/archive.$principal'
 
 const ManagerLazyRouteImport = createFileRoute('/manager')()
 const SwapRouteLazyRouteImport = createFileRoute('/swap')()
@@ -54,6 +62,7 @@ const AuthAppPinaxLazyRouteImport = createFileRoute('/_auth/app/pinax')()
 const AuthDashboardLibrarianRouteLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian',
 )()
+const AuthAppSonoraRouteLazyRouteImport = createFileRoute('/_auth/app/sonora')()
 const AuthAppEmporiumRouteLazyRouteImport = createFileRoute(
   '/_auth/app/emporium',
 )()
@@ -281,6 +290,13 @@ const AuthDashboardLibrarianRouteLazyRoute =
       (d) => d.Route,
     ),
   )
+const AuthAppSonoraRouteLazyRoute = AuthAppSonoraRouteLazyRouteImport.update({
+  id: '/app/sonora',
+  path: '/app/sonora',
+  getParentRoute: () => AuthRouteLazyRoute,
+} as any).lazy(() =>
+  import('./src/routes/_auth/app/sonora/route.lazy').then((d) => d.Route),
+)
 const AuthAppEmporiumRouteLazyRoute =
   AuthAppEmporiumRouteLazyRouteImport.update({
     id: '/app/emporium',
@@ -307,6 +323,13 @@ const AuthAppPerpetuaIndexLazyRoute =
   } as any).lazy(() =>
     import('./src/routes/_auth/app/perpetua/index.lazy').then((d) => d.Route),
   )
+const AuthAppSonoraIndexRoute = AuthAppSonoraIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthAppSonoraRouteLazyRoute,
+} as any).lazy(() =>
+  import('./src/routes/_auth/app/sonora/index.lazy').then((d) => d.Route),
+)
 const AuthAppEmporiumIndexRoute = AuthAppEmporiumIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -334,6 +357,41 @@ const AuthDashboardLibrarianWalletsLazyRoute =
       (d) => d.Route,
     ),
   )
+const AuthAppSonoraUploadRoute = AuthAppSonoraUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => AuthAppSonoraRouteLazyRoute,
+} as any).lazy(() =>
+  import('./src/routes/_auth/app/sonora/upload.lazy').then((d) => d.Route),
+)
+const AuthAppSonoraStudioRoute = AuthAppSonoraStudioRouteImport.update({
+  id: '/studio',
+  path: '/studio',
+  getParentRoute: () => AuthAppSonoraRouteLazyRoute,
+} as any).lazy(() =>
+  import('./src/routes/_auth/app/sonora/studio.lazy').then((d) => d.Route),
+)
+const AuthAppSonoraRecordRoute = AuthAppSonoraRecordRouteImport.update({
+  id: '/record',
+  path: '/record',
+  getParentRoute: () => AuthAppSonoraRouteLazyRoute,
+} as any).lazy(() =>
+  import('./src/routes/_auth/app/sonora/record.lazy').then((d) => d.Route),
+)
+const AuthAppSonoraMarketRoute = AuthAppSonoraMarketRouteImport.update({
+  id: '/market',
+  path: '/market',
+  getParentRoute: () => AuthAppSonoraRouteLazyRoute,
+} as any).lazy(() =>
+  import('./src/routes/_auth/app/sonora/market.lazy').then((d) => d.Route),
+)
+const AuthAppSonoraArchiveRoute = AuthAppSonoraArchiveRouteImport.update({
+  id: '/archive',
+  path: '/archive',
+  getParentRoute: () => AuthAppSonoraRouteLazyRoute,
+} as any).lazy(() =>
+  import('./src/routes/_auth/app/sonora/archive.lazy').then((d) => d.Route),
+)
 const AuthAppEmporiumMyLogsRoute = AuthAppEmporiumMyLogsRouteImport.update({
   id: '/my-logs',
   path: '/my-logs',
@@ -358,6 +416,26 @@ const AuthAppPerpetuaShelfShelfIdLazyRoute =
     getParentRoute: () => AuthRouteLazyRoute,
   } as any).lazy(() =>
     import('./src/routes/_auth/app/perpetua/shelf.$shelfId.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const AuthAppSonoraStudioPrincipalRoute =
+  AuthAppSonoraStudioPrincipalRouteImport.update({
+    id: '/$principal',
+    path: '/$principal',
+    getParentRoute: () => AuthAppSonoraStudioRoute,
+  } as any).lazy(() =>
+    import('./src/routes/_auth/app/sonora/studio.$principal.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+const AuthAppSonoraArchivePrincipalRoute =
+  AuthAppSonoraArchivePrincipalRouteImport.update({
+    id: '/$principal',
+    path: '/$principal',
+    getParentRoute: () => AuthAppSonoraArchiveRoute,
+  } as any).lazy(() =>
+    import('./src/routes/_auth/app/sonora/archive.$principal.lazy').then(
       (d) => d.Route,
     ),
   )
@@ -403,6 +481,7 @@ export interface FileRoutesByFullPath {
   '/swap/stake': typeof SwapStakeLazyRoute
   '/info/': typeof InfoIndexLazyRoute
   '/app/emporium': typeof AuthAppEmporiumRouteLazyRouteWithChildren
+  '/app/sonora': typeof AuthAppSonoraRouteLazyRouteWithChildren
   '/app/pinax': typeof AuthAppPinaxLazyRoute
   '/dashboard/analytics': typeof AuthDashboardAnalyticsLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
@@ -412,11 +491,19 @@ export interface FileRoutesByFullPath {
   '/swap/': typeof AuthSwapIndexLazyRoute
   '/app/emporium/market-logs': typeof AuthAppEmporiumMarketLogsRoute
   '/app/emporium/my-logs': typeof AuthAppEmporiumMyLogsRoute
+  '/app/sonora/archive': typeof AuthAppSonoraArchiveRouteWithChildren
+  '/app/sonora/market': typeof AuthAppSonoraMarketRoute
+  '/app/sonora/record': typeof AuthAppSonoraRecordRoute
+  '/app/sonora/studio': typeof AuthAppSonoraStudioRouteWithChildren
+  '/app/sonora/upload': typeof AuthAppSonoraUploadRoute
   '/dashboard/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
   '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/app/emporium/': typeof AuthAppEmporiumIndexRoute
+  '/app/sonora/': typeof AuthAppSonoraIndexRoute
   '/app/perpetua': typeof AuthAppPerpetuaIndexLazyRoute
   '/dashboard/': typeof AuthDashboardLibrarianIndexLazyRoute
+  '/app/sonora/archive/$principal': typeof AuthAppSonoraArchivePrincipalRoute
+  '/app/sonora/studio/$principal': typeof AuthAppSonoraStudioPrincipalRoute
   '/app/perpetua/shelf/$shelfId': typeof AuthAppPerpetuaShelfShelfIdLazyRoute
   '/app/perpetua/user/$userId': typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
   '/app/perpetua/user/$userId/shelf/$shelfId': typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
@@ -448,10 +535,18 @@ export interface FileRoutesByTo {
   '/swap/burn': typeof AuthSwapBurnLazyRoute
   '/app/emporium/market-logs': typeof AuthAppEmporiumMarketLogsRoute
   '/app/emporium/my-logs': typeof AuthAppEmporiumMyLogsRoute
+  '/app/sonora/archive': typeof AuthAppSonoraArchiveRouteWithChildren
+  '/app/sonora/market': typeof AuthAppSonoraMarketRoute
+  '/app/sonora/record': typeof AuthAppSonoraRecordRoute
+  '/app/sonora/studio': typeof AuthAppSonoraStudioRouteWithChildren
+  '/app/sonora/upload': typeof AuthAppSonoraUploadRoute
   '/dashboard/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
   '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/app/emporium': typeof AuthAppEmporiumIndexRoute
+  '/app/sonora': typeof AuthAppSonoraIndexRoute
   '/app/perpetua': typeof AuthAppPerpetuaIndexLazyRoute
+  '/app/sonora/archive/$principal': typeof AuthAppSonoraArchivePrincipalRoute
+  '/app/sonora/studio/$principal': typeof AuthAppSonoraStudioPrincipalRoute
   '/app/perpetua/shelf/$shelfId': typeof AuthAppPerpetuaShelfShelfIdLazyRoute
   '/app/perpetua/user/$userId': typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
   '/app/perpetua/user/$userId/shelf/$shelfId': typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
@@ -480,6 +575,7 @@ export interface FileRoutesById {
   '/swap/stake': typeof SwapStakeLazyRoute
   '/info/': typeof InfoIndexLazyRoute
   '/_auth/app/emporium': typeof AuthAppEmporiumRouteLazyRouteWithChildren
+  '/_auth/app/sonora': typeof AuthAppSonoraRouteLazyRouteWithChildren
   '/_auth/dashboard/_librarian': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   '/_auth/app/pinax': typeof AuthAppPinaxLazyRoute
   '/_auth/dashboard/analytics': typeof AuthDashboardAnalyticsLazyRoute
@@ -490,11 +586,19 @@ export interface FileRoutesById {
   '/_auth/swap/': typeof AuthSwapIndexLazyRoute
   '/_auth/app/emporium/market-logs': typeof AuthAppEmporiumMarketLogsRoute
   '/_auth/app/emporium/my-logs': typeof AuthAppEmporiumMyLogsRoute
+  '/_auth/app/sonora/archive': typeof AuthAppSonoraArchiveRouteWithChildren
+  '/_auth/app/sonora/market': typeof AuthAppSonoraMarketRoute
+  '/_auth/app/sonora/record': typeof AuthAppSonoraRecordRoute
+  '/_auth/app/sonora/studio': typeof AuthAppSonoraStudioRouteWithChildren
+  '/_auth/app/sonora/upload': typeof AuthAppSonoraUploadRoute
   '/_auth/dashboard/_librarian/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
   '/_auth/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/_auth/app/emporium/': typeof AuthAppEmporiumIndexRoute
+  '/_auth/app/sonora/': typeof AuthAppSonoraIndexRoute
   '/_auth/app/perpetua/': typeof AuthAppPerpetuaIndexLazyRoute
   '/_auth/dashboard/_librarian/': typeof AuthDashboardLibrarianIndexLazyRoute
+  '/_auth/app/sonora/archive/$principal': typeof AuthAppSonoraArchivePrincipalRoute
+  '/_auth/app/sonora/studio/$principal': typeof AuthAppSonoraStudioPrincipalRoute
   '/_auth/app/perpetua/shelf/$shelfId': typeof AuthAppPerpetuaShelfShelfIdLazyRoute
   '/_auth/app/perpetua/user/$userId/': typeof AuthAppPerpetuaUserUserIdIndexLazyRoute
   '/_auth/app/perpetua/user/$userId/shelf/$shelfId': typeof AuthAppPerpetuaUserUserIdShelfShelfIdLazyRoute
@@ -522,6 +626,7 @@ export interface FileRouteTypes {
     | '/swap/stake'
     | '/info/'
     | '/app/emporium'
+    | '/app/sonora'
     | '/app/pinax'
     | '/dashboard/analytics'
     | '/dashboard/arweave-assets'
@@ -531,11 +636,19 @@ export interface FileRouteTypes {
     | '/swap/'
     | '/app/emporium/market-logs'
     | '/app/emporium/my-logs'
+    | '/app/sonora/archive'
+    | '/app/sonora/market'
+    | '/app/sonora/record'
+    | '/app/sonora/studio'
+    | '/app/sonora/upload'
     | '/dashboard/wallets'
     | '/dashboard/profile/upgrade'
     | '/app/emporium/'
+    | '/app/sonora/'
     | '/app/perpetua'
     | '/dashboard/'
+    | '/app/sonora/archive/$principal'
+    | '/app/sonora/studio/$principal'
     | '/app/perpetua/shelf/$shelfId'
     | '/app/perpetua/user/$userId'
     | '/app/perpetua/user/$userId/shelf/$shelfId'
@@ -567,10 +680,18 @@ export interface FileRouteTypes {
     | '/swap/burn'
     | '/app/emporium/market-logs'
     | '/app/emporium/my-logs'
+    | '/app/sonora/archive'
+    | '/app/sonora/market'
+    | '/app/sonora/record'
+    | '/app/sonora/studio'
+    | '/app/sonora/upload'
     | '/dashboard/wallets'
     | '/dashboard/profile/upgrade'
     | '/app/emporium'
+    | '/app/sonora'
     | '/app/perpetua'
+    | '/app/sonora/archive/$principal'
+    | '/app/sonora/studio/$principal'
     | '/app/perpetua/shelf/$shelfId'
     | '/app/perpetua/user/$userId'
     | '/app/perpetua/user/$userId/shelf/$shelfId'
@@ -598,6 +719,7 @@ export interface FileRouteTypes {
     | '/swap/stake'
     | '/info/'
     | '/_auth/app/emporium'
+    | '/_auth/app/sonora'
     | '/_auth/dashboard/_librarian'
     | '/_auth/app/pinax'
     | '/_auth/dashboard/analytics'
@@ -608,11 +730,19 @@ export interface FileRouteTypes {
     | '/_auth/swap/'
     | '/_auth/app/emporium/market-logs'
     | '/_auth/app/emporium/my-logs'
+    | '/_auth/app/sonora/archive'
+    | '/_auth/app/sonora/market'
+    | '/_auth/app/sonora/record'
+    | '/_auth/app/sonora/studio'
+    | '/_auth/app/sonora/upload'
     | '/_auth/dashboard/_librarian/wallets'
     | '/_auth/dashboard/profile/upgrade'
     | '/_auth/app/emporium/'
+    | '/_auth/app/sonora/'
     | '/_auth/app/perpetua/'
     | '/_auth/dashboard/_librarian/'
+    | '/_auth/app/sonora/archive/$principal'
+    | '/_auth/app/sonora/studio/$principal'
     | '/_auth/app/perpetua/shelf/$shelfId'
     | '/_auth/app/perpetua/user/$userId/'
     | '/_auth/app/perpetua/user/$userId/shelf/$shelfId'
@@ -837,6 +967,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardLibrarianRouteLazyRouteImport
       parentRoute: typeof AuthDashboardRouteLazyRoute
     }
+    '/_auth/app/sonora': {
+      id: '/_auth/app/sonora'
+      path: '/app/sonora'
+      fullPath: '/app/sonora'
+      preLoaderRoute: typeof AuthAppSonoraRouteLazyRouteImport
+      parentRoute: typeof AuthRouteLazyRoute
+    }
     '/_auth/app/emporium': {
       id: '/_auth/app/emporium'
       path: '/app/emporium'
@@ -857,6 +994,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/perpetua'
       preLoaderRoute: typeof AuthAppPerpetuaIndexLazyRouteImport
       parentRoute: typeof AuthRouteLazyRoute
+    }
+    '/_auth/app/sonora/': {
+      id: '/_auth/app/sonora/'
+      path: '/'
+      fullPath: '/app/sonora/'
+      preLoaderRoute: typeof AuthAppSonoraIndexRouteImport
+      parentRoute: typeof AuthAppSonoraRouteLazyRoute
     }
     '/_auth/app/emporium/': {
       id: '/_auth/app/emporium/'
@@ -879,6 +1023,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardLibrarianWalletsLazyRouteImport
       parentRoute: typeof AuthDashboardLibrarianRouteLazyRoute
     }
+    '/_auth/app/sonora/upload': {
+      id: '/_auth/app/sonora/upload'
+      path: '/upload'
+      fullPath: '/app/sonora/upload'
+      preLoaderRoute: typeof AuthAppSonoraUploadRouteImport
+      parentRoute: typeof AuthAppSonoraRouteLazyRoute
+    }
+    '/_auth/app/sonora/studio': {
+      id: '/_auth/app/sonora/studio'
+      path: '/studio'
+      fullPath: '/app/sonora/studio'
+      preLoaderRoute: typeof AuthAppSonoraStudioRouteImport
+      parentRoute: typeof AuthAppSonoraRouteLazyRoute
+    }
+    '/_auth/app/sonora/record': {
+      id: '/_auth/app/sonora/record'
+      path: '/record'
+      fullPath: '/app/sonora/record'
+      preLoaderRoute: typeof AuthAppSonoraRecordRouteImport
+      parentRoute: typeof AuthAppSonoraRouteLazyRoute
+    }
+    '/_auth/app/sonora/market': {
+      id: '/_auth/app/sonora/market'
+      path: '/market'
+      fullPath: '/app/sonora/market'
+      preLoaderRoute: typeof AuthAppSonoraMarketRouteImport
+      parentRoute: typeof AuthAppSonoraRouteLazyRoute
+    }
+    '/_auth/app/sonora/archive': {
+      id: '/_auth/app/sonora/archive'
+      path: '/archive'
+      fullPath: '/app/sonora/archive'
+      preLoaderRoute: typeof AuthAppSonoraArchiveRouteImport
+      parentRoute: typeof AuthAppSonoraRouteLazyRoute
+    }
     '/_auth/app/emporium/my-logs': {
       id: '/_auth/app/emporium/my-logs'
       path: '/my-logs'
@@ -899,6 +1078,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/perpetua/shelf/$shelfId'
       preLoaderRoute: typeof AuthAppPerpetuaShelfShelfIdLazyRouteImport
       parentRoute: typeof AuthRouteLazyRoute
+    }
+    '/_auth/app/sonora/studio/$principal': {
+      id: '/_auth/app/sonora/studio/$principal'
+      path: '/$principal'
+      fullPath: '/app/sonora/studio/$principal'
+      preLoaderRoute: typeof AuthAppSonoraStudioPrincipalRouteImport
+      parentRoute: typeof AuthAppSonoraStudioRoute
+    }
+    '/_auth/app/sonora/archive/$principal': {
+      id: '/_auth/app/sonora/archive/$principal'
+      path: '/$principal'
+      fullPath: '/app/sonora/archive/$principal'
+      preLoaderRoute: typeof AuthAppSonoraArchivePrincipalRouteImport
+      parentRoute: typeof AuthAppSonoraArchiveRoute
     }
     '/_auth/app/perpetua/user/$userId/': {
       id: '/_auth/app/perpetua/user/$userId/'
@@ -1002,10 +1195,57 @@ const AuthAppEmporiumRouteLazyRouteWithChildren =
     AuthAppEmporiumRouteLazyRouteChildren,
   )
 
+interface AuthAppSonoraArchiveRouteChildren {
+  AuthAppSonoraArchivePrincipalRoute: typeof AuthAppSonoraArchivePrincipalRoute
+}
+
+const AuthAppSonoraArchiveRouteChildren: AuthAppSonoraArchiveRouteChildren = {
+  AuthAppSonoraArchivePrincipalRoute: AuthAppSonoraArchivePrincipalRoute,
+}
+
+const AuthAppSonoraArchiveRouteWithChildren =
+  AuthAppSonoraArchiveRoute._addFileChildren(AuthAppSonoraArchiveRouteChildren)
+
+interface AuthAppSonoraStudioRouteChildren {
+  AuthAppSonoraStudioPrincipalRoute: typeof AuthAppSonoraStudioPrincipalRoute
+}
+
+const AuthAppSonoraStudioRouteChildren: AuthAppSonoraStudioRouteChildren = {
+  AuthAppSonoraStudioPrincipalRoute: AuthAppSonoraStudioPrincipalRoute,
+}
+
+const AuthAppSonoraStudioRouteWithChildren =
+  AuthAppSonoraStudioRoute._addFileChildren(AuthAppSonoraStudioRouteChildren)
+
+interface AuthAppSonoraRouteLazyRouteChildren {
+  AuthAppSonoraArchiveRoute: typeof AuthAppSonoraArchiveRouteWithChildren
+  AuthAppSonoraMarketRoute: typeof AuthAppSonoraMarketRoute
+  AuthAppSonoraRecordRoute: typeof AuthAppSonoraRecordRoute
+  AuthAppSonoraStudioRoute: typeof AuthAppSonoraStudioRouteWithChildren
+  AuthAppSonoraUploadRoute: typeof AuthAppSonoraUploadRoute
+  AuthAppSonoraIndexRoute: typeof AuthAppSonoraIndexRoute
+}
+
+const AuthAppSonoraRouteLazyRouteChildren: AuthAppSonoraRouteLazyRouteChildren =
+  {
+    AuthAppSonoraArchiveRoute: AuthAppSonoraArchiveRouteWithChildren,
+    AuthAppSonoraMarketRoute: AuthAppSonoraMarketRoute,
+    AuthAppSonoraRecordRoute: AuthAppSonoraRecordRoute,
+    AuthAppSonoraStudioRoute: AuthAppSonoraStudioRouteWithChildren,
+    AuthAppSonoraUploadRoute: AuthAppSonoraUploadRoute,
+    AuthAppSonoraIndexRoute: AuthAppSonoraIndexRoute,
+  }
+
+const AuthAppSonoraRouteLazyRouteWithChildren =
+  AuthAppSonoraRouteLazyRoute._addFileChildren(
+    AuthAppSonoraRouteLazyRouteChildren,
+  )
+
 interface AuthRouteLazyRouteChildren {
   AuthDashboardRouteLazyRoute: typeof AuthDashboardRouteLazyRouteWithChildren
   AuthSwapRouteLazyRoute: typeof AuthSwapRouteLazyRouteWithChildren
   AuthAppEmporiumRouteLazyRoute: typeof AuthAppEmporiumRouteLazyRouteWithChildren
+  AuthAppSonoraRouteLazyRoute: typeof AuthAppSonoraRouteLazyRouteWithChildren
   AuthAppPinaxLazyRoute: typeof AuthAppPinaxLazyRoute
   AuthAppPerpetuaIndexLazyRoute: typeof AuthAppPerpetuaIndexLazyRoute
   AuthAppPerpetuaShelfShelfIdLazyRoute: typeof AuthAppPerpetuaShelfShelfIdLazyRoute
@@ -1017,6 +1257,7 @@ const AuthRouteLazyRouteChildren: AuthRouteLazyRouteChildren = {
   AuthDashboardRouteLazyRoute: AuthDashboardRouteLazyRouteWithChildren,
   AuthSwapRouteLazyRoute: AuthSwapRouteLazyRouteWithChildren,
   AuthAppEmporiumRouteLazyRoute: AuthAppEmporiumRouteLazyRouteWithChildren,
+  AuthAppSonoraRouteLazyRoute: AuthAppSonoraRouteLazyRouteWithChildren,
   AuthAppPinaxLazyRoute: AuthAppPinaxLazyRoute,
   AuthAppPerpetuaIndexLazyRoute: AuthAppPerpetuaIndexLazyRoute,
   AuthAppPerpetuaShelfShelfIdLazyRoute: AuthAppPerpetuaShelfShelfIdLazyRoute,
