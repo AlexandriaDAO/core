@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import MyEngines from "@/features/my-engines";
 import AddEngine from "@/features/my-engines/components/AddEngine";
 import fetchMyEngines from "@/features/my-engines/thunks/fetchMyEngines";
@@ -18,6 +19,10 @@ function EnginesPage() {
 
 	return (
 		<>
+			<Helmet>
+				<title>My Engines | Alexandria</title>
+				<meta name="description" content="Manage your search engines on Alexandria." />
+			</Helmet>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">My Engines</h1>
 				<AddEngine />

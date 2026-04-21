@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import { useLocation } from "@tanstack/react-router";
 
@@ -27,7 +28,15 @@ function WhitepaperPage() {
 			.catch((error) => console.error("Error fetching content:", error));
 	}, [location.hash]);
 
-	return <MarkdownRenderer content={content} />;
+	return (
+		<>
+			<Helmet>
+				<title>Whitepaper | Alexandria</title>
+				<meta name="description" content="Read the Alexandria whitepaper — decentralized content platform on ICP." />
+			</Helmet>
+			<MarkdownRenderer content={content} />
+		</>
+	);
 }
 
 export default WhitepaperPage;

@@ -1,4 +1,5 @@
 import React from "react";
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import MyEngines from "@/features/my-engines";
 import EngineOverview from "@/features/engine-overview";
@@ -11,6 +12,10 @@ function ManagerPage() {
 	);
 	return (
 		<>
+			<Helmet>
+				<title>Manager | Alexandria</title>
+				<meta name="description" content="Manage your NFTs and tokens on Alexandria." />
+			</Helmet>
 			<div className="flex-grow flex items-start p-4 gap-4">
 				<div className="basis-1/4 flex flex-col items-start gap-10">
 					<MyEngines />

@@ -6,4 +6,5 @@ export interface IcpInfo {
     alex: number;
     lbry: number;
     rank?: number;
+    scionCount?: number;
 }

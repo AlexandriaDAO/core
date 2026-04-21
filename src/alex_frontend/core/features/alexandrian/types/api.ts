@@ -7,7 +7,7 @@ export interface FetchTokensParams {
 	page?: number;
 	pageSize?: number;
 	sortOrder?: "newest" | "oldest";
-	sortBy?: "default" | "alex" | "lbry";
+	sortBy?: "default" | "alex" | "lbry" | "trending";
 }
 
 export interface FetchTokensResponse {
@@ -25,7 +25,7 @@ export interface TokenFetchParams {
 	page: number;
 	pageSize: number;
 	sortOrder: 'newest' | 'oldest';
-	sortBy: 'default' | 'alex' | 'lbry';
+	sortBy: 'default' | 'alex' | 'lbry' | 'trending';
 }
 
 // What token fetcher returns

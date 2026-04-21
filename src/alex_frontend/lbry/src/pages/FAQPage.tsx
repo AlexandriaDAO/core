@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import ReactMarkdown from "react-markdown";
 import {
 	Accordion,
@@ -70,6 +71,10 @@ function FAQPage() {
 
 	return (
 		<div className="container mx-auto px-4 py-8 max-w-4xl">
+			<Helmet>
+				<title>FAQ | Alexandria</title>
+				<meta name="description" content="Frequently asked questions about the Alexandria platform." />
+			</Helmet>
 			<h1 className="text-3xl md:text-4xl font-syne font-bold text-white mb-8 text-center">
 				Frequently Asked Questions
 			</h1>

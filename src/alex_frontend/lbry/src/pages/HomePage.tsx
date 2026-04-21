@@ -1,4 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { cn } from "@/lib/utils";
 import { appsData } from "@/config/apps";
@@ -54,6 +55,10 @@ const HomePage: React.FC = () => {
 
 	return (
 		<>
+			<Helmet>
+				<title>Alexandria - Decentralized Content Platform</title>
+				<meta name="description" content="Browse, discover, and trade NFTs and SBTs on the Alexandria decentralized content platform powered by ICP." />
+			</Helmet>
 			<div className="relative h-screen">
 				{/* First Panel */}
 				<div

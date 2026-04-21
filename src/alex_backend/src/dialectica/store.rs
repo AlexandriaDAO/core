@@ -1,11 +1,12 @@
 use candid::{CandidType, Decode, Encode, Principal};
-use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
+use ic_stable_structures::memory_manager::{MemoryId, VirtualMemory};
 use ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap, Storable};
 use std::borrow::Cow;
 use std::cell::RefCell;
 use serde::{Serialize, Deserialize};
 
 use super::models::activity::Activity;
+use crate::MEMORY_MANAGER;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -144,10 +145,6 @@ impl Storable for StorableUserReactionKey {
 }
 
 thread_local! {
-    static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
-        MemoryManager::init(DefaultMemoryImpl::default())
-    );
-
     // Main activities storage: activity_id -> Activity
     pub static ACTIVITIES: RefCell<StableBTreeMap<u64, StorableActivity, Memory>> = RefCell::new(
         StableBTreeMap::init(

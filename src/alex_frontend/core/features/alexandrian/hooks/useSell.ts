@@ -62,7 +62,8 @@ export const useSell = () => {
                         },
                     },
                 ]);
-                if ("Err" in resultApproveIcrc7) {
+                const approvalResult = resultApproveIcrc7[0];
+                if (!approvalResult || ('Err' in approvalResult)) {
                     throw new Error("Approval failed");
                 }
             }

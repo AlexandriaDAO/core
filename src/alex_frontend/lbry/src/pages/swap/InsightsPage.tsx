@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import LineChart from '@/features/insights/components/LineChart';
 import { Alert } from '@/components/Alert';
@@ -42,6 +43,10 @@ const InsightsPage: React.FC = () => {
 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+      <Helmet>
+        <title>Insights | Alexandria</title>
+        <meta name="description" content="View token supply, staking, and market insights on Alexandria." />
+      </Helmet>
       <LineChart name='ALEX Supply' dataXaxis={data.map((item) => item.time)} dataYaxis={data.map((item) => item.alex)} lineColor={'#5470C6'} gardientColor={'#75A0FD4D'} />
       <LineChart name='LBRY Supply' dataXaxis={data.map((item) => item.time)} dataYaxis={data.map((item) => item.lbry)} lineColor={'#1A9442'} gardientColor={'#1A94424D'} />
       <LineChart name='LBRY Burned' dataXaxis={data.map((item) => item.time)} dataYaxis={data.map((item) => item.totalLbryBurn)} lineColor={'#B325EB'} gardientColor={'#B325EB4D'} />

@@ -1,9 +1,14 @@
 import React from "react";
+import { Helmet } from "react-helmet-async";
 import LibrarianCard from "@/components/LibrarianCard";
 
 function SettingsPage() {
 	return (
 		<>
+			<Helmet>
+				<title>Settings | Alexandria</title>
+				<meta name="description" content="Manage your Alexandria account settings." />
+			</Helmet>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">Settings</h1>
 			</div>

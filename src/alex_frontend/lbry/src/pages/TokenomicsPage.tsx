@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/lib/components/card';
@@ -779,6 +780,10 @@ const TokenomicsPage: React.FC = () => {
 
 	return (
 		<div className="flex-grow p-4 md:p-6 overflow-auto">
+			<Helmet>
+				<title>Tokenomics | Alexandria</title>
+				<meta name="description" content="Explore ALEX and LBRY token economics, supply, and distribution." />
+			</Helmet>
 			<div className="max-w-6xl mx-auto space-y-8">
 				{/* Hero Section */}
 				<div className="text-center space-y-4">

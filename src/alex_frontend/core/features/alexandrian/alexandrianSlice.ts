@@ -61,7 +61,7 @@ const alexandrianSlice = createSlice({
 		// Sorting actions
 		setSortBy: (
 			state,
-			action: PayloadAction<"default" | "alex" | "lbry">
+			action: PayloadAction<"default" | "alex" | "lbry" | "trending">
 		) => {
 			state.sortBy = action.payload;
 			state.page = 0; // Reset to first page when sort changes

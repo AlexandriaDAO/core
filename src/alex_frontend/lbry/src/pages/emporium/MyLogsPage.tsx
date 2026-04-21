@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { Helmet } from "react-helmet-async";
 import { Alert } from "@/components/Alert";
 import { Skeleton } from "@/lib/components/skeleton";
 import { Button } from "@/lib/components/button";
@@ -36,6 +37,10 @@ const MyLogsPage: React.FC = () => {
 
     return (
         <div className="sm:w-10/12 flex flex-col gap-4">
+            <Helmet>
+                <title>My Logs | Alexandria</title>
+                <meta name="description" content="View your personal transaction logs on Alexandria." />
+            </Helmet>
             <div className="flex gap-1 items-center">
                 <p className="text-sm text-muted-foreground">Here you will find All your Logs</p>
                 <Button

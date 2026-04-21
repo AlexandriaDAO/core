@@ -17,6 +17,7 @@ import ActorProvider from "@/providers/ActorProvider";
 import { IdentityProvider } from "@/lib/ic-use-identity";
 import NsfwProvider from "@/providers/NsfwProvider";
 import ErrorFallback from "@/components/fallbacks/ErrorFallback";
+import { HelmetProvider } from "react-helmet-async";
 
 
 import { RouterProvider, createRouter } from '@tanstack/react-router'
@@ -78,6 +79,7 @@ export default function App() {
 
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <HelmetProvider>
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
                  <QueryClientProvider client={queryClient}>
                     <SWRConfig
@@ -104,6 +106,7 @@ export default function App() {
                     </SWRConfig>
                  </QueryClientProvider>
             </ThemeProvider>
+            </HelmetProvider>
         </ErrorBoundary>
     )
 }

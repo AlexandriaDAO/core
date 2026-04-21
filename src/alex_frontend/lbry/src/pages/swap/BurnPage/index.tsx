@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import LoginPrompt from "./LoginPrompt";
@@ -35,6 +36,10 @@ const BurnPage: React.FC = () => {
 
 	return (
 		<div className="px-4 py-8">
+			<Helmet>
+				<title>Burn | Alexandria</title>
+				<meta name="description" content="Burn LBRY tokens to earn ICP and ALEX rewards on Alexandria." />
+			</Helmet>
 			<div className="max-w-7xl mx-auto">
 				{/* Error Alert */}
 				<BurnError />

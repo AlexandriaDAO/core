@@ -1,4 +1,5 @@
 import React from "react";
+import { Helmet } from "react-helmet-async";
 import AssetTable from "@/features/arweave-assets/components/AssetTable";
 import AssetDetail from "@/features/arweave-assets/components/AssetDetail";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -14,6 +15,10 @@ function ArweaveAssetsPage() {
 
 	return (
 		<>
+			<Helmet>
+				<title>Arweave Assets | Alexandria</title>
+				<meta name="description" content="View and manage your Arweave assets on Alexandria." />
+			</Helmet>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">Arweave Assets</h1>
 				<Button

@@ -230,3 +230,30 @@ pub fn get_view_count(arweave_id: String) -> ActivityResult<u64> {
         }
     })
 }
+
+/// Get trending content ranked by authenticated-viewer count (descending).
+/// Returns a list of (arweave_id, count) tuples, limited to `limit` results.
+///
+/// Ranking uses `Some(principal)` entries only — anonymous views (`None`) are
+/// intentionally excluded so trending cannot be gamed by one anon user
+/// refreshing in a loop. `get_view_count` still reflects the full total for
+/// display purposes.
+#[query]
+pub fn get_trending(limit: u64) -> Vec<(String, u64)> {
+    let max_limit = limit.min(100) as usize;
+
+    VIEWS.with(|views| {
+        let views = views.borrow();
+        let mut entries: Vec<(String, u64)> = views
+            .iter()
+            .map(|(key, viewers)| {
+                let authed = viewers.0.0.iter().flatten().count() as u64;
+                (key.0.clone(), authed)
+            })
+            .collect();
+
+        entries.sort_by(|a, b| b.1.cmp(&a.1));
+        entries.truncate(max_limit);
+        entries
+    })
+}

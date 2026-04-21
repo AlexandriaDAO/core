@@ -1,4 +1,5 @@
 import React from "react";
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import LoginPrompt from "./LoginPrompt";
 import LoadingView from "./LoadingView";
@@ -12,6 +13,10 @@ const RedeemPage: React.FC = () => {
 
 	return (
 		<div className="px-4 py-8">
+			<Helmet>
+				<title>Redeem | Alexandria</title>
+				<meta name="description" content="Redeem your archived ICP balance on Alexandria." />
+			</Helmet>
 			<div className="max-w-7xl mx-auto">
 				{/* Error Alert */}
 				<RedeemError />

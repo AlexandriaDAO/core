@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { ExternalLink, Flag, Check, Hash, Cloud, CloudOff, User, ArrowDownToLine, LoaderCircle, ArrowUpFromLine } from "lucide-react";
+import { Flag, Check, Hash, Cloud, CloudOff, User, ArrowDownToLine, LoaderCircle, ArrowUpFromLine } from "lucide-react";
 import UsernameBadge from "@/components/UsernameBadge";
 import { Badge } from "@/lib/components/badge";
 import { Button } from "@/lib/components/button";
@@ -166,26 +166,28 @@ const IcpInfo: React.FC<IcpInfoProps> = ({ token }) => {
 				</Badge>
 
 				{token.owner && (
-					<Badge variant="outline" className="px-2 flex items-center gap-1 bg-blue-500/10 text-blue-700 border-blue-500/30 hover:bg-blue-500/20 hover:text-blue-800 transition-colors cursor-pointer" onClick={handleCopyOwner}>
-						{ownerCopied ? <Check size={12} /> : <User size={12} />}
-						{ownerCopied ? 'Copied!' : shorten(token.owner, 3, 3)}
-					</Badge>
+					<Link to="/user/$principal" params={{ principal: token.owner }}>
+						<Badge variant="outline" className="px-2 flex items-center gap-1 bg-blue-500/10 text-blue-700 border-blue-500/30 hover:bg-blue-500/20 hover:text-blue-800 transition-colors cursor-pointer">
+							<User size={12} />
+							{shorten(token.owner, 3, 3)}
+						</Badge>
+					</Link>
 				)}
 
 				{token.owner && (
 					<UsernameBadge principal={token.owner} />
 				)}
 
-				<Link to="/nft/$tokenId" params={{ tokenId: token.id }}>
-					<Badge variant="outline" className="px-2 bg-primary/10 text-primary border-primary/30 hover:bg-primary/20 hover:text-primary transition-colors cursor-pointer">
-						<ExternalLink size={12} className="mr-1" /> View Token
-					</Badge>
-				</Link>
-
 				{token.rank && (
 					<Badge variant="default" className="px-2 flex items-center gap-1 bg-yellow-500/20 text-yellow-700 border-yellow-500/30 hover:bg-yellow-500/30 hover:text-yellow-800 transition-colors cursor-default">
 						<Flag size={12} className="text-yellow-600" />
 						{`${(token.rank / 100).toFixed(2)}% Rarity`}
+					</Badge>
+				)}
+
+				{token.scionCount !== undefined && token.scionCount > 0 && (
+					<Badge variant="default" className="px-2 flex items-center gap-1 bg-purple-500/20 text-purple-700 border-purple-500/30 hover:bg-purple-500/30 hover:text-purple-800 transition-colors cursor-default">
+						{token.scionCount} {token.scionCount === 1 ? 'Scion' : 'Scions'}
 					</Badge>
 				)}
 				</div>

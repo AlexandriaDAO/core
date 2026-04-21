@@ -1,10 +1,15 @@
 import React from "react";
+import { Helmet } from "react-helmet-async";
 import Protected from "@/guards/Protected";
 import AuthenticationSettings from "@/features/auth/components/AuthenticationSettings";
 
 function LibrarianPage() {
 	return (
 		<>
+			<Helmet>
+				<title>Librarian | Alexandria</title>
+				<meta name="description" content="Librarian dashboard for managing wallets and keys on Alexandria." />
+			</Helmet>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold text-primary">
 					Librarian Home

@@ -22,6 +22,7 @@ type CommentInfo = record {
   created_at : nat64;
   comment : text;
 };
+type EmbeddingEntry = record { embedding : vec float32; arweave_id : text };
 type HttpRequest = record {
   url : text;
   method : text;
@@ -46,7 +47,10 @@ type Result_3 = variant { Ok : nat64; Err : ActivityError };
 type Result_4 = variant { Ok : ReactionCounts; Err : ActivityError };
 type Result_5 = variant { Ok : opt ReactionType; Err : ActivityError };
 type Result_6 = variant { Ok; Err : ActivityError };
-type Result_7 = variant { Ok : text; Err : text };
+type Result_7 = variant { Ok : vec SimilarityResult; Err : text };
+type Result_8 = variant { Ok : text; Err : text };
+type SimilarityResult = record { score : float32; arweave_id : text };
+type StoreResult = record { stored : nat64; errors : vec text };
 type UserNFTInfo = record {
   "principal" : principal;
   username : text;
@@ -59,17 +63,31 @@ service : () -> {
   add_comment : (text, text) -> (Result);
   // Add or update a reaction to an NFT
   add_reaction : (text, ReactionType) -> (Result);
+  // Clear all embeddings. Controller only.
+  clear_embeddings : () -> (nat64);
   // Get all activities for a specific NFT
   get_activities : (text) -> (Result_1) query;
   // Get a specific activity by ID
   get_activity : (nat64) -> (Result) query;
   // Get all comments for a specific NFT
   get_comments : (text) -> (Result_2) query;
+  // Get total number of indexed embeddings
+  get_embedding_count : () -> (nat64) query;
   // Get the impression count for an article
   get_impressions : (text) -> (Result_3) query;
+  // Get all indexed arweave IDs
+  get_indexed_ids : () -> (vec text) query;
   // Get aggregated reaction counts for a specific NFT
   get_reaction_counts : (text) -> (Result_4) query;
   get_stored_nft_users : () -> (vec UserNFTInfo) query;
+  // Get trending content ranked by authenticated-viewer count (descending).
+  // Returns a list of (arweave_id, count) tuples, limited to `limit` results.
+  // 
+  // Ranking uses `Some(principal)` entries only — anonymous views (`None`) are
+  // intentionally excluded so trending cannot be gamed by one anon user
+  // refreshing in a loop. `get_view_count` still reflects the full total for
+  // display purposes.
+  get_trending : (nat64) -> (vec record { text; nat64 }) query;
   // Get all activities by a specific user
   get_user_activities : (principal) -> (Result_1) query;
   // Get the current user's reaction for a specific NFT
@@ -79,6 +97,16 @@ service : () -> {
   // Get the view count for an article
   get_view_count : (text) -> (Result_3) query;
   http_request : (HttpRequest) -> (HttpResponse) query;
+  // Check if an arweave_id has been indexed
+  is_indexed : (text) -> (bool) query;
+  // Record impressions and views in a single batched call.
+  // Impressions: counted unconditionally — no per-caller dedup. Every entry in the
+  // `impressions` vec increments the counter, so repeated calls
+  // (refresh, multiple tabs) inflate the total. Treat the number as
+  // a raw signal, not a unique-user metric.
+  // Views: deduped per authenticated caller (same as `record_view`). Anonymous
+  // views are counted without dedup.
+  record_engagement_batch : (vec text, vec text) -> (Result_6);
   // Record an impression for an article (article appeared in feed)
   // Anyone can call, always increments counter
   record_impression : (text) -> (Result_3);
@@ -89,10 +117,20 @@ service : () -> {
   record_view : (text) -> (Result_3);
   // Remove a comment (only by the comment author)
   remove_comment : (nat64) -> (Result_6);
+  // Remove embeddings. Controller only.
+  remove_embeddings : (vec text) -> (nat64);
   // Remove a user's reaction from an NFT
   remove_reaction : (text) -> (Result_6);
-  start_alex_supply_timer : () -> (Result_7);
-  update_alex_supply : () -> (Result_7);
+  // Reset embeddings by reinitializing the BTreeMap. Use if data is corrupted. Controller only.
+  reset_embeddings : () -> (text);
+  // Search by a pre-computed embedding vector (for text-to-image search)
+  search_by_vector : (vec float32, nat32) -> (Result_7) query;
+  // Search for NFTs with similar images to the given arweave_id
+  search_similar : (text, nat32) -> (Result_7) query;
+  start_alex_supply_timer : () -> (Result_8);
+  // Store embeddings for NFT images. Controller only.
+  store_embeddings : (vec EmbeddingEntry) -> (StoreResult);
+  update_alex_supply : () -> (Result_8);
   // Update a comment (only by the comment author)
   update_comment : (nat64, text) -> (Result);
   // Get the caller's principal

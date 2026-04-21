@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { ContentType } from "@/features/pinax/pinaxSlice";
 import useNavigationGuard from "@/features/pinax/hooks/useNavigationGuard";
@@ -43,6 +44,10 @@ function PinaxPage() {
 
 	return (
 		<div className="py-10 px-4 sm:px-6 md:px-10 flex-grow flex justify-center">
+			<Helmet>
+				<title>Pinax | Alexandria</title>
+				<meta name="description" content="Pinax content scanning and discovery on Alexandria." />
+			</Helmet>
 			<div className="max-w-2xl w-full flex flex-col justify-center items-center gap-8">
 				<Header />
 

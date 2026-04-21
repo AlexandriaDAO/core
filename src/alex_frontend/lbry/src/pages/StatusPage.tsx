@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Helmet } from "react-helmet-async";
 import {
 	CheckCircle2,
 	XCircle,
@@ -549,6 +550,10 @@ const StatusPage: React.FC = () => {
 
 	return (
 		<div className="container mx-auto px-4 py-8 max-w-4xl">
+			<Helmet>
+				<title>Status | Alexandria</title>
+				<meta name="description" content="Check the current status of Alexandria platform services." />
+			</Helmet>
 			<div className="flex items-center justify-between mb-8">
 				<div>
 					<h1 className="text-3xl font-bold font-syne">System Status</h1>
