@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useParams, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +20,18 @@ function UserProfilePage() {
 	const { actor: perpetuaActor } = usePerpetua();
 	const [copied, setCopied] = useState(false);
 	const [activeTab, setActiveTab] = useState<"nfts" | "scions" | "shelves">("nfts");
+	const [avatarError, setAvatarError] = useState(false);
+
+	// Route param is untrusted URL input — Principal.fromText throws on malformed
+	// strings, which would send every downstream query into error state with no
+	// user feedback. Parse once, short-circuit to an error page if invalid.
+	const parsedPrincipal = useMemo(() => {
+		try {
+			return Principal.fromText(principal);
+		} catch {
+			return null;
+		}
+	}, [principal]);
 
 	const handleCopy = async () => {
 		navigator.clipboard.writeText(principal);
@@ -31,12 +43,12 @@ function UserProfilePage() {
 	const { data: userData, isLoading: userLoading } = useQuery({
 		queryKey: ["user-profile", principal],
 		queryFn: async () => {
-			if (!userActor) return null;
-			const result = await userActor.get_user(Principal.fromText(principal));
+			if (!userActor || !parsedPrincipal) return null;
+			const result = await userActor.get_user(parsedPrincipal);
 			if ("Ok" in result) return result.Ok;
 			return null;
 		},
-		enabled: !!userActor && !!principal,
+		enabled: !!userActor && !!parsedPrincipal,
 		staleTime: 60_000,
 	});
 
@@ -45,11 +57,11 @@ function UserProfilePage() {
 		queryKey: ["user-og-count", principal],
 		queryFn: async () => {
 			const result = await icrc7.icrc7_balance_of([
-				{ owner: Principal.fromText(principal), subaccount: [] },
+				{ owner: parsedPrincipal!, subaccount: [] },
 			]);
 			return Number(result[0]);
 		},
-		enabled: !!principal,
+		enabled: !!parsedPrincipal,
 		staleTime: 60_000,
 	});
 
@@ -58,11 +70,11 @@ function UserProfilePage() {
 		queryKey: ["user-scion-count", principal],
 		queryFn: async () => {
 			const result = await icrc7_scion.icrc7_balance_of([
-				{ owner: Principal.fromText(principal), subaccount: [] },
+				{ owner: parsedPrincipal!, subaccount: [] },
 			]);
 			return Number(result[0]);
 		},
-		enabled: !!principal,
+		enabled: !!parsedPrincipal,
 		staleTime: 60_000,
 	});
 
@@ -70,7 +82,7 @@ function UserProfilePage() {
 	const { data: userNfts } = useQuery({
 		queryKey: ["user-nfts", principal],
 		queryFn: async () => {
-			const account = { owner: Principal.fromText(principal), subaccount: [] as [] };
+			const account = { owner: parsedPrincipal!, subaccount: [] as [] };
 			const tokenIds = await icrc7.icrc7_tokens_of(account, [], []);
 			return tokenIds.map((tokenId) => ({
 				id: tokenId.toString(),
@@ -81,7 +93,7 @@ function UserProfilePage() {
 				lbry: 0,
 			}));
 		},
-		enabled: !!principal,
+		enabled: !!parsedPrincipal,
 		staleTime: 60_000,
 	});
 
@@ -89,7 +101,7 @@ function UserProfilePage() {
 	const { data: userScions } = useQuery({
 		queryKey: ["user-scions", principal],
 		queryFn: async () => {
-			const account = { owner: Principal.fromText(principal), subaccount: [] as [] };
+			const account = { owner: parsedPrincipal!, subaccount: [] as [] };
 			const tokenIds = await icrc7_scion.icrc7_tokens_of(account, [], []);
 			return tokenIds.map((tokenId) => ({
 				id: tokenId.toString(),
@@ -100,7 +112,7 @@ function UserProfilePage() {
 				lbry: 0,
 			}));
 		},
-		enabled: !!principal,
+		enabled: !!parsedPrincipal,
 		staleTime: 60_000,
 	});
 
@@ -108,21 +120,26 @@ function UserProfilePage() {
 	const { data: userShelves } = useQuery({
 		queryKey: ["user-shelves", principal],
 		queryFn: async () => {
-			if (!perpetuaActor) return [];
+			if (!perpetuaActor || !parsedPrincipal) return [];
 			const result = await perpetuaActor.get_user_shelves(
-				Principal.fromText(principal),
+				parsedPrincipal,
 				{ offset: BigInt(0), limit: BigInt(20) }
 			);
 			if ("Ok" in result) return result.Ok.items;
 			return [];
 		},
-		enabled: !!perpetuaActor && !!principal,
+		enabled: !!perpetuaActor && !!parsedPrincipal,
 		staleTime: 60_000,
 	});
 
 	const avatarUrl = userData?.avatar;
 	const username = userData?.username;
 	const name = userData?.name;
+
+	// Re-attempt image load if the user's avatar URL changes after a prior failure
+	useEffect(() => {
+		setAvatarError(false);
+	}, [avatarUrl]);
 	const memberSince = userData?.created_at
 		? convertTimestamp(userData.created_at, "readable")
 		: null;
@@ -132,6 +149,28 @@ function UserProfilePage() {
 		{ id: "scions" as const, label: "Collected", count: scionCount, icon: Layers },
 		{ id: "shelves" as const, label: "Shelves", count: userShelves?.length, icon: Library },
 	];
+
+	if (!parsedPrincipal) {
+		return (
+			<div className="flex-grow flex flex-col items-center justify-center py-20 px-4 text-center">
+				<Helmet>
+					<title>Invalid profile | Alexandria</title>
+				</Helmet>
+				<div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+					<User size={28} className="opacity-40" />
+				</div>
+				<h1 className="text-xl font-semibold mb-2">Invalid principal</h1>
+				<p className="text-sm text-muted-foreground max-w-md">
+					The URL doesn't contain a valid user principal. Check the link and try again.
+				</p>
+				<Link to="/" className="mt-6">
+					<Button variant="outline" className="gap-2">
+						<ArrowLeft size={16} /> Back home
+					</Button>
+				</Link>
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex-grow flex flex-col items-center">
@@ -155,20 +194,18 @@ function UserProfilePage() {
 				<div className="flex flex-col sm:flex-row items-start gap-5">
 					{/* Avatar */}
 					<div className="w-28 h-28 rounded-2xl bg-gray-200 dark:bg-gray-800 border-4 border-background shadow-xl flex items-center justify-center overflow-hidden flex-shrink-0">
-						{avatarUrl ? (
+						{avatarUrl && !avatarError ? (
 							<img
 								src={avatarUrl}
 								alt={username || "User"}
 								className="w-full h-full object-cover"
-								onError={(e) => {
-									(e.target as HTMLImageElement).style.display = "none";
-									(e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
-								}}
+								onError={() => setAvatarError(true)}
 							/>
-						) : null}
-						<span className={`text-3xl font-bold text-muted-foreground ${avatarUrl ? "hidden" : ""}`}>
-							{username ? username[0].toUpperCase() : "?"}
-						</span>
+						) : (
+							<span className="text-3xl font-bold text-muted-foreground">
+								{username ? username[0].toUpperCase() : "?"}
+							</span>
+						)}
 					</div>
 
 					{/* Info */}

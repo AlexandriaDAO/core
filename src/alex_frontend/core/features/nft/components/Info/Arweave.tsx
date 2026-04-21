@@ -153,24 +153,28 @@ const ArweaveInfo: React.FC<ArweaveInfoProps> = ({ id }) => {
 				<TabsList className="grid w-full grid-cols-4 bg-transparent p-0 h-auto">
 					<TabsTrigger
 						value="tags"
+						aria-label="Tags"
 						className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none px-1 py-2"
 					>
 						<Tag className="w-5 h-5" />
 					</TabsTrigger>
 					<TabsTrigger
 						value="comments"
+						aria-label="Comments"
 						className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none px-1 py-2"
 					>
 						<MessageCircle className="w-5 h-5" />
 					</TabsTrigger>
 					<TabsTrigger
 						value="history"
+						aria-label="History"
 						className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none px-1 py-2"
 					>
 						<History className="w-5 h-5" />
 					</TabsTrigger>
 					<TabsTrigger
 						value="share"
+						aria-label="Share"
 						className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-2 border-transparent data-[state=active]:border-primary rounded-none px-1 py-2"
 					>
 						<Share2 className="w-5 h-5" />

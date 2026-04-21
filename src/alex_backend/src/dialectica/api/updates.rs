@@ -334,15 +334,18 @@ pub fn update_comment(activity_id: u64, new_comment: String) -> ActivityResult<A
 }
 
 /// Record impressions and views in a single batched call.
-/// Impressions: deduped per authenticated user (one per arweave_id per user).
-/// Views: deduped per authenticated user (same as record_view).
-/// Anonymous users are always counted for both.
+/// Impressions: counted unconditionally — no per-caller dedup. Every entry in the
+///              `impressions` vec increments the counter, so repeated calls
+///              (refresh, multiple tabs) inflate the total. Treat the number as
+///              a raw signal, not a unique-user metric.
+/// Views: deduped per authenticated caller (same as `record_view`). Anonymous
+///        views are counted without dedup.
 #[update]
 pub fn record_engagement_batch(impressions: Vec<String>, views: Vec<String>) -> ActivityResult<()> {
     let caller = caller();
     let is_anonymous = caller == Principal::anonymous();
 
-    // Process impressions — dedup per user
+    // Process impressions — counter-only, no dedup (see fn-level docs)
     IMPRESSIONS.with(|imp_store| {
         let mut imp_store = imp_store.borrow_mut();
         for arweave_id in &impressions {

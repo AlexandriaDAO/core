@@ -28,7 +28,8 @@ import { arweaveIdToNat } from "@/utils/id_convert";
 import { createTokenAdapter } from "@/features/alexandrian/adapters/TokenAdapter";
 import { alex_backend } from "../../../../declarations/alex_backend";
 
-const EMBEDDING_SERVER = "https://lbry.youthumber.com";
+const EMBEDDING_SERVER =
+	process.env.REACT_APP_EMBEDDING_SERVER || "https://lbry.youthumber.com";
 
 // zdcg2-dqaaa-aaaap-qpnha-cai
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
@@ -100,6 +101,32 @@ function AlexandrianPage() {
 
 	const disabled = loading || updating;
 
+	const renderCard = (token: AlexandrianToken) => (
+		<NFTCard
+			id={token.arweaveId}
+			action={user && (
+				<>
+					<AddToShelfButton item={{ id: token.id, arweaveId: token.arweaveId, owner: token.owner }} />
+					{token.owner === user.principal && token.collection !== "SBT" ? (
+						<SellButton tokenId={token.id} />
+					) : token.owner === emporium_canister_id ? (
+						<Tooltip delayDuration={0}>
+							<TooltipTrigger asChild>
+								<Button variant="outline" scale="sm" className="px-1 py-4 opacity-60 cursor-auto hover:text-foreground">
+									<Check />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent side="right" sideOffset={8} portal>Listed</TooltipContent>
+						</Tooltip>
+					) : (
+						<MintButton token={token} />
+					)}
+				</>
+			)}
+			token={token}
+		/>
+	);
+
 	return (
 		<>
 		<Helmet>
@@ -133,84 +160,34 @@ function AlexandrianPage() {
             </div>
 
             <div className="w-full flex flex-col items-center gap-8">
-				{searchResults ? (
-					<NftProvider loading={searching} items={searchResults} safe={safe}>
-						{token => (
-							<NFTCard
-								id={token.arweaveId}
-								action={
-									user && <>
-										<AddToShelfButton item={{ id: token.id, arweaveId: token.arweaveId, owner: token.owner }} />
-										{token.owner === user.principal && token.collection !== "SBT" ? (
-											<SellButton tokenId={token.id} />
-										) : token.owner === emporium_canister_id ? (
-											<Tooltip delayDuration={0}>
-												<TooltipTrigger asChild>
-													<Button variant="outline" scale="sm" className="px-1 py-4 opacity-60 cursor-auto hover:text-foreground">
-														<Check />
-													</Button>
-												</TooltipTrigger>
-												<TooltipContent side="right" sideOffset={8} portal>Listed</TooltipContent>
-											</Tooltip>
-										) : (
-											<MintButton token={token}/>
-										)}
-									</>
-								}
-								token={token}
-							/>
-						)}
-					</NftProvider>
-				) : (
-					<>
-						<NftProvider loading={loading} items={Object.values(tokens)} safe={safe}>
-							{token => (
-								<NFTCard
-									id={token.arweaveId}
-									action={
-										user && <>
-											<AddToShelfButton item={{ id: token.id, arweaveId: token.arweaveId, owner: token.owner }} />
-											{token.owner === user.principal && token.collection !== "SBT" ? (
-												<SellButton tokenId={token.id} />
-											) : token.owner === emporium_canister_id ? (
-												<Tooltip delayDuration={0}>
-													<TooltipTrigger asChild>
-														<Button variant="outline" scale="sm" className="px-1 py-4 opacity-60 cursor-auto hover:text-foreground">
-															<Check />
-														</Button>
-													</TooltipTrigger>
-													<TooltipContent side="right" sideOffset={8} portal>Listed</TooltipContent>
-												</Tooltip>
-											) : (
-												<MintButton token={token}/>
-											)}
-										</>
-									}
-									token={token}
-								/>
-							)}
-						</NftProvider>
+				<NftProvider
+					loading={searchResults ? searching : loading}
+					items={searchResults ?? Object.values(tokens)}
+					safe={safe}
+				>
+					{renderCard}
+				</NftProvider>
 
-						<div className="flex justify-center mt-6 mb-8">
-							{ (loading || updating) ? (
-								<Button disabled={true} className="bg-gray-900 text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors flex items-center">
-									<LoaderPinwheel className="animate-spin mr-2 h-4 w-4" /> Loading more...
-								</Button>
-							): page < (totalPages - 1) ? (
-								<Button
-									onClick={() => dispatch(setPage(page + 1))}
-									disabled={disabled}
-									className="bg-gray-900 text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
-								>
-									{loading || updating ? 'Loading...' : 'Load More'}
-								</Button>
-							) : (
-								<p className="text-base font-medium text-gray-900 dark:text-gray-100">
-									That's all for now!
-								</p>
-							)}
-						</div>
-					</>
+				{!searchResults && (
+					<div className="flex justify-center mt-6 mb-8">
+						{ (loading || updating) ? (
+							<Button disabled={true} className="bg-gray-900 text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors flex items-center">
+								<LoaderPinwheel className="animate-spin mr-2 h-4 w-4" /> Loading more...
+							</Button>
+						): page < (totalPages - 1) ? (
+							<Button
+								onClick={() => dispatch(setPage(page + 1))}
+								disabled={disabled}
+								className="bg-gray-900 text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
+							>
+								{loading || updating ? 'Loading...' : 'Load More'}
+							</Button>
+						) : (
+							<p className="text-base font-medium text-gray-900 dark:text-gray-100">
+								That's all for now!
+							</p>
+						)}
+					</div>
 				)}
 			</div>
 		</div>

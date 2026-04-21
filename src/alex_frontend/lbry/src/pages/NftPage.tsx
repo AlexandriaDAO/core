@@ -60,7 +60,13 @@ function NftPage() {
 			setLoading(true);
 			try {
 				const nftId = BigInt(tokenId);
-				const adapter = createTokenAdapter("NFT");
+				// Scion token IDs encode an extra 64-bit principal hash and
+				// come out >90 decimal digits wide. `natToArweaveId` already
+				// uses this exact threshold to peel the hash back off, so
+				// routing the adapter the same way keeps them consistent.
+				const isScion = tokenId.length > 90;
+				const collection: "NFT" | "SBT" = isScion ? "SBT" : "NFT";
+				const adapter = createTokenAdapter(collection);
 				const awId = natToArweaveId(nftId);
 
 				const ownerResult = await adapter.getOwnerOf([nftId]);
@@ -73,7 +79,7 @@ function NftPage() {
 						id: tokenId,
 						arweaveId: awId,
 						owner,
-						collection: "NFT",
+						collection,
 						...icpInfo,
 					});
 				}

@@ -10,7 +10,7 @@ use crate::MEMORY_MANAGER;
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 // Memory IDs starting from 30 to avoid conflicts (10=supply, 20-26=dialectica)
-const EMBEDDINGS_MEM_ID: MemoryId = MemoryId::new(30);
+pub const EMBEDDINGS_MEM_ID: MemoryId = MemoryId::new(30);
 
 // CLIP ViT-B-32 produces 512-dimensional vectors
 pub const EMBEDDING_DIM: usize = 512;

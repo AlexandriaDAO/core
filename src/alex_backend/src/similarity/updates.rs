@@ -15,7 +15,6 @@ pub struct EmbeddingEntry {
 #[derive(CandidType)]
 pub struct StoreResult {
     pub stored: u64,
-    pub skipped: u64,
     pub errors: Vec<String>,
 }
 
@@ -32,7 +31,6 @@ fn is_controller() -> Result<(), String> {
 #[update(guard = "is_controller")]
 fn store_embeddings(entries: Vec<EmbeddingEntry>) -> StoreResult {
     let mut stored: u64 = 0;
-    let mut skipped: u64 = 0;
     let mut errors: Vec<String> = Vec::new();
 
     for entry in entries {
@@ -64,7 +62,6 @@ fn store_embeddings(entries: Vec<EmbeddingEntry>) -> StoreResult {
 
     StoreResult {
         stored,
-        skipped,
         errors,
     }
 }
@@ -102,12 +99,12 @@ fn clear_embeddings() -> u64 {
 #[update(guard = "is_controller")]
 fn reset_embeddings() -> String {
     use crate::MEMORY_MANAGER;
-    use ic_stable_structures::memory_manager::MemoryId;
+    use super::store::EMBEDDINGS_MEM_ID;
 
     EMBEDDINGS.with(|emb| {
         let old_count = emb.borrow().len();
         *emb.borrow_mut() = ic_stable_structures::StableBTreeMap::new(
-            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(30)))
+            MEMORY_MANAGER.with(|m| m.borrow().get(EMBEDDINGS_MEM_ID))
         );
         let new_count = emb.borrow().len();
         format!("Reset done. Old count: {}, New count: {}", old_count, new_count)
