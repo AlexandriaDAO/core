@@ -6,7 +6,7 @@ import { ShelfGridSkeleton } from "./ShelfSkeleton";
 import { Loader2, Inbox, Compass, Users, AlertCircle } from "lucide-react";
 
 export default function FeedView() {
-	const feedType = useAppSelector((state) => state.valora.feedType);
+	const feedType = useAppSelector((state) => state.perpetua.feedType);
 
 	if (feedType === "recency") return <RecencyFeed />;
 	if (feedType === "random") return <RandomFeed />;

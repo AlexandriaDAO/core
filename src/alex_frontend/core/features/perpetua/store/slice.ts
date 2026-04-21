@@ -19,7 +19,7 @@ const initialState: PerpetuaState = {
 };
 
 const perpetuaSlice = createSlice({
-	name: "valora",
+	name: "perpetua",
 	initialState,
 	reducers: {
 		setFeedType(state, action: PayloadAction<FeedType>) {

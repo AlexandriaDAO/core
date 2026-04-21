@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { nsfwService } from "@/apps/Modules/shared/services/nsfwService";
+import { nsfwService } from "@/services/nsfwService";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { setScanError, setScanning } from "../pinaxSlice";
 

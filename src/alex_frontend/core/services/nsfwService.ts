@@ -1,6 +1,6 @@
 import type { NSFWJS, PredictionType } from 'nsfwjs';
-import type { TensorFlow } from '../apps/Modules/LibModules/arweaveSearch/types/tensorflow';
-import { getTensorFlow, clearTensorFlowInstance, isTensorFlowLoaded } from '../apps/Modules/shared/services/tensorflowLoader';
+import type { TensorFlow } from './tensorflow.types';
+import { getTensorFlow, clearTensorFlowInstance, isTensorFlowLoaded } from './tensorflowLoader';
 
 export type PredictionResults = {
   Drawing: number;

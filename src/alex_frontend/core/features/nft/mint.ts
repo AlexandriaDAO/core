@@ -1,7 +1,7 @@
 import { Principal } from '@dfinity/principal';
 import { store } from "@/store";
 import { nft_manager } from "@/../../declarations/nft_manager";
-import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
+import { createTokenAdapter } from "@/features/alexandrian/adapters/TokenAdapter";
 import { ActorSubclass } from '@dfinity/agent';
 import { _SERVICE } from '../../../../declarations/nft_manager/nft_manager.did';
 
@@ -22,7 +22,6 @@ export type MintResult =
 // Function to find existing NFT ID for a given Arweave transaction
 const getExistingNftIdForTransaction = async (transactionId: string): Promise<string | null> => {
   console.log(`[mint.ts] Searching for existing NFT ID for Arweave tx: ${transactionId}`);
-  const {arweaveToNftId, nfts} = store.getState().nftData;
   const {user} = store.getState().auth;
 
   if(!user) {
@@ -32,22 +31,8 @@ const getExistingNftIdForTransaction = async (transactionId: string): Promise<st
   const currentUserPrincipalText = user.principal
   const currentUserPrincipal = Principal.fromText(currentUserPrincipalText);
 
-  // --- Step 1: Check Redux Cache ---
-  const cachedNftId = arweaveToNftId[transactionId];
-  if (cachedNftId && nfts[cachedNftId]) {
-    const cachedOwner = nfts[cachedNftId]?.principal;
-    if (cachedOwner === currentUserPrincipalText) {
-      console.log(`[mint.ts] Found existing ID in Redux state: ${cachedNftId} owned by current user`);
-      return cachedNftId;
-    } else {
-       console.log(`[mint.ts] Found ID ${cachedNftId} in Redux for tx ${transactionId}, but owner (${cachedOwner}) doesn't match current user (${currentUserPrincipalText}).`);
-    }
-  } else {
-     console.log(`[mint.ts] Did not find owned ID for tx ${transactionId} in Redux cache.`);
-  }
-
-  // --- Step 2: Fallback - Query Canisters Directly ---
-  console.log(`[mint.ts] Redux check failed for tx ${transactionId}, querying canisters...`);
+  // Query Canisters Directly
+  console.log(`[mint.ts] Querying canisters for tx ${transactionId}...`);
   try {
     // Convert Arweave ID to the base minting number (Nat/bigint)
     // Assuming nft_manager actor can do this conversion, or use a local utility if available
@@ -97,19 +82,6 @@ export const mint_nft = async (actor: ActorSubclass<_SERVICE>, transactionId: st
     }
 
     const currentUserPrincipalText = user.principal;
-
-    // --- Optimization: Check Redux cache *before* calling backend ---
-    // This avoids backend call if user clearly owns it according to cache
-    const {nfts, arweaveToNftId} = store.getState().nftData;
-    const cachedNftId = arweaveToNftId[transactionId];
-    const nftData = cachedNftId ? nfts[cachedNftId] : undefined;
-    const ownerStr = nftData?.principal;
-
-    if (cachedNftId && ownerStr === currentUserPrincipalText) {
-      console.log(`[mint.ts] User already owns NFT with ID ${cachedNftId} for tx ${transactionId} (checked Redux before backend call)`);
-      return { status: 'already_exists', id: cachedNftId };
-    }
-    // --- End Optimization ---
 
     let ownerArg: [] | [Principal] = []; // Keep ownerArg logic if needed for specific mint flows
 

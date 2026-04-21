@@ -14,9 +14,9 @@ import CreateShelf from "../actions/CreateShelf";
 
 export default function PerpetuaLayout() {
 	const [showNewShelf, setShowNewShelf] = useState(false);
-	const showFilters = useAppSelector((state) => state.valora.showFilters);
-	const showFollowing = useAppSelector((state) => state.valora.showFollowing);
-	const tagFilter = useAppSelector((state) => state.valora.tagFilter);
+	const showFilters = useAppSelector((state) => state.perpetua.showFilters);
+	const showFollowing = useAppSelector((state) => state.perpetua.showFollowing);
+	const tagFilter = useAppSelector((state) => state.perpetua.tagFilter);
 
 	// Route matching — determine current view
 	const shelfMatch = useMatch({ from: "/_auth/app/perpetua/shelf/$shelfId", shouldThrow: false });

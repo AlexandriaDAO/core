@@ -1,7 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
-import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
-import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
+import { createTokenAdapter } from "@/features/alexandrian/adapters/TokenAdapter";
+import { natToArweaveId } from "@/utils/id_convert";
+import { fetchTransactionsByIds } from "../api/fetchTransactions";
 import { ArweaveAssetItem } from "../types";
 import { RootState } from "@/store";
 
@@ -28,18 +29,11 @@ export const fetchUserArweaveAssets = createAsyncThunk<
 			BigInt(10000)
 		);
 
-		// Get arweave IDs for each token
-		const arweaveIds: string[] = [];
-		for (const tokenId of tokenIds) {
-			const nftData = await nftAdapter.tokenToNFTData(
-				tokenId,
-				userPrincipal
-			);
-			arweaveIds.push(nftData.arweaveId);
-		}
+		// Convert token IDs to arweave IDs
+		const arweaveIds = tokenIds.map((tokenId) => natToArweaveId(tokenId));
 
 		// Fetch transaction data for the arweave IDs
-		const transactions = await fetchTransactionsForAlexandrian(arweaveIds);
+		const transactions = await fetchTransactionsByIds(arweaveIds);
 
 		// Map transactions to asset items
 		const assets: ArweaveAssetItem[] = transactions.map((tx) => {
