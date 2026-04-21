@@ -49,12 +49,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchUsers from "@/features/nft/thunks/fetchUsers";
 import { usePerpetua } from "@/hooks/actors";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import {
-	getUserShelves,
-	getUserPubliclyEditableShelves,
-} from "@/apps/app/Perpetua/state/services/shelfService";
-import { useTagActions } from "@/apps/app/Perpetua/features/tags/hooks/useTagActions";
-import { useTagData } from "@/apps/app/Perpetua/features/tags/hooks/useTagData";
+import { usePopularTags } from "@/features/perpetua/hooks/useTags";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { Principal } from "@dfinity/principal";
 import { toast } from "sonner";
@@ -111,8 +106,7 @@ export function AddToShelfButton({ item, variant = "outline", scale = "sm", clas
 	const { user } = useAppSelector((state) => state.auth);
 	const { users } = useAppSelector((state) => state.nft);
 	const dispatch = useAppDispatch();
-	const { fetchTagsWithPrefix } = useTagActions();
-	const { tagSearchResults, isTagSearchLoading, popularTags } = useTagData();
+	const { data: popularTags } = usePopularTags();
 
 	// Load my shelves when dialog opens
 	useEffect(() => {
@@ -134,13 +128,14 @@ export function AddToShelfButton({ item, variant = "outline", scale = "sm", clas
 
 		setLoadingMyShelves(true);
 		try {
-			const result = await getUserShelves(perpetuaActor, user.principal, {
-				offset: 0,
-				limit: 50,
+			const principal = Principal.fromText(user.principal);
+			const result = await perpetuaActor.get_user_shelves(principal, {
+				offset: 0n,
+				limit: 50n,
 			});
 
 			if ("Ok" in result) {
-				setMyShelves(result.Ok.items);
+				setMyShelves(result.Ok.items as unknown as ShelfPublic[]);
 			} else {
 				toast.error("Failed to load shelves");
 			}
@@ -188,17 +183,13 @@ export function AddToShelfButton({ item, variant = "outline", scale = "sm", clas
 
 			try {
 				const principal = Principal.fromText(userId);
-				const result = await getUserPubliclyEditableShelves(
-					perpetuaActor,
+				const result = await perpetuaActor.get_user_publicly_editable_shelves(
 					principal,
-					{
-						offset: 0,
-						limit: 50,
-					}
+					{ offset: 0n, limit: 50n }
 				);
 
 				if ("Ok" in result) {
-					setPublicShelvesByUser(result.Ok.items);
+					setPublicShelvesByUser(result.Ok.items as unknown as ShelfPublic[]);
 				} else {
 					console.error("Failed to load user's public shelves");
 				}
