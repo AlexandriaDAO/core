@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { fetchMarketAudioNFTs } from "../marketSlice";
@@ -9,14 +9,14 @@ export const useMarketAudioNFTs = () => {
     const user = useAppSelector((state) => state.auth.user);
     const { audios, loading, loadingMore, error, pagination } = useAppSelector((state) => state.sonora.market);
 
-    const refreshMarketAudioNFTs = (page = 1, pageSize = 8, appendMode = false) => {
-        dispatch(fetchMarketAudioNFTs({ 
-            page, 
-            pageSize, 
-            appendMode, 
-            currentUserPrincipal: user?.principal 
+    const refreshMarketAudioNFTs = useCallback((page = 1, pageSize = 8, appendMode = false) => {
+        dispatch(fetchMarketAudioNFTs({
+            page,
+            pageSize,
+            appendMode,
+            currentUserPrincipal: user?.principal
         }));
-    };
+    }, [dispatch, user?.principal]);
 
     return {
         audios,

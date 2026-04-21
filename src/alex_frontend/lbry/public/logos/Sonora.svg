@@ -1,0 +1,37 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 40C0 17.9086 17.9086 0 40 0H472C494.091 0 512 17.9086 512 40V472C512 494.091 494.091 512 472 512H40C17.9086 512 0 494.091 0 472V40Z" fill="url(#sonora_bg)" fill-opacity="0.35"/>
+<g filter="url(#sonora_shadow)">
+<circle cx="256" cy="256" r="132" stroke="url(#sonora_stroke)" stroke-width="8"/>
+<circle cx="256" cy="256" r="108" stroke="url(#sonora_stroke)" stroke-width="8" stroke-opacity="0.55"/>
+<circle cx="256" cy="256" r="84" stroke="url(#sonora_stroke)" stroke-width="8" stroke-opacity="0.55"/>
+<circle cx="256" cy="256" r="48" stroke="url(#sonora_stroke)" stroke-width="8"/>
+<circle cx="256" cy="256" r="8" fill="url(#sonora_stroke)"/>
+<path d="M122 172.3 A158 158 0 0 0 122 339.7" stroke="url(#sonora_stroke)" stroke-width="8" stroke-linecap="round"/>
+<path d="M88.2 166.8 A190 190 0 0 0 88.2 345.2" stroke="url(#sonora_stroke)" stroke-width="8" stroke-linecap="round" stroke-opacity="0.7"/>
+<path d="M53.2 165.7 A222 222 0 0 0 53.2 346.3" stroke="url(#sonora_stroke)" stroke-width="8" stroke-linecap="round" stroke-opacity="0.45"/>
+<path d="M390 172.3 A158 158 0 0 1 390 339.7" stroke="url(#sonora_stroke)" stroke-width="8" stroke-linecap="round"/>
+<path d="M423.8 166.8 A190 190 0 0 1 423.8 345.2" stroke="url(#sonora_stroke)" stroke-width="8" stroke-linecap="round" stroke-opacity="0.7"/>
+<path d="M458.8 165.7 A222 222 0 0 1 458.8 346.3" stroke="url(#sonora_stroke)" stroke-width="8" stroke-linecap="round" stroke-opacity="0.45"/>
+</g>
+<defs>
+<filter id="sonora_shadow" x="30" y="100" width="470" height="320" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="4" dy="4"/>
+<feGaussianBlur stdDeviation="7"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+</filter>
+<linearGradient id="sonora_bg" x1="494.5" y1="0" x2="0" y2="512" gradientUnits="userSpaceOnUse">
+<stop stop-color="#E4D4FC"/>
+<stop offset="1" stop-color="#5B2D9E"/>
+</linearGradient>
+<linearGradient id="sonora_stroke" x1="256" y1="34" x2="256" y2="478" gradientUnits="userSpaceOnUse">
+<stop stop-color="#A78BFA"/>
+<stop offset="0.5" stop-color="#7C3AED"/>
+<stop offset="1" stop-color="#3B0E78"/>
+</linearGradient>
+</defs>
+</svg>
