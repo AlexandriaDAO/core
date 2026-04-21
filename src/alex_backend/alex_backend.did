@@ -50,11 +50,7 @@ type Result_6 = variant { Ok; Err : ActivityError };
 type Result_7 = variant { Ok : vec SimilarityResult; Err : text };
 type Result_8 = variant { Ok : text; Err : text };
 type SimilarityResult = record { score : float32; arweave_id : text };
-type StoreResult = record {
-  stored : nat64;
-  skipped : nat64;
-  errors : vec text;
-};
+type StoreResult = record { stored : nat64; errors : vec text };
 type UserNFTInfo = record {
   "principal" : principal;
   username : text;
@@ -84,8 +80,13 @@ service : () -> {
   // Get aggregated reaction counts for a specific NFT
   get_reaction_counts : (text) -> (Result_4) query;
   get_stored_nft_users : () -> (vec UserNFTInfo) query;
-  // Get trending content sorted by view count (descending).
-  // Returns a list of (arweave_id, view_count) tuples, limited to `limit` results.
+  // Get trending content ranked by authenticated-viewer count (descending).
+  // Returns a list of (arweave_id, count) tuples, limited to `limit` results.
+  // 
+  // Ranking uses `Some(principal)` entries only — anonymous views (`None`) are
+  // intentionally excluded so trending cannot be gamed by one anon user
+  // refreshing in a loop. `get_view_count` still reflects the full total for
+  // display purposes.
   get_trending : (nat64) -> (vec record { text; nat64 }) query;
   // Get all activities by a specific user
   get_user_activities : (principal) -> (Result_1) query;
@@ -99,9 +100,12 @@ service : () -> {
   // Check if an arweave_id has been indexed
   is_indexed : (text) -> (bool) query;
   // Record impressions and views in a single batched call.
-  // Impressions: deduped per authenticated user (one per arweave_id per user).
-  // Views: deduped per authenticated user (same as record_view).
-  // Anonymous users are always counted for both.
+  // Impressions: counted unconditionally — no per-caller dedup. Every entry in the
+  // `impressions` vec increments the counter, so repeated calls
+  // (refresh, multiple tabs) inflate the total. Treat the number as
+  // a raw signal, not a unique-user metric.
+  // Views: deduped per authenticated caller (same as `record_view`). Anonymous
+  // views are counted without dedup.
   record_engagement_batch : (vec text, vec text) -> (Result_6);
   // Record an impression for an article (article appeared in feed)
   // Anyone can call, always increments counter

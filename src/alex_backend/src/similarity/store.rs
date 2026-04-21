@@ -73,7 +73,7 @@ pub fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
     let mut norm_a: f32 = 0.0;
     let mut norm_b: f32 = 0.0;
 
-    for i in 0..a.len() {
+    for i in 0..a.len().min(b.len()) {
         dot += a[i] * b[i];
         norm_a += a[i] * a[i];
         norm_b += b[i] * b[i];
