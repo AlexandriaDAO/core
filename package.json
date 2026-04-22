@@ -94,6 +94,7 @@
 		"flatted": "^3.3.1",
 		"formik": "^2.4.6",
 		"graphql": "^16.11.0",
+		"html-to-image": "^1.11.13",
 		"html-to-text": "^9.0.5",
 		"human-crypto-keys": "^0.1.4",
 		"ic-mops": "^1.0.1",
