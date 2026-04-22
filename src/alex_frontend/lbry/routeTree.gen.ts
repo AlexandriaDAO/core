@@ -59,6 +59,7 @@ const AuthDashboardAnalyticsLazyRouteImport = createFileRoute(
   '/_auth/dashboard/analytics',
 )()
 const AuthAppPinaxLazyRouteImport = createFileRoute('/_auth/app/pinax')()
+const AuthAppPearlLazyRouteImport = createFileRoute('/_auth/app/pearl')()
 const AuthDashboardLibrarianRouteLazyRouteImport = createFileRoute(
   '/_auth/dashboard/_librarian',
 )()
@@ -281,6 +282,13 @@ const AuthAppPinaxLazyRoute = AuthAppPinaxLazyRouteImport.update({
 } as any).lazy(() =>
   import('./src/routes/_auth/app/pinax.lazy').then((d) => d.Route),
 )
+const AuthAppPearlLazyRoute = AuthAppPearlLazyRouteImport.update({
+  id: '/app/pearl',
+  path: '/app/pearl',
+  getParentRoute: () => AuthRouteLazyRoute,
+} as any).lazy(() =>
+  import('./src/routes/_auth/app/pearl.lazy').then((d) => d.Route),
+)
 const AuthDashboardLibrarianRouteLazyRoute =
   AuthDashboardLibrarianRouteLazyRouteImport.update({
     id: '/_librarian',
@@ -482,6 +490,7 @@ export interface FileRoutesByFullPath {
   '/info/': typeof InfoIndexLazyRoute
   '/app/emporium': typeof AuthAppEmporiumRouteLazyRouteWithChildren
   '/app/sonora': typeof AuthAppSonoraRouteLazyRouteWithChildren
+  '/app/pearl': typeof AuthAppPearlLazyRoute
   '/app/pinax': typeof AuthAppPinaxLazyRoute
   '/dashboard/analytics': typeof AuthDashboardAnalyticsLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
@@ -527,6 +536,7 @@ export interface FileRoutesByTo {
   '/swap/redeem': typeof SwapRedeemLazyRoute
   '/swap/stake': typeof SwapStakeLazyRoute
   '/info': typeof InfoIndexLazyRoute
+  '/app/pearl': typeof AuthAppPearlLazyRoute
   '/app/pinax': typeof AuthAppPinaxLazyRoute
   '/dashboard/analytics': typeof AuthDashboardAnalyticsLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
@@ -577,6 +587,7 @@ export interface FileRoutesById {
   '/_auth/app/emporium': typeof AuthAppEmporiumRouteLazyRouteWithChildren
   '/_auth/app/sonora': typeof AuthAppSonoraRouteLazyRouteWithChildren
   '/_auth/dashboard/_librarian': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
+  '/_auth/app/pearl': typeof AuthAppPearlLazyRoute
   '/_auth/app/pinax': typeof AuthAppPinaxLazyRoute
   '/_auth/dashboard/analytics': typeof AuthDashboardAnalyticsLazyRoute
   '/_auth/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
@@ -627,6 +638,7 @@ export interface FileRouteTypes {
     | '/info/'
     | '/app/emporium'
     | '/app/sonora'
+    | '/app/pearl'
     | '/app/pinax'
     | '/dashboard/analytics'
     | '/dashboard/arweave-assets'
@@ -672,6 +684,7 @@ export interface FileRouteTypes {
     | '/swap/redeem'
     | '/swap/stake'
     | '/info'
+    | '/app/pearl'
     | '/app/pinax'
     | '/dashboard/analytics'
     | '/dashboard/arweave-assets'
@@ -721,6 +734,7 @@ export interface FileRouteTypes {
     | '/_auth/app/emporium'
     | '/_auth/app/sonora'
     | '/_auth/dashboard/_librarian'
+    | '/_auth/app/pearl'
     | '/_auth/app/pinax'
     | '/_auth/dashboard/analytics'
     | '/_auth/dashboard/arweave-assets'
@@ -958,6 +972,13 @@ declare module '@tanstack/react-router' {
       path: '/app/pinax'
       fullPath: '/app/pinax'
       preLoaderRoute: typeof AuthAppPinaxLazyRouteImport
+      parentRoute: typeof AuthRouteLazyRoute
+    }
+    '/_auth/app/pearl': {
+      id: '/_auth/app/pearl'
+      path: '/app/pearl'
+      fullPath: '/app/pearl'
+      preLoaderRoute: typeof AuthAppPearlLazyRouteImport
       parentRoute: typeof AuthRouteLazyRoute
     }
     '/_auth/dashboard/_librarian': {
@@ -1246,6 +1267,7 @@ interface AuthRouteLazyRouteChildren {
   AuthSwapRouteLazyRoute: typeof AuthSwapRouteLazyRouteWithChildren
   AuthAppEmporiumRouteLazyRoute: typeof AuthAppEmporiumRouteLazyRouteWithChildren
   AuthAppSonoraRouteLazyRoute: typeof AuthAppSonoraRouteLazyRouteWithChildren
+  AuthAppPearlLazyRoute: typeof AuthAppPearlLazyRoute
   AuthAppPinaxLazyRoute: typeof AuthAppPinaxLazyRoute
   AuthAppPerpetuaIndexLazyRoute: typeof AuthAppPerpetuaIndexLazyRoute
   AuthAppPerpetuaShelfShelfIdLazyRoute: typeof AuthAppPerpetuaShelfShelfIdLazyRoute
@@ -1258,6 +1280,7 @@ const AuthRouteLazyRouteChildren: AuthRouteLazyRouteChildren = {
   AuthSwapRouteLazyRoute: AuthSwapRouteLazyRouteWithChildren,
   AuthAppEmporiumRouteLazyRoute: AuthAppEmporiumRouteLazyRouteWithChildren,
   AuthAppSonoraRouteLazyRoute: AuthAppSonoraRouteLazyRouteWithChildren,
+  AuthAppPearlLazyRoute: AuthAppPearlLazyRoute,
   AuthAppPinaxLazyRoute: AuthAppPinaxLazyRoute,
   AuthAppPerpetuaIndexLazyRoute: AuthAppPerpetuaIndexLazyRoute,
   AuthAppPerpetuaShelfShelfIdLazyRoute: AuthAppPerpetuaShelfShelfIdLazyRoute,

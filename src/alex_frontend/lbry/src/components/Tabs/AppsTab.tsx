@@ -8,7 +8,7 @@ export const AppsTab: React.FC = () => {
 	const navigate = useNavigate();
 	const [isHovered, setIsHovered] = useState(false);
 
-	const activeApps = appsData.filter((app: App) => !app.comingSoon);
+	const activeApps = appsData.filter((app: App) => !app.comingSoon && !app.hideFromHeader);
 
 	return (
 		<div

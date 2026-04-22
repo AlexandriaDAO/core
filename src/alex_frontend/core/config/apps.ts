@@ -5,6 +5,7 @@ export interface App {
 	path: string;
 	logo?: string;
 	comingSoon?: boolean;
+	hideFromHeader?: boolean;
 }
 
 export const appsData: App[] = [
@@ -12,8 +13,9 @@ export const appsData: App[] = [
 	{ name: 'Alexandrian', description: 'Library', path: '/app/alexandrian', logo: '/logos/Alexandrian.svg' },
 	{ name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/Permasearch.svg' },
 	{ name: 'Emporium', description: 'Trade', path: '/app/emporium', logo: '/logos/Emporium.svg' },
-	{ name: 'Pinax', description: 'Upload', path: '/app/pinax', logo: '/logos/Pinax.svg', comingSoon: false },
 	{ name: 'Sonora', description: 'Audio', path: '/app/sonora', logo: '/logos/Sonora.svg' },
+	{ name: 'Pinax', description: 'Upload', path: '/app/pinax', logo: '/logos/Pinax.svg', comingSoon: false, hideFromHeader: true },
+	{ name: 'Pearl', description: 'Receipt', path: '/app/pearl', logo: '/logos/Pearl.svg', comingSoon: false, hideFromHeader: true },
 	{ name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos', logo: '/logos/Syllogos.svg', comingSoon: true },
 	{ name: 'Bibliotheca', description: 'Library', path: '/app/bibliotheca', comingSoon: true },
 	{ name: 'Dialectica', description: 'Debate', path: '/app/dialectica', comingSoon: true },

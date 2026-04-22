@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Plus, Loader2, AlertCircle, Search } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Textarea } from "@/lib/components/textarea";
@@ -30,10 +31,12 @@ export default function AddItem({ shelfId, existingShelfIds }: AddItemProps) {
 	const [tab, setTab] = useState("markdown");
 	const [markdown, setMarkdown] = useState("");
 	const [nftTokenId, setNftTokenId] = useState("");
+	const [pearlTokenId, setPearlTokenId] = useState("");
 	const [selectedShelfId, setSelectedShelfId] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const addItem = useAddItem();
 	const { data: myShelves } = useMyShelves();
+	const navigate = useNavigate();
 
 	// Shelf sub-mode state
 	const [shelfMode, setShelfMode] = useState<ShelfMode>("mine");
@@ -63,6 +66,7 @@ export default function AddItem({ shelfId, existingShelfIds }: AddItemProps) {
 	const canSubmit = !addItem.isPending && (
 		(tab === "markdown" && markdown.trim().length > 0) ||
 		(tab === "nft" && nftTokenId.trim().length > 0) ||
+		(tab === "pearl" && pearlTokenId.trim().length > 0) ||
 		(tab === "shelf" && selectedShelfId.length > 0)
 	);
 
@@ -70,15 +74,19 @@ export default function AddItem({ shelfId, existingShelfIds }: AddItemProps) {
 		if (!canSubmit) return;
 		setError(null);
 
+		// Pearl receipts are NFTs minted through the same pipeline, so they
+		// share the `Nft` content variant on the canister side.
 		let content;
 		if (tab === "markdown") content = { Markdown: markdown.trim() };
 		else if (tab === "nft") content = { Nft: nftTokenId.trim() };
+		else if (tab === "pearl") content = { Nft: pearlTokenId.trim() };
 		else content = { Shelf: selectedShelfId };
 
 		try {
 			await addItem.mutateAsync({ shelfId, content });
 			setMarkdown("");
 			setNftTokenId("");
+			setPearlTokenId("");
 			setSelectedShelfId("");
 			setOpen(false);
 		} catch (err: any) {
@@ -91,6 +99,7 @@ export default function AddItem({ shelfId, existingShelfIds }: AddItemProps) {
 			setError(null);
 			setMarkdown("");
 			setNftTokenId("");
+			setPearlTokenId("");
 			setSelectedShelfId("");
 			setTab("markdown");
 			setShelfMode("mine");
@@ -106,6 +115,11 @@ export default function AddItem({ shelfId, existingShelfIds }: AddItemProps) {
 			setSearchedTag(tagSearch.trim());
 			setSelectedShelfId("");
 		}
+	};
+
+	const goTo = (path: "/app/pinax" | "/app/pearl") => {
+		handleOpenChange(false);
+		navigate({ to: path });
 	};
 
 	const handleShelfModeChange = (mode: ShelfMode) => {
@@ -145,6 +159,7 @@ export default function AddItem({ shelfId, existingShelfIds }: AddItemProps) {
 							<TabsTrigger value="markdown" className="flex-1 dark:data-[state=active]:bg-gray-900 dark:data-[state=active]:text-gray-100 dark:text-gray-400">Markdown</TabsTrigger>
 							<TabsTrigger value="nft" className="flex-1 dark:data-[state=active]:bg-gray-900 dark:data-[state=active]:text-gray-100 dark:text-gray-400">NFT</TabsTrigger>
 							<TabsTrigger value="shelf" className="flex-1 dark:data-[state=active]:bg-gray-900 dark:data-[state=active]:text-gray-100 dark:text-gray-400">Shelf</TabsTrigger>
+							<TabsTrigger value="pearl" className="flex-1 dark:data-[state=active]:bg-gray-900 dark:data-[state=active]:text-gray-100 dark:text-gray-400">Pearl</TabsTrigger>
 						</TabsList>
 
 						<TabsContent value="markdown" className="mt-3 space-y-1">
@@ -168,7 +183,15 @@ export default function AddItem({ shelfId, existingShelfIds }: AddItemProps) {
 								rounded="md"
 							/>
 							<p className="text-sm text-muted-foreground dark:text-gray-400">
-								Find NFTs in Alexandrian, Permasearch, or Emporium.
+								Find NFTs in Alexandrian, Permasearch, or Emporium, or{" "}
+								<button
+									type="button"
+									onClick={() => goTo("/app/pinax")}
+									className="text-muted-foreground/80 hover:text-foreground underline underline-offset-2"
+								>
+									upload media
+								</button>
+								.
 							</p>
 						</TabsContent>
 
@@ -303,6 +326,28 @@ export default function AddItem({ shelfId, existingShelfIds }: AddItemProps) {
 									)}
 								</div>
 							)}
+						</TabsContent>
+
+						<TabsContent value="pearl" className="mt-3 space-y-2">
+							<Input
+								type="text"
+								value={pearlTokenId}
+								onChange={(e) => setPearlTokenId(e.target.value)}
+								placeholder="Enter Pearl receipt token ID"
+								scale="sm"
+								rounded="md"
+							/>
+							<p className="text-sm text-muted-foreground dark:text-gray-400">
+								Paste the token ID of an already-minted Pearl receipt, or{" "}
+								<button
+									type="button"
+									onClick={() => goTo("/app/pearl")}
+									className="text-muted-foreground/80 hover:text-foreground underline underline-offset-2"
+								>
+									create a new one
+								</button>
+								.
+							</p>
 						</TabsContent>
 					</Tabs>
 				</div>

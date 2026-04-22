@@ -37,6 +37,7 @@ import RemoveItem from "../actions/RemoveItem";
 import EditShelfMeta from "../actions/EditShelfMeta";
 import TogglePublicAccess from "../actions/TogglePublicAccess";
 import ManageTags from "../actions/ManageTags";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/lib/components/select";
 
 type ViewMode = "grid" | "list" | "blog";
 
@@ -45,6 +46,32 @@ const viewModes: { mode: ViewMode; icon: typeof LayoutGrid }[] = [
 	{ mode: "list", icon: List },
 	{ mode: "blog", icon: BookOpen },
 ];
+
+type ContentFilter = "all" | "Markdown" | "Nft" | "Shelf";
+
+const contentFilters: { key: ContentFilter; label: string }[] = [
+	{ key: "all", label: "All" },
+	{ key: "Markdown", label: "Markdown" },
+	{ key: "Nft", label: "NFT" },
+	{ key: "Shelf", label: "Shelf" },
+];
+
+function ContentTypeFilter({ value, onChange }: { value: ContentFilter; onChange: (f: ContentFilter) => void }) {
+	return (
+		<Select value={value} onValueChange={(v) => onChange(v as ContentFilter)}>
+			<SelectTrigger className="h-[22px] w-auto rounded-full border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-2.5 py-0 gap-1 text-xs text-muted-foreground dark:text-gray-400 [&>svg]:h-3 [&>svg]:w-3">
+				<SelectValue />
+			</SelectTrigger>
+			<SelectContent>
+				{contentFilters.map(({ key, label }) => (
+					<SelectItem key={key} value={key} className="text-xs">
+						{label}
+					</SelectItem>
+				))}
+			</SelectContent>
+		</Select>
+	);
+}
 
 function ViewSwitch({ viewMode, onChange }: { viewMode: ViewMode; onChange: (mode: ViewMode) => void }) {
 	return (
@@ -127,6 +154,7 @@ export default function ShelfDetail({ shelfId, userId }: ShelfDetailProps) {
 	const setItemOrder = useSetItemOrder();
 	const [nftModal, setNftModal] = useState<Modal | null>(null);
 	const [viewMode, setViewMode] = useState<ViewMode>("grid");
+	const [contentFilter, setContentFilter] = useState<ContentFilter>("all");
 	const { username: ownerName } = useUsername(shelf?.owner);
 
 	const handleSaveOrder = useCallback(async (reordered: [number, Item][]) => {
@@ -153,6 +181,13 @@ export default function ShelfDetail({ shelfId, userId }: ShelfDetailProps) {
 		() => reorder.displayItems.map(([key]) => String(key)),
 		[reorder.displayItems],
 	);
+
+	// Client-side filter by content-variant. NFTs and Pearls are both stored
+	// as `{ Nft: tokenId }` today, so selecting "NFT" shows both.
+	const filteredItems = useMemo(() => {
+		if (contentFilter === "all") return reorder.displayItems;
+		return reorder.displayItems.filter(([, item]) => contentFilter in item.content);
+	}, [reorder.displayItems, contentFilter]);
 
 	if (isLoading) return <ShelfDetailSkeleton />;
 
@@ -280,10 +315,13 @@ export default function ShelfDetail({ shelfId, userId }: ShelfDetailProps) {
 				</div>
 			</div>
 
-			{/* Row 2: View switch + Tags */}
+			{/* Row 2: Content filter + View switch + Tags */}
 			<div className="flex gap-2 flex-wrap items-center">
 				{!reorder.isEditMode && reorder.displayItems.length > 0 && (
-					<ViewSwitch viewMode={viewMode} onChange={setViewMode} />
+					<>
+						<ContentTypeFilter value={contentFilter} onChange={setContentFilter} />
+						<ViewSwitch viewMode={viewMode} onChange={setViewMode} />
+					</>
 				)}
 
 				{isOwner ? (
@@ -308,6 +346,15 @@ export default function ShelfDetail({ shelfId, userId }: ShelfDetailProps) {
 						</div>
 						<p className="text-base">This shelf is empty. Add some items to get started!</p>
 					</div>
+				) : !reorder.isEditMode && filteredItems.length === 0 ? (
+					<div className="flex flex-col items-center gap-4 py-24 text-muted-foreground dark:text-gray-400 animate-fade">
+						<div className="h-12 w-12 rounded-full bg-muted dark:bg-gray-800 flex items-center justify-center">
+							<Package className="h-6 w-6" />
+						</div>
+						<p className="text-base">
+							No {contentFilters.find((f) => f.key === contentFilter)?.label} items in this shelf.
+						</p>
+					</div>
 				) : reorder.isEditMode ? (
 					<DndContext
 						sensors={sensors}
@@ -328,10 +375,10 @@ export default function ShelfDetail({ shelfId, userId }: ShelfDetailProps) {
 						</SortableContext>
 					</DndContext>
 				) : isBlogView ? (
-					<BlogView items={reorder.displayItems} canEdit={canEdit} shelfId={shelfId} />
+					<BlogView items={filteredItems} canEdit={canEdit} shelfId={shelfId} />
 				) : viewMode === "list" ? (
 					<div className="flex flex-col gap-4 max-w-3xl">
-						{reorder.displayItems.map(([itemKey, item], index) => (
+						{filteredItems.map(([itemKey, item], index) => (
 							<div
 								key={itemKey}
 								className="relative group animate-fade"
@@ -348,7 +395,7 @@ export default function ShelfDetail({ shelfId, userId }: ShelfDetailProps) {
 					</div>
 				) : (
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 items-center">
-						{reorder.displayItems.map(([itemKey, item], index) => (
+						{filteredItems.map(([itemKey, item], index) => (
 							<div
 								key={itemKey}
 								className="relative group animate-fade"
