@@ -8,6 +8,7 @@ import { NftContext } from "@/components/NftProvider";
 import IcpInfo from "@/features/nft/components/Info/Icp";
 import Tags from "@/features/nft/components/Info/Tags";
 import Comment from "@/features/nft/components/Comment";
+import SimilarNfts from "@/features/nft/components/SimilarNfts";
 import useTransactionMetadata from "@/features/nft/hooks/useTransactionMetadata";
 import { AlexandrianToken } from "@/features/alexandrian/types";
 import { natToArweaveId, arweaveIdToNat } from "@/utils/id_convert";
@@ -523,6 +524,9 @@ function NftPage() {
 					</Tabs>
 				</div>
 			</div>
+
+			{/* Row 2: Similar NFTs */}
+			<SimilarNfts arweaveId={arweaveId} />
 		</div>
 		</>
 	);

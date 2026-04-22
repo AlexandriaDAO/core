@@ -14,7 +14,7 @@ import {
 	useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ArrowLeft, BookOpen, Copy, Check, GripVertical, Info, Layers, LayoutGrid, List, Loader2, Package } from "lucide-react";
+import { ArrowLeft, BookOpen, Copy, Check, Download, GripVertical, Info, Layers, LayoutGrid, List, Loader2, Package } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Badge } from "@/lib/components/badge";
 import { Skeleton } from "@/lib/components/skeleton";
@@ -29,6 +29,7 @@ import { useSetItemOrder } from "../hooks/useMutations";
 import { useUsername } from "@/hooks/useUsername";
 import { convertTimestamp } from "@/utils/general";
 import { shortenPrincipal, getItemContentValue } from "../utils";
+import { natToArweaveId } from "@/utils/id_convert";
 import type { Item } from "../types";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import ItemCard from "./ItemCard";
@@ -321,6 +322,33 @@ export default function ShelfDetail({ shelfId, userId }: ShelfDetailProps) {
 					<>
 						<ContentTypeFilter value={contentFilter} onChange={setContentFilter} />
 						<ViewSwitch viewMode={viewMode} onChange={setViewMode} />
+						{contentFilter === "Nft" && filteredItems.length > 0 && (
+							<button
+								type="button"
+								onClick={() => {
+									const ids = filteredItems
+										.filter(([, item]) => "Nft" in item.content)
+										.map(([, item]) =>
+											natToArweaveId(BigInt(getItemContentValue(item.content))),
+										);
+									const blob = new Blob([JSON.stringify(ids, null, 2)], {
+										type: "application/json",
+									});
+									const url = URL.createObjectURL(blob);
+									const a = document.createElement("a");
+									a.href = url;
+									a.download = `${shelfId}-arweave-ids.json`;
+									document.body.appendChild(a);
+									a.click();
+									document.body.removeChild(a);
+									URL.revokeObjectURL(url);
+								}}
+								className="inline-flex items-center h-[22px] gap-1 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-2.5 text-xs text-muted-foreground dark:text-gray-400 hover:border-foreground transition-colors"
+							>
+								<Download className="h-3 w-3" />
+								Export
+							</button>
+						)}
 					</>
 				)}
 
